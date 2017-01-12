@@ -4,6 +4,7 @@ dist
 docs
 node_modules
 tmp
+build
 
 # environment
 .configurez.*
