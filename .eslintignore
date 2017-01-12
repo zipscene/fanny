@@ -1,0 +1,6 @@
+docs/*
+dist/*
+tmp/*
+node_modules/*
+Brocfile.js
+Gruntfile.js

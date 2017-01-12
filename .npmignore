@@ -1,0 +1,24 @@
+# general
+bower_components
+node_modules
+tmp
+
+# config
+.babelrc
+.editorconfig
+.eslintrc
+
+# environment
+.configurez.*
+
+# logs
+npm-debug.log
+
+# debug
+/test*.js
+
+# platform
+*.sublime-project
+*.sublime-workspace
+*.swp
+.DS_Store
