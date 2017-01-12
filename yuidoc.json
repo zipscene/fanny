@@ -1,8 +1,0 @@
-{
-	"name": "zs-fanny",
-	"description": "FANN Fast Artificial Neural Network Node.JS Bindings",
-	"options": {
-		"outdir": "./docs",
-		"exclude": "dist,tmp,test,node_modules"
-	}
-}
