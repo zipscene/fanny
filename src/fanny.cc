@@ -4,6 +4,27 @@
 
 namespace fanny {
 
+class TestWorker : public Nan::AsyncWorker {
+
+public:
+	TestWorker(Nan::Callback * callback) : Nan::AsyncWorker(callback) {}
+	~TestWorker() {}
+
+	void Execute() {
+		std::cout << "Async!\n";
+	}
+
+	void HandleOKCallback() {
+		Nan::HandleScope scope;
+		v8::Local<v8::Value> args[] = {
+			Nan::Null(),
+			Nan::New<v8::Number>(42)
+		};
+		callback->Call(2, args);
+	}
+
+};
+
 void FANN::Init(v8::Local<v8::Object> target) {
 	// Create new function template for this JS class constructor
 	v8::Local<v8::FunctionTemplate> tpl = Nan::New<v8::FunctionTemplate>(New);
@@ -59,6 +80,13 @@ NAN_METHOD(FANN::test) {
 	retArray->Set(0, Nan::New<v8::String>("first").ToLocalChecked());
 	retArray->Set(1, Nan::New<v8::String>("second").ToLocalChecked());
 	info.GetReturnValue().Set(retArray);
+
+	// If a callback is given, execute the async code
+	if (numArgs >= 2 && info[1]->IsFunction()) {
+		std::cout << "Starting async worker\n";
+		Nan::Callback * callback = new Nan::Callback(info[1].As<v8::Function>());
+		Nan::AsyncQueueWorker(new TestWorker(callback));
+	}
 }
 
 }
