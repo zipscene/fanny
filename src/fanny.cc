@@ -26,6 +26,7 @@ NAN_METHOD(FANN::New) {
 }
 
 NAN_METHOD(FANN::test) {
+	// Print out comma-separated array given as first arg
 	uint32_t numArgs = info.Length();
 	if (numArgs == 0) {
 		std::cout << "No args!\n";
@@ -38,7 +39,6 @@ NAN_METHOD(FANN::test) {
 		for (uint32_t i = 0; i < array->Length(); i++) {
 			v8::Local<v8::Value> value = array->Get(i);
 			if (value->IsString()) {
-				//v8::Local<v8::String> str = Nan::To<v8::String>(value).ToLocalChecked();
 				v8::String::Utf8Value utf8Str(value);
 				const char * cStr = *utf8Str;
 				std::cout << cStr << ", ";
@@ -50,7 +50,15 @@ NAN_METHOD(FANN::test) {
 	} else {
 		std::cout << "Unrecognized type\n";
 	}
+
+	// Print out the string "Test"
 	std::cout << "Test!\n";
+
+	// Return an array we construct
+	v8::Local<v8::Array> retArray = Nan::New<v8::Array>();
+	retArray->Set(0, Nan::New<v8::String>("first").ToLocalChecked());
+	retArray->Set(1, Nan::New<v8::String>("second").ToLocalChecked());
+	info.GetReturnValue().Set(retArray);
 }
 
 }
