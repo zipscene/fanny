@@ -1,10 +1,11 @@
 #include "fanny.h"
 #include <nan.h>
+#include <fann_cpp.h>
 #include <iostream>
 
 namespace fanny {
 
-class TestWorker : public Nan::AsyncWorker {
+/*class TestWorker : public Nan::AsyncWorker {
 
 public:
 	TestWorker(Nan::Callback * callback) : Nan::AsyncWorker(callback) {}
@@ -23,25 +24,97 @@ public:
 		callback->Call(2, args);
 	}
 
-};
+};*/
 
-void FANN::Init(v8::Local<v8::Object> target) {
+void FANNY::Init(v8::Local<v8::Object> target) {
 	// Create new function template for this JS class constructor
 	v8::Local<v8::FunctionTemplate> tpl = Nan::New<v8::FunctionTemplate>(New);
 	// Set the class name
-	tpl->SetClassName(Nan::New("FANN").ToLocalChecked());
+	tpl->SetClassName(Nan::New("FANNY").ToLocalChecked());
 	// Set the number of "slots" to allocate for fields on this class, not including prototype methods
 	tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
 	// Add prototype methods
-	Nan::SetPrototypeMethod(tpl, "test", test);
+	//Nan::SetPrototypeMethod(tpl, "run", run);
+	//Nan::SetPrototypeMethod(tpl, "runSync", runSync);
 
-	// Assign a property called 'FANN' to module.exports, pointing to our constructor
-	Nan::Set(target, Nan::New("FANN").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
+	// Assign a property called 'FANNY' to module.exports, pointing to our constructor
+	Nan::Set(target, Nan::New("FANNY").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
 }
 
-NAN_METHOD(FANN::New) {
-	FANN *obj = new FANN();
+FANNY(FANN::neural_net *_fann) : fann(_fann) {}
+
+~FANNY() {
+	delete fann;
+}
+
+NAN_METHOD(FANNY::New) {
+	// Get the options argument
+	v8::Local<v8::Object> optionsObj;
+	if (info.Length() < 1) {
+		optionsObj = Nan::New<v8::Object>();
+	} else if (info[0]->IsObject()) {
+		optionsObj = Nan::New(info.As<v8::Object>[0]);
+	} else {
+		return Nan::ThrowTypeError("Invalid argument type");
+	}
+
+	// Variables for individual options
+	std::string optType;
+	std::vector<unsigned int> optLayers;
+	float optConnectionRate = 0.5;
+
+	// Get the type option
+	Nan::MaybeLocal<v8::Value> maybeType = Nan::Get(optionsObj, Nan::New("type").ToLocalChecked());
+	if (!maybeType.IsEmpty()) {
+		v8::Local<v8::Value> localType = maybeType.ToLocalChecked();
+		if (localType->IsString()) {
+			optType = std::string(*(v8::String::Utf8Value(localType)));
+		}
+	}
+
+	// Get the layers option
+	Nan::MaybeLocal<v8::Value> maybeLayers = Nan::Get(optionsObj, Nan::New("layers").ToLocalChecked());
+	if (!maybeLayers.IsEmpty()) {
+		v8::Local<v8::Value> localLayers = maybeLayers.ToLocalChecked();
+		if (localLayers->IsArray()) {
+			v8::Local<v8::Array> arrayLayers = localLayers.As<v8::Array>();
+			uint32_t length = arrayLayers->Length();
+			for (uint32_t idx = 0; idx < length; ++idx) {
+				Nan::MaybeLocal<v8::Value> maybeIdxValue = Nan::Get(arrayLayers, idx);
+				if (!maybeIdxValue.IsEmpty()) {
+					v8::Local<v8::Value> localIdxValue = maybeIdxValue.ToLocalChecked();
+					if (localIdxValue->IsNumber()) {
+						unsigned int idxValue = localIdxValue->Uint32Value();
+						optLayers.push_back(idxValue);
+					}
+				}
+			}
+		}
+	}
+
+	// Get the connectionRate option
+	Nan::MaybeLocal<v8::Value> maybeConnectionRate = Nan::Get(optionsObj, Nan::New("connectionRate").ToLocalChecked());
+	if (!maybeConnectionRate.IsEmpty()) {
+		v8::Local<v8::Value> localConnectionRate = maybeConnectionRate.ToLocalChecked();
+		if (localConnectionRate->IsNumber()) {
+			optConnectionRate = localConnectionRate->NumberValue();
+		}
+	}
+
+	// Construct the neural_net underlying class
+	FANN::neural_net *fann;
+	if (!optType.compare("standard") || optType.empty()) {
+		fann = new FANN::neural_net(FANN::network_type_enum::LAYER, optLayers.size(), &optLayers[0]);
+	} else if(optType.compare("sparse")) {
+		fann = new FANN::neural_net(optConnectionRate, optLayers.size(), &optLayers[0]);
+	} else if (opType.compare("shortcut")) {
+		fann = new FANN::neural_net(FANN::network_type_enum::SHORTCUT, optLayers.size(), &optLayers[0]);
+	} else {
+		return Nan::ThrowError("Invalid type option");
+	}
+
+	FANNY *obj = new FANN(fann);
 	obj->Wrap(info.This());
 	info.GetReturnValue().Set(info.This());
 }
