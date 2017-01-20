@@ -42,22 +42,23 @@ void FANNY::Init(v8::Local<v8::Object> target) {
 	Nan::Set(target, Nan::New("FANNY").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
 }
 
-FANNY(FANN::neural_net *_fann) : fann(_fann) {}
+FANNY::FANNY(FANN::neural_net *_fann) : fann(_fann) {}
 
-~FANNY() {
+FANNY::~FANNY() {
 	delete fann;
 }
 
 NAN_METHOD(FANNY::New) {
-	// Get the options argument
-	v8::Local<v8::Object> optionsObj;
-	if (info.Length() < 1) {
-		optionsObj = Nan::New<v8::Object>();
-	} else if (info[0]->IsObject()) {
-		optionsObj = Nan::New(info.As<v8::Object>[0]);
-	} else {
+	// Ensure arguments
+	if (info.Length() != 1) {
+		return Nan::ThrowError("Requires options argument");
+	}
+	if (!info[0]->IsObject()) {
 		return Nan::ThrowTypeError("Invalid argument type");
 	}
+
+	// Get the options argument
+	v8::Local<v8::Object> optionsObj(info[0].As<v8::Object>());
 
 	// Variables for individual options
 	std::string optType;
@@ -92,6 +93,9 @@ NAN_METHOD(FANNY::New) {
 			}
 		}
 	}
+	if (optLayers.size() < 2) {
+		return Nan::ThrowError("layers option is required with at least 2 layers");
+	}
 
 	// Get the connectionRate option
 	Nan::MaybeLocal<v8::Value> maybeConnectionRate = Nan::Get(optionsObj, Nan::New("connectionRate").ToLocalChecked());
@@ -105,20 +109,20 @@ NAN_METHOD(FANNY::New) {
 	// Construct the neural_net underlying class
 	FANN::neural_net *fann;
 	if (!optType.compare("standard") || optType.empty()) {
-		fann = new FANN::neural_net(FANN::network_type_enum::LAYER, optLayers.size(), &optLayers[0]);
+		fann = new FANN::neural_net(FANN::network_type_enum::LAYER, (unsigned int)optLayers.size(), (const unsigned int *)&optLayers[0]);
 	} else if(optType.compare("sparse")) {
 		fann = new FANN::neural_net(optConnectionRate, optLayers.size(), &optLayers[0]);
-	} else if (opType.compare("shortcut")) {
+	} else if (optType.compare("shortcut")) {
 		fann = new FANN::neural_net(FANN::network_type_enum::SHORTCUT, optLayers.size(), &optLayers[0]);
 	} else {
 		return Nan::ThrowError("Invalid type option");
 	}
 
-	FANNY *obj = new FANN(fann);
+	FANNY *obj = new FANNY(fann);
 	obj->Wrap(info.This());
 	info.GetReturnValue().Set(info.This());
 }
-
+/*
 NAN_METHOD(FANN::test) {
 	// Print out comma-separated array given as first arg
 	uint32_t numArgs = info.Length();
@@ -161,6 +165,7 @@ NAN_METHOD(FANN::test) {
 		Nan::AsyncQueueWorker(new TestWorker(callback));
 	}
 }
+*/
 
 }
 
