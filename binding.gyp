@@ -3,13 +3,45 @@
 		{
 			"target_name": "addon-floatfann",
 			"sources": [
-				"src/addon-floatfann.cc",
+				"src/addon.cc",
 				"src/fanny.cc"
 			],
 			"libraries": [
 				"-lfloatfann"
 			],
-			"include_dirs": [ "<!(node -e \"require('nan')\")" ]
+			"include_dirs": [ "<!(node -e \"require('nan')\")" ],
+			"defines": [
+				"FANNY_FLOAT"
+			]
+		},
+		{
+			"target_name": "addon-doublefann",
+			"sources": [
+				"src/addon.cc",
+				"src/fanny.cc"
+			],
+			"libraries": [
+				"-ldoublefann"
+			],
+			"include_dirs": [ "<!(node -e \"require('nan')\")" ],
+			"defines": [
+				"FANNY_DOUBLE"
+			]
+		},
+		{
+			"target_name": "addon-fixedfann",
+			"sources": [
+				"src/addon.cc",
+				"src/fanny.cc"
+			],
+			"libraries": [
+				"-lfixedfann"
+			],
+			"include_dirs": [ "<!(node -e \"require('nan')\")" ],
+			"defines": [
+				"FANNY_FIXED"
+			]
 		}
+
 	]
 }

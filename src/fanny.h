@@ -1,6 +1,5 @@
 #include <nan.h>
-#include <floatfann.h>
-#include <fann_cpp.h>
+#include "fann-includes.h"
 
 namespace fanny {
 
