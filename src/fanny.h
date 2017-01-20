@@ -26,7 +26,7 @@ private:
 	//static NAN_METHOD(run);
 
 	// Synchronous version of "run".
-	//static NAN_METHOD(runSync);
+	static NAN_METHOD(runSync);
 
 	// constructor & destructor
 	explicit FANNY(FANN::neural_net *fann);

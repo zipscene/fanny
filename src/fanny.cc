@@ -2,6 +2,7 @@
 #include <nan.h>
 #include "fann-includes.h"
 #include <iostream>
+#include "utils.h"
 
 namespace fanny {
 
@@ -122,6 +123,15 @@ NAN_METHOD(FANNY::New) {
 	obj->Wrap(info.This());
 	info.GetReturnValue().Set(info.This());
 }
+
+NAN_METHOD(FANN::runSync) {
+	if (info.Length() != 1) return Nan::ThrowError("Missing argument");
+	if (!info[0]->IsArray()) return Nan::ThrowError("Must be array");
+	std::vector<FANN::fann_type> inputs = v8ArrayToFannData(info[0]);
+	if (inputs.size() != fann->get_num_input()) return Nan::ThrowError("Wrong number of inputs");
+	
+}
+
 /*
 NAN_METHOD(FANN::test) {
 	// Print out comma-separated array given as first arg

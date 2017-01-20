@@ -4,7 +4,8 @@
 			"target_name": "addon-floatfann",
 			"sources": [
 				"src/addon.cc",
-				"src/fanny.cc"
+				"src/fanny.cc",
+				"src/utils.cc"
 			],
 			"libraries": [
 				"-lfloatfann"
@@ -18,7 +19,8 @@
 			"target_name": "addon-doublefann",
 			"sources": [
 				"src/addon.cc",
-				"src/fanny.cc"
+				"src/fanny.cc",
+				"src/utils.cc"
 			],
 			"libraries": [
 				"-ldoublefann"
@@ -32,7 +34,8 @@
 			"target_name": "addon-fixedfann",
 			"sources": [
 				"src/addon.cc",
-				"src/fanny.cc"
+				"src/fanny.cc",
+				"src/utils.cc"
 			],
 			"libraries": [
 				"-lfixedfann"
