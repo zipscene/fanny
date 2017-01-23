@@ -55,6 +55,18 @@ NAN_METHOD(TrainingData::shuffle) {
 	self->trainingData->shuffle_train_data();
 }
 
+NAN_METHOD(TrainingData::merge) {
+	if (info.Length() != 1) {
+		return Nan::ThrowError("Requires single argument");
+	}
+	if (!Nan::New(TrainingData::constructorFunctionTpl)->HasInstance(info[0])) {
+		return Nan::ThrowError("Must be an instance of TrainingData");
+	}
+	TrainingData *other = Nan::ObjectWrap::Unwrap<TrainingData>(info[0].As<v8::Object>());
+	TrainingData *self = Nan::ObjectWrap::Unwrap<TrainingData>(info.Holder());
+	self->trainingData->merge_train_data(*other->trainingData);
+}
+
 
 }
 
