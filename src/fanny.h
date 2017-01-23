@@ -13,6 +13,9 @@ public:
 	// Encapsulated FANN neural_net instance
 	FANN::neural_net *fann;
 
+	// Constructor
+	static Nan::Persistent<v8::FunctionTemplate> constructorFunctionTpl;
+
 private:
 
 	// Javascript Constructor.  Takes single "options" object parameter.  Options can include:

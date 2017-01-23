@@ -14,8 +14,12 @@ console.log('NUM LAYERS :: ' + fanny.getNumLayers());
 
 var inputs = [ 0.2, 0.8 ];
 var results = fanny.run(inputs);
-
 console.log(results);
+
+var fanny2 = new FANNY(fanny);
+results = fanny2.run(inputs);
+console.log(results);
+
 console.log('BIT FAIL :: ' + fanny.getBitFail());
 console.log('GET ERRNO :: ' + fanny.getErrno());
 console.log('GET MSE :: ' + fanny.getMSE());
