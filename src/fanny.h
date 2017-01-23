@@ -23,14 +23,20 @@ private:
 
 	// FANN "run" method.  Parameter is array of numbers.  Returns array of numbers.
 	// Also takes a callback.
-	//static NAN_METHOD(run);
+	//static NAN_METHOD(runAsync);
 
 	// Synchronous version of "run".
-	static NAN_METHOD(runSync);
+	static NAN_METHOD(run);
 
 	// constructor & destructor
 	explicit FANNY(FANN::neural_net *fann);
 	~FANNY();
+
+	// Checks to see if the fann instance has a recorded error.
+	// If so, this throws a JS error and returns true.
+	// In this case, the calling function must return immediately.
+	// It also resets the fann error.
+	bool checkError();
 
 	// Encapsulated FANN neural_net instance
 	FANN::neural_net *fann;
@@ -38,3 +44,4 @@ private:
 };
 
 }
+

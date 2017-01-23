@@ -36,8 +36,8 @@ void FANNY::Init(v8::Local<v8::Object> target) {
 	tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
 	// Add prototype methods
-	//Nan::SetPrototypeMethod(tpl, "run", run);
-	//Nan::SetPrototypeMethod(tpl, "runSync", runSync);
+	Nan::SetPrototypeMethod(tpl, "run", run);
+	//Nan::SetPrototypeMethod(tpl, "runAsync", runAsync);
 
 	// Assign a property called 'FANNY' to module.exports, pointing to our constructor
 	Nan::Set(target, Nan::New("FANNY").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
@@ -124,12 +124,30 @@ NAN_METHOD(FANNY::New) {
 	info.GetReturnValue().Set(info.This());
 }
 
-NAN_METHOD(FANN::runSync) {
+bool FANNY::checkError() {
+	unsigned int fannerr = fann->get_errno();
+	if (fannerr) {
+		std::string errstr = fann->get_errstr();
+		std::string msg = std::string("FANN error ") + std::to_string(fannerr) + ": " + errstr;
+		Nan::ThrowError(msg.c_str());
+		fann->reset_errno();
+		fann->reset_errstr();
+		return true;
+	} else {
+		return false;
+	}
+}
+
+NAN_METHOD(FANNY::run) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
 	if (info.Length() != 1) return Nan::ThrowError("Missing argument");
 	if (!info[0]->IsArray()) return Nan::ThrowError("Must be array");
-	std::vector<FANN::fann_type> inputs = v8ArrayToFannData(info[0]);
-	if (inputs.size() != fann->get_num_input()) return Nan::ThrowError("Wrong number of inputs");
-	
+	std::vector<fann_type> inputs = v8ArrayToFannData(info[0]);
+	if (inputs.size() != fanny->fann->get_num_input()) return Nan::ThrowError("Wrong number of inputs");
+	fann_type *outputs = fanny->fann->run(&inputs[0]);
+	if (fanny->checkError()) return;
+	v8::Local<v8::Value> outputArray = fannDataToV8Array(outputs, fanny->fann->get_num_output());
+	info.GetReturnValue().Set(outputArray);
 }
 
 /*
