@@ -29,6 +29,8 @@ private:
 	static NAN_METHOD(shuffle);
 	static NAN_METHOD(merge);
 	static NAN_METHOD(length);
+	static NAN_METHOD(numInput);
+	static NAN_METHOD(numOutput);
 
 };
 
