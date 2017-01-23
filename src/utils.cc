@@ -34,6 +34,17 @@ v8::Local<v8::Value> fannDataToV8Array(fann_type * data, unsigned int size) {
 	return scope.Escape(v8Array);
 }
 
+// length is how many entries are in data, size is the number of fann_type values in each entry
+v8::Local<v8::Value> fannDataSetToV8Array(fann_type ** data, unsigned int length, unsigned int size) {
+	Nan::EscapableHandleScope scope;
+	v8::Local<v8::Array> v8Array = Nan::New<v8::Array>(size);
+	for (uint32_t idx = 0; idx < length; ++idx) {
+		v8::Local<v8::Value> value = fannDataToV8Array(data[idx], size);
+		Nan::Set(v8Array, idx, value);
+	}
+	return scope.Escape(v8Array);
+}
+
 }
 
 
