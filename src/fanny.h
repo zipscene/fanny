@@ -10,6 +10,9 @@ public:
 	// This is NOT the Javascript class constructor method
 	static void Init(v8::Local<v8::Object> target);
 
+	// Encapsulated FANN neural_net instance
+	FANN::neural_net *fann;
+
 private:
 
 	// Javascript Constructor.  Takes single "options" object parameter.  Options can include:
@@ -20,7 +23,7 @@ private:
 
 	// FANN "run" method.  Parameter is array of numbers.  Returns array of numbers.
 	// Also takes a callback.
-	//static NAN_METHOD(runAsync);
+	static NAN_METHOD(runAsync);
 
 	// Synchronous version of "run".
 	static NAN_METHOD(run);
@@ -34,9 +37,6 @@ private:
 	// In this case, the calling function must return immediately.
 	// It also resets the fann error.
 	bool checkError();
-
-	// Encapsulated FANN neural_net instance
-	FANN::neural_net *fann;
 
 };
 

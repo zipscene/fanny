@@ -10,3 +10,7 @@ var results = fanny.run(inputs);
 
 console.log(results);
 
+fanny.runAsync(inputs, function(err, results) {
+	console.log(err, results);
+});
+
