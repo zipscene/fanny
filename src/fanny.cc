@@ -183,6 +183,17 @@ NAN_METHOD(FANNY::run) {
 	info.GetReturnValue().Set(outputArray);
 }
 
+NAN_METHOD(FANNY::runAsync) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 2) return Nan::ThrowError("Takes two arguments");
+	if (!info[0]->IsArray()) return Nan::ThrowError("First argument must be array");
+	if (!info[1]->IsFunction()) return Nan::ThrowError("Second argument must be callback");
+	std::vector<fann_type> inputs = v8ArrayToFannData(info[0]);
+	if (inputs.size() != fanny->fann->get_num_input()) return Nan::ThrowError("Wrong number of inputs");
+	Nan::Callback * callback = new Nan::Callback(info[1].As<v8::Function>());
+	Nan::AsyncQueueWorker(new RunWorker(callback, inputs, info.Holder()));
+}
+
 NAN_METHOD(FANNY::getNumInput) {
 	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
 	unsigned int num = fanny->fann->get_num_input();
@@ -286,17 +297,5 @@ NAN_METHOD(FANNY::getRpropDeltaMax) {
 	float num = fanny->fann->get_rprop_delta_max();
 	info.GetReturnValue().Set(num);
 }
-
-NAN_METHOD(FANNY::runAsync) {
-	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
-	if (info.Length() != 2) return Nan::ThrowError("Takes two arguments");
-	if (!info[0]->IsArray()) return Nan::ThrowError("First argument must be array");
-	if (!info[1]->IsFunction()) return Nan::ThrowError("Second argument must be callback");
-	std::vector<fann_type> inputs = v8ArrayToFannData(info[0]);
-	if (inputs.size() != fanny->fann->get_num_input()) return Nan::ThrowError("Wrong number of inputs");
-	Nan::Callback * callback = new Nan::Callback(info[1].As<v8::Function>());
-	Nan::AsyncQueueWorker(new RunWorker(callback, inputs, info.Holder()));
-}
-
 
 }
