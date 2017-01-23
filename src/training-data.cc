@@ -34,20 +34,14 @@ TrainingData::~TrainingData() {
 
 NAN_METHOD(TrainingData::New) {
 	FANN::training_data *trainingData;
-	std::cout << "In constructor\n";
 	if (info.Length() == 1 && Nan::New(TrainingData::constructorFunctionTpl)->HasInstance(info[0])) {
-		std::cout << "Con2\n";
 		TrainingData *other = Nan::ObjectWrap::Unwrap<TrainingData>(info[0].As<v8::Object>());
-		std::cout << "Con3\n";
 		FANN::training_data *otherTrainingData = other->trainingData;
-		std::cout << "Con3.5\n" << otherTrainingData->length_train_data() << "\n";
-		if (!otherTrainingData) std::cout << "IsNull\n";
 		if (otherTrainingData->length_train_data() > 0) {
 			trainingData = new FANN::training_data(*otherTrainingData);
 		} else {
 			trainingData = new FANN::training_data();
 		}
-		std::cout << "Con4\n";
 	} else {
 		trainingData = new FANN::training_data();
 	}
