@@ -19,7 +19,9 @@ void TrainingData::Init(v8::Local<v8::Object> target) {
 	TrainingData::constructorFunctionTpl.Reset(tpl);
 
 	// Add prototype methods
-	//Nan::SetPrototypeMethod(tpl, "clone", clone);
+	Nan::SetPrototypeMethod(tpl, "shuffle", shuffle);
+	Nan::SetPrototypeMethod(tpl, "merge", merge);
+	Nan::SetPrototypeMethod(tpl, "length", length);
 
 	// Assign a property called 'TrainingData' to module.exports, pointing to our constructor
 	Nan::Set(target, Nan::New("TrainingData").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
@@ -65,6 +67,11 @@ NAN_METHOD(TrainingData::merge) {
 	TrainingData *other = Nan::ObjectWrap::Unwrap<TrainingData>(info[0].As<v8::Object>());
 	TrainingData *self = Nan::ObjectWrap::Unwrap<TrainingData>(info.Holder());
 	self->trainingData->merge_train_data(*other->trainingData);
+}
+
+NAN_METHOD(TrainingData::length) {
+	TrainingData *self = Nan::ObjectWrap::Unwrap<TrainingData>(info.Holder());
+	info.GetReturnValue().Set(self->trainingData->length_train_data());
 }
 
 

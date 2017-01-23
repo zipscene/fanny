@@ -28,6 +28,7 @@ private:
 	// Methods
 	static NAN_METHOD(shuffle);
 	static NAN_METHOD(merge);
+	static NAN_METHOD(length);
 
 };
 
