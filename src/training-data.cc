@@ -50,13 +50,10 @@ NAN_METHOD(TrainingData::New) {
 	info.GetReturnValue().Set(info.This());
 }
 
-/*NAN_METHOD(TrainingData::clone) {
-	Nan::EscapableHandleScope scope;
+NAN_METHOD(TrainingData::shuffle) {
 	TrainingData *self = Nan::ObjectWrap::Unwrap<TrainingData>(info.Holder());
-	TrainingData *obj = new TrainingData(new FANN::training_data(*self->trainingData));
-	v8::Local<v8::Object>
-	obj->Wrap()
-}*/
+	self->trainingData->shuffle_train_data();
+}
 
 
 }

@@ -26,7 +26,7 @@ private:
 	~TrainingData();
 
 	// Methods
-	//static NAN_METHOD(clone);
+	static NAN_METHOD(shuffle);
 
 };
 
