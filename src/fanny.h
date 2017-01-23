@@ -12,9 +12,6 @@ public:
 
 private:
 
-	// Neural network instance this class wraps
-	FANN::neural_net *neural_net;
-
 	// Javascript Constructor.  Takes single "options" object parameter.  Options can include:
 	// - type (string) - One of "standard", "sparse", "shortcut"
 	// - layers (array of numbers)
