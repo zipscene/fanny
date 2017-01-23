@@ -5,7 +5,8 @@
 			"sources": [
 				"src/addon.cc",
 				"src/fanny.cc",
-				"src/utils.cc"
+				"src/utils.cc",
+				"src/training-data.cc"
 			],
 			"libraries": [
 				"-lfloatfann"
@@ -20,7 +21,8 @@
 			"sources": [
 				"src/addon.cc",
 				"src/fanny.cc",
-				"src/utils.cc"
+				"src/utils.cc",
+				"src/training-data.cc"
 			],
 			"libraries": [
 				"-ldoublefann"
@@ -35,7 +37,8 @@
 			"sources": [
 				"src/addon.cc",
 				"src/fanny.cc",
-				"src/utils.cc"
+				"src/utils.cc",
+				"src/training-data.cc"
 			],
 			"libraries": [
 				"-lfixedfann"
