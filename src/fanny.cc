@@ -90,10 +90,7 @@ FANNY::~FANNY() {
 NAN_METHOD(FANNY::New) {
 	// Ensure arguments
 	if (info.Length() != 1) {
-		return Nan::ThrowError("Requires options argument");
-	}
-	if (!info[0]->IsObject()) {
-		return Nan::ThrowTypeError("Invalid argument type");
+		return Nan::ThrowError("Requires single argument");
 	}
 
 	FANN::neural_net *fann;
@@ -102,8 +99,11 @@ NAN_METHOD(FANNY::New) {
 		// Copy constructor
 		FANNY *other = Nan::ObjectWrap::Unwrap<FANNY>(info[0].As<v8::Object>());
 		fann = new FANN::neural_net(*other->fann);
-	} else {
-		// Not copy constructor
+	} else if (info[0]->IsString()) {
+		// Load-from-file constructor
+		fann = new FANN::neural_net(std::string(*v8::String::Utf8Value(info[0])));
+	} else if (info[0]->IsObject()) {
+		// Options constructor
 
 		// Get the options argument
 		v8::Local<v8::Object> optionsObj(info[0].As<v8::Object>());
@@ -164,6 +164,8 @@ NAN_METHOD(FANNY::New) {
 		} else {
 			return Nan::ThrowError("Invalid type option");
 		}
+	} else {
+		return Nan::ThrowTypeError("Invalid argument type");
 	}
 
 	FANNY *obj = new FANNY(fann);
