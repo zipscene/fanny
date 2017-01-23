@@ -24,6 +24,22 @@ private:
 
 	// Synchronous version of "run".
 	static NAN_METHOD(run);
+	static NAN_METHOD(getNumInput);
+	static NAN_METHOD(getNumOutput);
+	static NAN_METHOD(getTotalNeurons);
+	static NAN_METHOD(getTotalConnections);
+	static NAN_METHOD(getNumLayers);
+	static NAN_METHOD(getBitFail);
+	static NAN_METHOD(getErrno);
+	static NAN_METHOD(getMSE);
+	static NAN_METHOD(getLearningRate);
+	static NAN_METHOD(getQuickPropDecay);
+	static NAN_METHOD(getQuickPropMu);
+	static NAN_METHOD(getRpropIncreaseFactor);
+	static NAN_METHOD(getRpropDecreaseFactor);
+	static NAN_METHOD(getRpropDeltaZero);
+	static NAN_METHOD(getRpropDeltaMin);
+	static NAN_METHOD(getRpropDeltaMax);
 
 	// constructor & destructor
 	explicit FANNY(FANN::neural_net *fann);

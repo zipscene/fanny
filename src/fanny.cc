@@ -37,6 +37,22 @@ void FANNY::Init(v8::Local<v8::Object> target) {
 
 	// Add prototype methods
 	Nan::SetPrototypeMethod(tpl, "run", run);
+	Nan::SetPrototypeMethod(tpl, "getNumInput", getNumInput);
+	Nan::SetPrototypeMethod(tpl, "getNumOutput", getNumOutput);
+	Nan::SetPrototypeMethod(tpl, "getTotalNeurons", getTotalNeurons);
+	Nan::SetPrototypeMethod(tpl, "getTotalConnections", getTotalConnections);
+	Nan::SetPrototypeMethod(tpl, "getNumLayers", getNumLayers);
+	Nan::SetPrototypeMethod(tpl, "getBitFail", getBitFail);
+	Nan::SetPrototypeMethod(tpl, "getErrno", getErrno);
+	Nan::SetPrototypeMethod(tpl, "getMSE", getMSE);
+	Nan::SetPrototypeMethod(tpl, "getLearningRate", getLearningRate);
+	Nan::SetPrototypeMethod(tpl, "getQuickPropDecay", getQuickPropDecay);
+	Nan::SetPrototypeMethod(tpl, "getQuickPropMu", getQuickPropMu);
+	Nan::SetPrototypeMethod(tpl, "getRpropIncreaseFactor", getRpropIncreaseFactor);
+	Nan::SetPrototypeMethod(tpl, "getRpropDecreaseFactor", getRpropDecreaseFactor);
+	Nan::SetPrototypeMethod(tpl, "getRpropDeltaZero", getRpropDeltaZero);
+	Nan::SetPrototypeMethod(tpl, "getRpropDeltaMin", getRpropDeltaMin);
+	Nan::SetPrototypeMethod(tpl, "getRpropDeltaMax", getRpropDeltaMax);
 	//Nan::SetPrototypeMethod(tpl, "runAsync", runAsync);
 
 	// Assign a property called 'FANNY' to module.exports, pointing to our constructor
@@ -149,6 +165,112 @@ NAN_METHOD(FANNY::run) {
 	v8::Local<v8::Value> outputArray = fannDataToV8Array(outputs, fanny->fann->get_num_output());
 	info.GetReturnValue().Set(outputArray);
 }
+
+NAN_METHOD(FANNY::getNumInput) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	unsigned int num = fanny->fann->get_num_input();
+	info.GetReturnValue().Set(num);
+}
+
+NAN_METHOD(FANNY::getNumOutput) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	unsigned int num = fanny->fann->get_num_output();
+	info.GetReturnValue().Set(num);
+}
+
+NAN_METHOD(FANNY::getTotalNeurons) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	unsigned int num = fanny->fann->get_total_neurons();
+	info.GetReturnValue().Set(num);
+}
+
+NAN_METHOD(FANNY::getTotalConnections) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	unsigned int num = fanny->fann->get_total_connections();
+	info.GetReturnValue().Set(num);
+}
+
+NAN_METHOD(FANNY::getNumLayers) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	unsigned int num = fanny->fann->get_num_layers();
+	info.GetReturnValue().Set(num);
+}
+
+NAN_METHOD(FANNY::getBitFail) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	unsigned int num = fanny->fann->get_bit_fail();
+	info.GetReturnValue().Set(num);
+}
+
+NAN_METHOD(FANNY::getErrno) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	unsigned int num = fanny->fann->get_errno();
+	info.GetReturnValue().Set(num);
+}
+
+NAN_METHOD(FANNY::getMSE) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	float num = fanny->fann->get_MSE();
+	info.GetReturnValue().Set(num);
+}
+
+// by default 0.7
+NAN_METHOD(FANNY::getLearningRate) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	float num = fanny->fann->get_learning_rate();
+	info.GetReturnValue().Set(num);
+}
+
+// by default -0.0001
+NAN_METHOD(FANNY::getQuickPropDecay) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	float num = fanny->fann->get_quickprop_decay();
+	info.GetReturnValue().Set(num);
+}
+
+// by default 1.75
+NAN_METHOD(FANNY::getQuickPropMu) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	float num = fanny->fann->get_quickprop_mu();
+	info.GetReturnValue().Set(num);	
+}
+
+// by default 1.2
+NAN_METHOD(FANNY::getRpropIncreaseFactor) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	float num = fanny->fann->get_rprop_increase_factor();
+	info.GetReturnValue().Set(num);
+}
+
+// by default 0.5
+NAN_METHOD(FANNY::getRpropDecreaseFactor) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	float num = fanny->fann->get_rprop_decrease_factor();
+	info.GetReturnValue().Set(num);
+}
+
+// by default 0.1
+NAN_METHOD(FANNY::getRpropDeltaZero) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	float num = fanny->fann->get_rprop_delta_zero();
+	info.GetReturnValue().Set(num);
+}
+
+// by default 0.0
+NAN_METHOD(FANNY::getRpropDeltaMin) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	float num = fanny->fann->get_rprop_delta_min();
+	info.GetReturnValue().Set(num);
+}
+
+// by default 50.0
+NAN_METHOD(FANNY::getRpropDeltaMax) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	float num = fanny->fann->get_rprop_delta_max();
+	info.GetReturnValue().Set(num);
+}
+
+
 
 /*
 NAN_METHOD(FANN::test) {
