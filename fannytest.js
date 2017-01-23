@@ -1,5 +1,6 @@
 var libfanny = require('./build/Release/addon-floatfann');
 var FANNY = libfanny.FANNY;
+var TrainingData = libfanny.TrainingData;
 
 var fanny = new FANNY({
 	layers: [ 2, 10, 5 ]
@@ -26,4 +27,11 @@ console.log('GET RPROP DECREASE FACTOR :: ' + fanny.getRpropDecreaseFactor());
 console.log('GET RPROP DELTA ZERO :: ' + fanny.getRpropDeltaZero());
 console.log('GET RPROP DELTA MIN :: ' + fanny.getRpropDeltaMin());
 console.log('GET RPROP DELTA MAX :: '  + fanny.getRpropDeltaMax());
+
+//fanny.runAsync(inputs, function(err, results) {
+//	console.log(err, results);
+//});
+
+var td = new TrainingData();
+var td2 = new TrainingData(td);
 

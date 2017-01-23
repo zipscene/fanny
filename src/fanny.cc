@@ -6,26 +6,42 @@
 
 namespace fanny {
 
-/*class TestWorker : public Nan::AsyncWorker {
+class RunWorker : public Nan::AsyncWorker {
 
 public:
-	TestWorker(Nan::Callback * callback) : Nan::AsyncWorker(callback) {}
-	~TestWorker() {}
+	RunWorker(Nan::Callback *callback, std::vector<fann_type> & _inputs, v8::Local<v8::Object> fannyHolder) : Nan::AsyncWorker(callback), inputs(_inputs) {
+		SaveToPersistent("fannyHolder", fannyHolder);
+		fanny = Nan::ObjectWrap::Unwrap<FANNY>(fannyHolder);
+	}
+	~RunWorker() {}
 
 	void Execute() {
-		std::cout << "Async!\n";
+		fann_type *fannOutputs = fanny->fann->run(&inputs[0]);
+		if (fanny->fann->get_errno()) {
+			SetErrorMessage(fanny->fann->get_errstr().c_str());
+			fanny->fann->reset_errno();
+			fanny->fann->reset_errstr();
+			return;
+		}
+		unsigned int numOutputs = fanny->fann->get_num_output();
+		for (unsigned int idx = 0; idx < numOutputs; idx++) {
+			outputs.push_back(fannOutputs[idx]);
+		}
 	}
 
 	void HandleOKCallback() {
 		Nan::HandleScope scope;
 		v8::Local<v8::Value> args[] = {
 			Nan::Null(),
-			Nan::New<v8::Number>(42)
+			fannDataToV8Array(&outputs[0], outputs.size())
 		};
 		callback->Call(2, args);
 	}
 
-};*/
+	std::vector<fann_type> inputs;
+	std::vector<fann_type> outputs;
+	FANNY *fanny;
+};
 
 void FANNY::Init(v8::Local<v8::Object> target) {
 	// Create new function template for this JS class constructor
@@ -54,6 +70,7 @@ void FANNY::Init(v8::Local<v8::Object> target) {
 	Nan::SetPrototypeMethod(tpl, "getRpropDeltaMin", getRpropDeltaMin);
 	Nan::SetPrototypeMethod(tpl, "getRpropDeltaMax", getRpropDeltaMax);
 	//Nan::SetPrototypeMethod(tpl, "runAsync", runAsync);
+	Nan::SetPrototypeMethod(tpl, "runAsync", runAsync);
 
 	// Assign a property called 'FANNY' to module.exports, pointing to our constructor
 	Nan::Set(target, Nan::New("FANNY").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
@@ -156,7 +173,7 @@ bool FANNY::checkError() {
 
 NAN_METHOD(FANNY::run) {
 	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
-	if (info.Length() != 1) return Nan::ThrowError("Missing argument");
+	if (info.Length() != 1) return Nan::ThrowError("Takes one argument");
 	if (!info[0]->IsArray()) return Nan::ThrowError("Must be array");
 	std::vector<fann_type> inputs = v8ArrayToFannData(info[0]);
 	if (inputs.size() != fanny->fann->get_num_input()) return Nan::ThrowError("Wrong number of inputs");
@@ -270,52 +287,16 @@ NAN_METHOD(FANNY::getRpropDeltaMax) {
 	info.GetReturnValue().Set(num);
 }
 
-
-
-/*
-NAN_METHOD(FANN::test) {
-	// Print out comma-separated array given as first arg
-	uint32_t numArgs = info.Length();
-	if (numArgs == 0) {
-		std::cout << "No args!\n";
-	} else if (info[0]->IsUndefined()) {
-		std::cout << "Undefined!\n";
-	} else if (info[0]->IsNull()) {
-		std::cout << "Null!\n";
-	} else if (info[0]->IsArray()) {
-		v8::Local<v8::Array> array = v8::Local<v8::Array>::Cast(info[0]);
-		for (uint32_t i = 0; i < array->Length(); i++) {
-			v8::Local<v8::Value> value = array->Get(i);
-			if (value->IsString()) {
-				v8::String::Utf8Value utf8Str(value);
-				const char * cStr = *utf8Str;
-				std::cout << cStr << ", ";
-			} else {
-				std::cout << "<NotString>, ";
-			}
-		}
-		std::cout << "\n";
-	} else {
-		std::cout << "Unrecognized type\n";
-	}
-
-	// Print out the string "Test"
-	std::cout << "Test!\n";
-
-	// Return an array we construct
-	v8::Local<v8::Array> retArray = Nan::New<v8::Array>();
-	retArray->Set(0, Nan::New<v8::String>("first").ToLocalChecked());
-	retArray->Set(1, Nan::New<v8::String>("second").ToLocalChecked());
-	info.GetReturnValue().Set(retArray);
-
-	// If a callback is given, execute the async code
-	if (numArgs >= 2 && info[1]->IsFunction()) {
-		std::cout << "Starting async worker\n";
-		Nan::Callback * callback = new Nan::Callback(info[1].As<v8::Function>());
-		Nan::AsyncQueueWorker(new TestWorker(callback));
-	}
-}
-*/
-
+NAN_METHOD(FANNY::runAsync) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 2) return Nan::ThrowError("Takes two arguments");
+	if (!info[0]->IsArray()) return Nan::ThrowError("First argument must be array");
+	if (!info[1]->IsFunction()) return Nan::ThrowError("Second argument must be callback");
+	std::vector<fann_type> inputs = v8ArrayToFannData(info[0]);
+	if (inputs.size() != fanny->fann->get_num_input()) return Nan::ThrowError("Wrong number of inputs");
+	Nan::Callback * callback = new Nan::Callback(info[1].As<v8::Function>());
+	Nan::AsyncQueueWorker(new RunWorker(callback, inputs, info.Holder()));
 }
 
+
+}
