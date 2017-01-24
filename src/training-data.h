@@ -31,6 +31,8 @@ private:
 	static NAN_METHOD(length);
 	static NAN_METHOD(numInput);
 	static NAN_METHOD(numOutput);
+	static NAN_METHOD(getInput);
+	static NAN_METHOD(getOutput);
 
 };
 

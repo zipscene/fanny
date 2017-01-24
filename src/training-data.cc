@@ -86,6 +86,18 @@ NAN_METHOD(TrainingData::numOutput) {
 	info.GetReturnValue().Set(self->trainingData->num_output_train_data());
 }
 
+NAN_METHOD(TrainingData::getInput) {
+	TrainingData *self = Nan::ObjectWrap::Unwrap<TrainingData>(info.Holder());
+	fann_type **data = self->trainingData->get_input();
+	info.GetReturnValue().Set(fannDataSetToV8Array(data, self->trainingData->length_train_data(), self->trainingData->num_input_train_data()));
+}
+
+NAN_METHOD(TrainingData::getOutput) {
+	TrainingData *self = Nan::ObjectWrap::Unwrap<TrainingData>(info.Holder());
+	fann_type **data = self->trainingData->get_output();
+	info.GetReturnValue().Set(fannDataSetToV8Array(data, self->trainingData->length_train_data(), self->trainingData->num_output_train_data()));
+}
+
 
 }
 
