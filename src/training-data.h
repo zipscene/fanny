@@ -33,6 +33,8 @@ private:
 	static NAN_METHOD(numOutput);
 	static NAN_METHOD(getInput);
 	static NAN_METHOD(getOutput);
+	static NAN_METHOD(getTrainInput);
+	static NAN_METHOD(getTrainOutput);
 
 };
 

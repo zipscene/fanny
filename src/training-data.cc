@@ -24,6 +24,11 @@ void TrainingData::Init(v8::Local<v8::Object> target) {
 	Nan::SetPrototypeMethod(tpl, "length", length);
 	Nan::SetPrototypeMethod(tpl, "numInput", numInput);
 	Nan::SetPrototypeMethod(tpl, "numOutput", numOutput);
+	Nan::SetPrototypeMethod(tpl, "getInput", getInput);
+	Nan::SetPrototypeMethod(tpl, "getOutput", getOutput);
+	Nan::SetPrototypeMethod(tpl, "getTrainInput", getTrainInput);
+	Nan::SetPrototypeMethod(tpl, "getTrainOutput", getTrainOutput);
+
 
 	// Assign a property called 'TrainingData' to module.exports, pointing to our constructor
 	Nan::Set(target, Nan::New("TrainingData").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
@@ -98,6 +103,26 @@ NAN_METHOD(TrainingData::getOutput) {
 	info.GetReturnValue().Set(fannDataSetToV8Array(data, self->trainingData->length_train_data(), self->trainingData->num_output_train_data()));
 }
 
+NAN_METHOD(TrainingData::getTrainInput) {
+	if (info.Length() != 1 || !info[0]->IsNumber()) {
+		return Nan::ThrowError("Argument must be a number");
+	}
+	TrainingData *self = Nan::ObjectWrap::Unwrap<TrainingData>(info.Holder());
+	unsigned int pos = info[0]->Uint32Value();
+	fann_type *data = self->trainingData->get_train_input(pos);
+	info.GetReturnValue().Set(fannDataToV8Array(data, self->trainingData->num_input_train_data()));
+}
+
+NAN_METHOD(TrainingData::getTrainOutput) {
+	if (info.Length() != 1 || !info[0]->IsNumber()) {
+		return Nan::ThrowError("Argument must be a number");
+	}
+	TrainingData *self = Nan::ObjectWrap::Unwrap<TrainingData>(info.Holder());
+	unsigned int pos = info[0]->Uint32Value();
+	fann_type *data = self->trainingData->get_train_output(pos);
+	info.GetReturnValue().Set(fannDataToV8Array(data, self->trainingData->num_output_train_data()));
+}
 
 }
+
 
