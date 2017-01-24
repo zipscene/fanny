@@ -21,7 +21,6 @@ results = fanny2.run(inputs);
 console.log(results);
 
 console.log('BIT FAIL :: ' + fanny.getBitFail());
-console.log('GET ERRNO :: ' + fanny.getErrno());
 console.log('GET MSE :: ' + fanny.getMSE());
 console.log('GET LEARNING RATE :: ' + fanny.getLearningRate()); // default should be 0.7
 console.log('GET PROP DECAY :: ' + fanny.getQuickPropDecay());
@@ -38,7 +37,7 @@ console.log('GET RPROP DELTA MAX :: '  + fanny.getRpropDeltaMax());
 
 var td = new TrainingData();
 var td2 = new TrainingData(td);
-td.setTrainData([ 
+td.setTrainData([
 	[ 1, 0 ],
 	[ 0, 1 ],
 	[ 0, 0 ],
@@ -51,11 +50,15 @@ td.setTrainData([
 	[ 1, 1, 0, 0, 0 ]
 ]);
 td.saveTrain("boolean-logic-training-data.txt", function(err) {
-	console.log('Save results', err);
+	console.log('TD Save results', err);
 });
 
-FANNY.loadFile("/asdasd", function(e, r) {
-	console.log('loadFile result', e, r);
+//FANNY.loadFile("/asdasd", function(e, r) {
+//	console.log('loadFile result', e, r);
+//});
+
+fanny.save("/tmp/testfann", function(err) {
+	console.log('FANN Save result', err);
 });
 
 setTimeout(function() { console.log('Done.'); }, 5000);

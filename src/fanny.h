@@ -30,6 +30,9 @@ private:
 
 	static NAN_METHOD(loadFile);
 
+	static NAN_METHOD(save);
+	static NAN_METHOD(saveToFixed);
+
 	// FANN "run" method.  Parameter is array of numbers.  Returns array of numbers.
 	// Also takes a callback.
 	static NAN_METHOD(runAsync);

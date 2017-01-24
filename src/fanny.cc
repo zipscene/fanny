@@ -77,6 +77,45 @@ public:
 	FANN::neural_net *fann;
 };
 
+class SaveFileWorker : public Nan::AsyncWorker {
+public:
+	SaveFileWorker(Nan::Callback *callback, v8::Local<v8::Object> fannyHolder, std::string _filename, bool _isFixed) :
+		Nan::AsyncWorker(callback), filename(_filename), isFixed(_isFixed)
+	{
+		SaveToPersistent("fannyHolder", fannyHolder);
+		fanny = Nan::ObjectWrap::Unwrap<FANNY>(fannyHolder);
+	}
+	~SaveFileWorker() {}
+
+	void Execute() {
+		bool hasError = false;
+		if (isFixed) {
+			decimalPoint = fanny->fann->save_to_fixed(filename);
+		} else {
+			hasError = !fanny->fann->save(filename);
+			decimalPoint = 0;
+		}
+		if (fanny->fann->get_errno()) {
+			SetErrorMessage(fanny->fann->get_errstr().c_str());
+			fanny->fann->reset_errno();
+			fanny->fann->reset_errstr();
+		} else if (hasError) {
+			SetErrorMessage("Error saving FANN file");
+		}
+	}
+
+	void HandleOKCallback() {
+		Nan::HandleScope scope;
+		v8::Local<v8::Value> args[] = { Nan::Null(), Nan::New(decimalPoint) };
+		callback->Call(2, args);
+	}
+
+	FANNY *fanny;
+	std::string filename;
+	bool isFixed;
+	int decimalPoint;
+};
+
 void FANNY::Init(v8::Local<v8::Object> target) {
 	// Create new function template for this JS class constructor
 	v8::Local<v8::FunctionTemplate> tpl = Nan::New<v8::FunctionTemplate>(New);
@@ -88,6 +127,8 @@ void FANNY::Init(v8::Local<v8::Object> target) {
 	FANNY::constructorFunctionTpl.Reset(tpl);
 
 	// Add prototype methods
+	Nan::SetPrototypeMethod(tpl, "save", save);
+	Nan::SetPrototypeMethod(tpl, "saveToFixed", saveToFixed);
 	Nan::SetPrototypeMethod(tpl, "run", run);
 	Nan::SetPrototypeMethod(tpl, "getNumInput", getNumInput);
 	Nan::SetPrototypeMethod(tpl, "getNumOutput", getNumOutput);
@@ -236,6 +277,22 @@ bool FANNY::checkError() {
 	} else {
 		return false;
 	}
+}
+
+NAN_METHOD(FANNY::save) {
+	if (info.Length() != 2) return Nan::ThrowError("Takes a filename and a callback");
+	if (!info[0]->IsString() || !info[1]->IsFunction()) return Nan::ThrowTypeError("Wrong argument type");
+	std::string filename(*v8::String::Utf8Value(info[0]));
+	Nan::Callback *callback = new Nan::Callback(info[1].As<v8::Function>());
+	Nan::AsyncQueueWorker(new SaveFileWorker(callback, info.Holder(), filename, false));
+}
+
+NAN_METHOD(FANNY::saveToFixed) {
+	if (info.Length() != 2) return Nan::ThrowError("Takes a filename and a callback");
+	if (!info[0]->IsString() || !info[1]->IsFunction()) return Nan::ThrowTypeError("Wrong argument type");
+	std::string filename(*v8::String::Utf8Value(info[0]));
+	Nan::Callback *callback = new Nan::Callback(info[1].As<v8::Function>());
+	Nan::AsyncQueueWorker(new SaveFileWorker(callback, info.Holder(), filename, true));
 }
 
 NAN_METHOD(FANNY::run) {
