@@ -3,8 +3,52 @@
 #include "fann-includes.h"
 #include <iostream>
 #include "utils.h"
+#include "training-data.h"
 
 namespace fanny {
+
+class TDIOWorker : public Nan::AsyncWorker {
+public:
+	TrainingData *trainingData;
+	std::string filename;
+	bool isSave;
+	bool isFixed;
+	unsigned int decimalPoint;
+	
+
+	TDIOWorker(
+		Nan::Callback *callback,
+		v8::Local<v8::Object> tdHolder,
+		std::string &_filename,
+		bool _isSave,
+		bool _isFixed,
+		unsigned int _decimalPoint
+	) : Nan::AsyncWorker(callback), filename(_filename),
+		isSave(_isSave), isFixed(_isFixed),
+		decimalPoint(_decimalPoint) {
+		SaveToPersistent("tdHolder", tdHolder);
+		trainingData = Nan::ObjectWrap::Unwrap<TrainingData>(tdHolder);
+	}
+
+	~TDIOWorker() {}
+
+	void Execute() {
+		if (!isSave) {
+			if (!trainingData->trainingData->read_train_from_file(filename)) {
+				SetErrorMessage("Error reading training data file");
+			}
+		} else if (!isFixed) {
+			if (!trainingData->trainingData->save_train(filename)) {
+				SetErrorMessage("Error saving training data file");
+			}
+		} else {
+			if (!trainingData->trainingData->save_train_to_fixed(filename, decimalPoint)) {
+				SetErrorMessage("Error saving training data file");
+			}
+		}
+	}
+};
+
 
 Nan::Persistent<v8::FunctionTemplate> TrainingData::constructorFunctionTpl;
 
@@ -19,6 +63,9 @@ void TrainingData::Init(v8::Local<v8::Object> target) {
 	TrainingData::constructorFunctionTpl.Reset(tpl);
 
 	// Add prototype methods
+	Nan::SetPrototypeMethod(tpl, "readTrainFromFile", readTrainFromFile);
+	Nan::SetPrototypeMethod(tpl, "saveTrain", saveTrain);
+	Nan::SetPrototypeMethod(tpl, "saveTrainToFixed", saveTrainToFixed);
 	Nan::SetPrototypeMethod(tpl, "shuffle", shuffle);
 	Nan::SetPrototypeMethod(tpl, "merge", merge);
 	Nan::SetPrototypeMethod(tpl, "length", length);
@@ -131,7 +178,7 @@ NAN_METHOD(TrainingData::setTrainData) {
 	if (info.Length() != 2) return Nan::ThrowError("Must have 2 arguments: input, output");
 	if (!info[0]->IsArray() || !info[1]->IsArray()) return Nan::ThrowError("Not an array");
 	v8::Local<v8::Array> inputs = info[0].As<v8::Array>();
-	v8::Local<v8::Array> outputs = info[0].As<v8::Array>();
+	v8::Local<v8::Array> outputs = info[1].As<v8::Array>();
 	unsigned int dataSetLength = inputs->Length();
 	if (outputs->Length() != dataSetLength) return Nan::ThrowError("Input and output dataset sizes must match");
 	if (!dataSetLength) return Nan::ThrowError("Dataset must be nonzero in size");
@@ -197,6 +244,28 @@ NAN_METHOD(TrainingData::getMaxOutput) {
 	#else
 	Nan::ThrowError("Not supported for fixed fann");
 	#endif
+}
+
+NAN_METHOD(TrainingData::readTrainFromFile) {
+	if (info.Length() < 2 || !info[0]->IsString()) return Nan::ThrowError("Filename required");
+	std::string filename = std::string(*v8::String::Utf8Value(info[0]));
+	Nan::Callback *callback = new Nan::Callback(info[1].As<v8::Function>());
+	AsyncQueueWorker(new TDIOWorker(callback, info.Holder(), filename, false, false, 0));
+}
+
+NAN_METHOD(TrainingData::saveTrain) {
+	if (info.Length() < 2 || !info[0]->IsString()) return Nan::ThrowError("Filename required");
+	std::string filename = std::string(*v8::String::Utf8Value(info[0]));
+	Nan::Callback *callback = new Nan::Callback(info[1].As<v8::Function>());
+	AsyncQueueWorker(new TDIOWorker(callback, info.Holder(), filename, true, false, 0));
+}
+
+NAN_METHOD(TrainingData::saveTrainToFixed) {
+	if (info.Length() < 3 || !info[0]->IsString() || !info[1]->IsNumber()) return Nan::ThrowError("Filename and decimalPoint required");
+	std::string filename = std::string(*v8::String::Utf8Value(info[0]));
+	unsigned int decimalPoint = info[1]->Uint32Value();
+	Nan::Callback *callback = new Nan::Callback(info[1].As<v8::Function>());
+	AsyncQueueWorker(new TDIOWorker(callback, info.Holder(), filename, true, true, decimalPoint));
 }
 
 

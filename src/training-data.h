@@ -1,3 +1,6 @@
+#ifndef TRAININGDATA_H
+#define TRAININGDATA_H
+
 #include <nan.h>
 #include "fann-includes.h"
 
@@ -40,8 +43,13 @@ private:
 	static NAN_METHOD(getMinInput);
 	static NAN_METHOD(getMaxOutput);
 	static NAN_METHOD(getMinOutput);
+	static NAN_METHOD(readTrainFromFile);
+	static NAN_METHOD(saveTrain);
+	static NAN_METHOD(saveTrainToFixed);
 
 };
 
 }
+
+#endif
 

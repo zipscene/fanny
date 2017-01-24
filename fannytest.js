@@ -50,4 +50,6 @@ td.setTrainData([
 	[ 0, 1, 1, 0, 0 ],
 	[ 1, 1, 0, 0, 0 ]
 ]);
-
+td.saveTrain("boolean-logic-training-data.txt", function(err) {
+	console.log('Save results', err);
+});

@@ -1,3 +1,6 @@
+#ifndef FANNY_H
+#define FANNY_H
+
 #include <nan.h>
 #include "fann-includes.h"
 
@@ -60,4 +63,6 @@ private:
 };
 
 }
+
+#endif
 
