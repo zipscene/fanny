@@ -95,7 +95,6 @@ void FANNY::Init(v8::Local<v8::Object> target) {
 	Nan::SetPrototypeMethod(tpl, "getTotalConnections", getTotalConnections);
 	Nan::SetPrototypeMethod(tpl, "getNumLayers", getNumLayers);
 	Nan::SetPrototypeMethod(tpl, "getBitFail", getBitFail);
-	Nan::SetPrototypeMethod(tpl, "getErrno", getErrno);
 	Nan::SetPrototypeMethod(tpl, "getMSE", getMSE);
 	Nan::SetPrototypeMethod(tpl, "getLearningRate", getLearningRate);
 	Nan::SetPrototypeMethod(tpl, "getQuickPropDecay", getQuickPropDecay);
@@ -295,12 +294,6 @@ NAN_METHOD(FANNY::getNumLayers) {
 NAN_METHOD(FANNY::getBitFail) {
 	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
 	unsigned int num = fanny->fann->get_bit_fail();
-	info.GetReturnValue().Set(num);
-}
-
-NAN_METHOD(FANNY::getErrno) {
-	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
-	unsigned int num = fanny->fann->get_errno();
 	info.GetReturnValue().Set(num);
 }
 

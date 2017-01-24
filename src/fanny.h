@@ -42,7 +42,6 @@ private:
 	static NAN_METHOD(getTotalConnections);
 	static NAN_METHOD(getNumLayers);
 	static NAN_METHOD(getBitFail);
-	static NAN_METHOD(getErrno);
 	static NAN_METHOD(getMSE);
 	static NAN_METHOD(getLearningRate);
 	static NAN_METHOD(getQuickPropDecay);
