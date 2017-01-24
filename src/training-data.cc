@@ -29,6 +29,10 @@ void TrainingData::Init(v8::Local<v8::Object> target) {
 	Nan::SetPrototypeMethod(tpl, "getTrainInput", getTrainInput);
 	Nan::SetPrototypeMethod(tpl, "getTrainOutput", getTrainOutput);
 	Nan::SetPrototypeMethod(tpl, "setTrainData", setTrainData);
+	Nan::SetPrototypeMethod(tpl, "getMinInput", getMinInput);
+	Nan::SetPrototypeMethod(tpl, "getMaxInput", getMaxInput);
+	Nan::SetPrototypeMethod(tpl, "getMinOutput", getMinOutput);
+	Nan::SetPrototypeMethod(tpl, "getMaxOutput", getMaxOutput);
 
 	// Assign a property called 'TrainingData' to module.exports, pointing to our constructor
 	Nan::Set(target, Nan::New("TrainingData").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
@@ -158,6 +162,43 @@ NAN_METHOD(TrainingData::setTrainData) {
 	TrainingData *self = Nan::ObjectWrap::Unwrap<TrainingData>(info.Holder());
 	self->trainingData->set_train_data(dataSetLength, numInputNodes, &inputVector[0], numOutputNodes, &outputVector[0]);
 }
+
+NAN_METHOD(TrainingData::getMinInput) {
+	#ifndef FANNY_FIXED
+	TrainingData *self = Nan::ObjectWrap::Unwrap<TrainingData>(info.Holder());
+	info.GetReturnValue().Set(self->trainingData->get_min_input());
+	#else
+	Nan::ThrowError("Not supported for fixed fann");
+	#endif
+}
+
+NAN_METHOD(TrainingData::getMaxInput) {
+	#ifndef FANNY_FIXED
+	TrainingData *self = Nan::ObjectWrap::Unwrap<TrainingData>(info.Holder());
+	info.GetReturnValue().Set(self->trainingData->get_max_input());
+	#else
+	Nan::ThrowError("Not supported for fixed fann");
+	#endif
+}
+
+NAN_METHOD(TrainingData::getMinOutput) {
+	#ifndef FANNY_FIXED
+	TrainingData *self = Nan::ObjectWrap::Unwrap<TrainingData>(info.Holder());
+	info.GetReturnValue().Set(self->trainingData->get_min_output());
+	#else
+	Nan::ThrowError("Not supported for fixed fann");
+	#endif
+}
+
+NAN_METHOD(TrainingData::getMaxOutput) {
+	#ifndef FANNY_FIXED
+	TrainingData *self = Nan::ObjectWrap::Unwrap<TrainingData>(info.Holder());
+	info.GetReturnValue().Set(self->trainingData->get_max_output());
+	#else
+	Nan::ThrowError("Not supported for fixed fann");
+	#endif
+}
+
 
 }
 
