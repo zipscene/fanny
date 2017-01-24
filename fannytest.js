@@ -3,7 +3,7 @@ var FANNY = libfanny.FANNY;
 var TrainingData = libfanny.TrainingData;
 
 var fanny = new FANNY({
-	layers: [ 2, 10, 5 ]
+	layers: [ 2, 20, 5 ]
 });
 
 console.log('NUM INPUT :: ' + fanny.getNumInput());
@@ -38,4 +38,16 @@ console.log('GET RPROP DELTA MAX :: '  + fanny.getRpropDeltaMax());
 
 var td = new TrainingData();
 var td2 = new TrainingData(td);
+td.setTrainData([ 
+	[ 1, 0 ],
+	[ 0, 1 ],
+	[ 0, 0 ],
+	[ 1, 1 ]
+], [
+	// AND, OR, NAND, NOR, XOR
+	[ 0, 1, 1, 0, 1 ],
+	[ 0, 1, 1, 0, 1 ],
+	[ 0, 1, 1, 0, 0 ],
+	[ 1, 1, 0, 0, 0 ]
+]);
 

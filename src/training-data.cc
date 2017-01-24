@@ -28,7 +28,7 @@ void TrainingData::Init(v8::Local<v8::Object> target) {
 	Nan::SetPrototypeMethod(tpl, "getOutput", getOutput);
 	Nan::SetPrototypeMethod(tpl, "getTrainInput", getTrainInput);
 	Nan::SetPrototypeMethod(tpl, "getTrainOutput", getTrainOutput);
-
+	Nan::SetPrototypeMethod(tpl, "setTrainData", setTrainData);
 
 	// Assign a property called 'TrainingData' to module.exports, pointing to our constructor
 	Nan::Set(target, Nan::New("TrainingData").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
@@ -121,6 +121,42 @@ NAN_METHOD(TrainingData::getTrainOutput) {
 	unsigned int pos = info[0]->Uint32Value();
 	fann_type *data = self->trainingData->get_train_output(pos);
 	info.GetReturnValue().Set(fannDataToV8Array(data, self->trainingData->num_output_train_data()));
+}
+
+NAN_METHOD(TrainingData::setTrainData) {
+	if (info.Length() != 2) return Nan::ThrowError("Must have 2 arguments: input, output");
+	if (!info[0]->IsArray() || !info[1]->IsArray()) return Nan::ThrowError("Not an array");
+	v8::Local<v8::Array> inputs = info[0].As<v8::Array>();
+	v8::Local<v8::Array> outputs = info[0].As<v8::Array>();
+	unsigned int dataSetLength = inputs->Length();
+	if (outputs->Length() != dataSetLength) return Nan::ThrowError("Input and output dataset sizes must match");
+	if (!dataSetLength) return Nan::ThrowError("Dataset must be nonzero in size");
+	std::vector<fann_type> inputVector, outputVector;
+	unsigned int numInputNodes = 0, numOutputNodes = 0;
+	for (unsigned int idx = 0; idx < dataSetLength; ++idx) {
+		Nan::MaybeLocal<v8::Value> inputMaybeValue = Nan::Get(inputs, idx);
+		Nan::MaybeLocal<v8::Value> outputMaybeValue = Nan::Get(outputs, idx);
+		if (inputMaybeValue.IsEmpty() || outputMaybeValue.IsEmpty()) return Nan::ThrowError("Invalid data");
+		v8::Local<v8::Value> inputValue = inputMaybeValue.ToLocalChecked();
+		v8::Local<v8::Value> outputValue = outputMaybeValue.ToLocalChecked();
+		if (!inputValue->IsArray() || !outputValue->IsArray()) return Nan::ThrowError("Invalid data");
+		v8::Local<v8::Array> inputArray = inputValue.As<v8::Array>();
+		v8::Local<v8::Array> outputArray = outputValue.As<v8::Array>();
+		if (idx == 0) {
+			numInputNodes = inputArray->Length();
+			numOutputNodes = outputArray->Length();
+			if (!numInputNodes || !numOutputNodes) return Nan::ThrowError("Invalid data");
+			inputVector.reserve(dataSetLength * numInputNodes);
+			outputVector.reserve(dataSetLength * numOutputNodes);
+		}
+		std::vector<fann_type> inputRow = v8ArrayToFannData(inputArray);
+		std::vector<fann_type> outputRow = v8ArrayToFannData(outputArray);
+		if (inputRow.size() != numInputNodes || outputRow.size() != numOutputNodes) return Nan::ThrowError("Invalid data");
+		memcpy(&inputVector[idx * numInputNodes], &inputRow[0], numInputNodes * sizeof(fann_type));
+		memcpy(&outputVector[idx * numOutputNodes], &outputRow[0], numOutputNodes * sizeof(fann_type));
+	}
+	TrainingData *self = Nan::ObjectWrap::Unwrap<TrainingData>(info.Holder());
+	self->trainingData->set_train_data(dataSetLength, numInputNodes, &inputVector[0], numOutputNodes, &outputVector[0]);
 }
 
 }
