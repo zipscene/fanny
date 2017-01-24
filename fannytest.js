@@ -53,3 +53,9 @@ td.setTrainData([
 td.saveTrain("boolean-logic-training-data.txt", function(err) {
 	console.log('Save results', err);
 });
+
+FANNY.loadFile("/asdasd", function(e, r) {
+	console.log('loadFile result', e, r);
+});
+
+setTimeout(function() { console.log('Done.'); }, 5000);

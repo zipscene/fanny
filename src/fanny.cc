@@ -43,6 +43,40 @@ public:
 	FANNY *fanny;
 };
 
+class LoadFileWorker : public Nan::AsyncWorker {
+public:
+	LoadFileWorker(Nan::Callback *callback, std::string _filename) : Nan::AsyncWorker(callback), filename(_filename) {}
+	~LoadFileWorker() {}
+
+	void Execute() {
+		struct fann *ann = fann_create_from_file(filename.c_str());
+		if (!ann) return SetErrorMessage("Error loading FANN file");
+		fann = new FANN::neural_net(ann);
+		fann_destroy(ann);
+	}
+
+	void HandleOKCallback() {
+		Nan::HandleScope scope;
+		if (fann->get_errno()) {
+			v8::Local<v8::Value> args[] = { Nan::Error(std::string(fann->get_errstr()).c_str()) };
+			delete fann;
+			callback->Call(1, args);
+		} else {
+			v8::Local<v8::Value> externFann = Nan::New<v8::External>(fann);
+			v8::Local<v8::Function> ctor = Nan::New(FANNY::constructorFunction);
+			v8::Local<v8::Value> ctorArgs[] = { externFann };
+			v8::Local<v8::Value> cbargs[] = {
+				Nan::Null(),
+				Nan::NewInstance(ctor, 1, ctorArgs).ToLocalChecked()
+			};
+			callback->Call(2, cbargs);
+		}
+	}
+
+	std::string filename;
+	FANN::neural_net *fann;
+};
+
 void FANNY::Init(v8::Local<v8::Object> target) {
 	// Create new function template for this JS class constructor
 	v8::Local<v8::FunctionTemplate> tpl = Nan::New<v8::FunctionTemplate>(New);
@@ -73,18 +107,33 @@ void FANNY::Init(v8::Local<v8::Object> target) {
 	Nan::SetPrototypeMethod(tpl, "getRpropDeltaMax", getRpropDeltaMax);
 	Nan::SetPrototypeMethod(tpl, "runAsync", runAsync);
 
+	// Create the loadFile function
+	v8::Local<v8::FunctionTemplate> loadFileTpl = Nan::New<v8::FunctionTemplate>(loadFile);
+	v8::Local<v8::Function> loadFileFunction = Nan::GetFunction(loadFileTpl).ToLocalChecked();
+
 	// Assign a property called 'FANNY' to module.exports, pointing to our constructor
-	Nan::Set(target, Nan::New("FANNY").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
+	v8::Local<v8::Function> ctorFunction = Nan::GetFunction(tpl).ToLocalChecked();
+	Nan::Set(ctorFunction, Nan::New("loadFile").ToLocalChecked(), loadFileFunction);
+	FANNY::constructorFunction.Reset(ctorFunction);
+	Nan::Set(target, Nan::New("FANNY").ToLocalChecked(), ctorFunction);
 }
 
 
 Nan::Persistent<v8::FunctionTemplate> FANNY::constructorFunctionTpl;
+Nan::Persistent<v8::Function> FANNY::constructorFunction;
 
 FANNY::FANNY(FANN::neural_net *_fann) : fann(_fann) {}
 
 FANNY::~FANNY() {
 	delete fann;
 	constructorFunctionTpl.Empty();
+}
+
+NAN_METHOD(FANNY::loadFile) {
+	if (info.Length() != 2) return Nan::ThrowError("Requires filename and callback");
+	std::string filename = *v8::String::Utf8Value(info[0]);
+	Nan::Callback * callback = new Nan::Callback(info[1].As<v8::Function>());
+	Nan::AsyncQueueWorker(new LoadFileWorker(callback, filename));
 }
 
 NAN_METHOD(FANNY::New) {
@@ -102,6 +151,9 @@ NAN_METHOD(FANNY::New) {
 	} else if (info[0]->IsString()) {
 		// Load-from-file constructor
 		fann = new FANN::neural_net(std::string(*v8::String::Utf8Value(info[0])));
+	} else if (info[0]->IsExternal()) {
+		// Internal from-instance constructor
+		fann = (FANN::neural_net *)info[0].As<v8::External>()->Value();
 	} else if (info[0]->IsObject()) {
 		// Options constructor
 

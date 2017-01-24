@@ -18,6 +18,7 @@ public:
 
 	// Constructor
 	static Nan::Persistent<v8::FunctionTemplate> constructorFunctionTpl;
+	static Nan::Persistent<v8::Function> constructorFunction;
 
 private:
 
@@ -26,6 +27,8 @@ private:
 	// - layers (array of numbers)
 	// - connectionRate (number) - For sparse networks
 	static NAN_METHOD(New);
+
+	static NAN_METHOD(loadFile);
 
 	// FANN "run" method.  Parameter is array of numbers.  Returns array of numbers.
 	// Also takes a callback.
