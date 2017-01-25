@@ -146,6 +146,9 @@ void FANNY::Init(v8::Local<v8::Object> target) {
 	Nan::SetPrototypeMethod(tpl, "getRpropDeltaMin", getRpropDeltaMin);
 	Nan::SetPrototypeMethod(tpl, "getRpropDeltaMax", getRpropDeltaMax);
 	Nan::SetPrototypeMethod(tpl, "runAsync", runAsync);
+	Nan::SetPrototypeMethod(tpl, "runAsync", runAsync);
+	Nan::SetPrototypeMethod(tpl, "train", train);
+
 
 	// Create the loadFile function
 	v8::Local<v8::FunctionTemplate> loadFileTpl = Nan::New<v8::FunctionTemplate>(loadFile);
@@ -415,6 +418,26 @@ NAN_METHOD(FANNY::getRpropDeltaMax) {
 	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
 	float num = fanny->fann->get_rprop_delta_max();
 	info.GetReturnValue().Set(num);
+}
+
+//
+NAN_METHOD(FANNY::train) {
+	#ifndef FANNY_FIXED
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 2) return Nan::ThrowError("Must have 2 arguments: input, desired_output");
+	if (!info[0]->IsArray() || !info[1]->IsArray()) return Nan::ThrowError("Argument not an array");
+
+	std::vector<fann_type> input = v8ArrayToFannData(info[0]);
+	std::vector<fann_type> desired_output = v8ArrayToFannData(info[1]);
+
+	if (input.size() != fanny->fann->get_num_input()) return Nan::ThrowError("Wrong number of inputs");
+	if (desired_output.size() != fanny->fann->get_num_output()) return Nan::ThrowError("Wrong number of desired ouputs");
+
+	fanny->fann->train(&input[0], &desired_output[0]);
+
+	#else
+	Nan::ThrowError("Not supported for fixed fann");
+	#endif
 }
 
 }

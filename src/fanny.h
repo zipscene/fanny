@@ -54,6 +54,7 @@ private:
 	static NAN_METHOD(getRpropDeltaZero);
 	static NAN_METHOD(getRpropDeltaMin);
 	static NAN_METHOD(getRpropDeltaMax);
+	static NAN_METHOD(train);
 
 	// constructor & destructor
 	explicit FANNY(FANN::neural_net *fann);
@@ -70,4 +71,3 @@ private:
 }
 
 #endif
-
