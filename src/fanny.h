@@ -73,8 +73,15 @@ private:
 	static NAN_METHOD(initWeights);
 	static NAN_METHOD(getLayerArray);
 	static NAN_METHOD(getBiasArray);
+	static NAN_METHOD(getCascadeActivationFunctions);
 	static NAN_METHOD(train);
 	static NAN_METHOD(test);
+	static NAN_METHOD(scaleTrain);
+	static NAN_METHOD(descaleTrain);
+	static NAN_METHOD(clearScalingParams);
+	static NAN_METHOD(setInputScalingParams);
+	static NAN_METHOD(setOutputScalingParams);
+	static NAN_METHOD(setScalingParams);
 
 	static NAN_METHOD(trainEpoch);
 	static NAN_METHOD(trainOnData);

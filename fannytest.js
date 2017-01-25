@@ -50,7 +50,7 @@ console.log('GET RPROP DELTA MIN :: ' + fanny.getRpropDeltaMin());
 console.log('GET RPROP DELTA MAX :: '  + fanny.getRpropDeltaMax());
 console.log('LAYERS ARRAY :: ' + fanny.getLayerArray().join(', '));
 console.log('BIAS ARRAY :: ' + fanny.getBiasArray().join(', '));
-
+console.log(fanny.getCascadeActivationFunctions());
 //fanny.runAsync(inputs, function(err, results) {
 //	console.log(err, results);
 //});
@@ -92,7 +92,40 @@ console.log('SUBSET TRAIN DATA OUTPUT :: ', td3.getOutput());
 //	console.log('loadFile result', e, r);
 //});
 
-/*fanny.save("/tmp/testfann", function(err) {
+var fanny5 = new FANNY(fanny)
+var td5 = new TrainingData();
+td5.setTrainData([
+	[ 2, 1 ],
+	[ 1, 2 ],
+	[ 1, 1 ],
+	[ 2, 2 ]
+], [
+	// AND, OR, NAND, NOR, XOR
+	[ 1, 2, 2, 1, 2 ],
+	[ 1, 2, 2, 1, 2 ],
+	[ 1, 2, 2, 1, 1 ],
+	[ 2, 2, 1, 1, 1 ]
+]);
+
+// Test scaleTrain and set setScalingParams
+fanny5.setScalingParams(td5, 2, 3, 2, 3);
+fanny5.scaleTrain(td5);
+console.log('SCALE TRAIN INPUT :: ', td5.getInput());
+console.log('SCALE TRAIN OUTPUT :: ', td5.getOutput());
+// Test descaleTrain
+fanny5.descaleTrain(td5);
+console.log('DESCALE TRAIN INPUT :: ', td5.getInput());
+console.log('DESCALE TRAIN OUTPUT :: ', td5.getOutput());
+// Test clearScaling Params
+console.log('CLEAR SCALING PARAMS :: ' + fanny5.clearScalingParams());
+// Test setInputScalingParams and setOutputScalingParams
+fanny5.setInputScalingParams(td5, 3, 4);
+fanny5.setOutputScalingParams(td5, 3, 4);
+fanny5.scaleTrain(td5);
+console.log('SCALE TRAIN INPUT :: ', td5.getInput());
+console.log('SCALE TRAIN OUTPUT :: ', td5.getOutput());
+
+/* fanny.save("/tmp/testfann", function(err) {
 	console.log('FANN Save result', err);
 	});*/
 
