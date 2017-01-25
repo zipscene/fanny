@@ -726,6 +726,7 @@ NAN_METHOD(FANNY::clearScalingParams) {
 	Nan::ThrowError("Not supported for fixed fann");
 	#endif
 }
+
 NAN_METHOD(FANNY::setInputScalingParams) {
 	#ifndef FANNY_FIXED
 	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
