@@ -62,6 +62,8 @@ private:
 	static NAN_METHOD(getBiasArray);
 	static NAN_METHOD(train);
 	static NAN_METHOD(test);
+	static NAN_METHOD(scaleTrain);
+	static NAN_METHOD(setScalingParams);
 
 	static NAN_METHOD(trainEpoch);
 	static NAN_METHOD(trainOnData);
