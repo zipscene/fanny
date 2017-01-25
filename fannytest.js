@@ -38,7 +38,9 @@ console.log('GET RPROP INCREASE FACTOR :: ' + fanny.getRpropIncreaseFactor());
 console.log('GET RPROP DECREASE FACTOR :: ' + fanny.getRpropDecreaseFactor());
 console.log('GET RPROP DELTA ZERO :: ' + fanny.getRpropDeltaZero());
 console.log('GET RPROP DELTA MIN :: ' + fanny.getRpropDeltaMin());
-console.log('GET RPROP DELTA MAX :: ' + fanny.getRpropDeltaMax());
+console.log('GET RPROP DELTA MAX :: '  + fanny.getRpropDeltaMax());
+console.log('LAYERS ARRAY :: ' + fanny.getLayerArray().join(', '));
+console.log('BIAS ARRAY :: ' + fanny.getBiasArray().join(', '));
 
 //fanny.runAsync(inputs, function(err, results) {
 //	console.log(err, results);
@@ -58,6 +60,12 @@ td.setTrainData([
 	[ 0, 1, 1, 0, 0 ],
 	[ 1, 1, 0, 0, 0 ]
 ]);
+
+fanny.initWeights(td);
+console.log('GET MSE OF TRAINING DATA :: ' + fanny.testData(td));
+console.log('SHOULD HAVE UPDATED MSE :: ' + fanny.getMSE());
+
+
 td.saveTrain("boolean-logic-training-data.txt", function(err) {
 	console.log('TD Save results', err);
 });
