@@ -233,6 +233,7 @@ void FANNY::Init(v8::Local<v8::Object> target) {
 	Nan::SetPrototypeMethod(tpl, "test", test);
 	Nan::SetPrototypeMethod(tpl, "scaleTrain", scaleTrain);
 	Nan::SetPrototypeMethod(tpl, "setScalingParams", setScalingParams);
+	Nan::SetPrototypeMethod(tpl, "getCascadeActivationFunctions", getCascadeActivationFunctions);
 
 	// Create the loadFile function
 	v8::Local<v8::FunctionTemplate> loadFileTpl = Nan::New<v8::FunctionTemplate>(loadFile);
@@ -716,7 +717,48 @@ NAN_METHOD(FANNY::setScalingParams) {
 	float new_output_max = info[4]->NumberValue();
 
 	fanny->fann->set_scaling_params(*fannyTrainingData->trainingData, new_input_min, new_input_max, new_output_min, new_output_max);
+	#else
+	Nan::ThrowError("Not supported for fixed fann");
+	#endif
+}
 
+NAN_METHOD(FANNY::getCascadeActivationFunctions) {
+	#ifndef FANNY_FIXED
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	FANN::activation_function_enum* activationFunctions = fanny->fann->get_cascade_activation_functions();
+	uint32_t size = fanny->fann->get_cascade_activation_functions_count();
+	v8::Local<v8::Array> v8Array = Nan::New<v8::Array>(size);
+	for (uint32_t idx = 0; idx < size; ++idx) {
+		const char *str = NULL;
+		FANN::activation_function_enum value = activationFunctions[idx];
+		fann_activationfunc_enum cValue = *reinterpret_cast<fann_activationfunc_enum *>(&value);
+		switch(cValue) {
+			case FANN_LINEAR: str = "FANN_LINEAR"; break;
+			case FANN_THRESHOLD: str = "FANN_THRESHOLD"; break;
+			case FANN_THRESHOLD_SYMMETRIC: str = "FANN_THRESHOLD_SYMMETRIC"; break; 
+			case FANN_SIGMOID: str = "FANN_SIGMOID"; break;
+			case FANN_SIGMOID_STEPWISE: str = "FANN_SIGMOID_STEPWISE"; break;
+			case FANN_SIGMOID_SYMMETRIC: str = "FANN_SIGMOID_SYMMETRIC"; break;
+			case FANN_SIGMOID_SYMMETRIC_STEPWISE: str = "FANN_SIGMOID_SYMMETRIC_STEPWISE"; break;
+			case FANN_GAUSSIAN: str = "FANN_GAUSSIAN"; break;
+			case FANN_GAUSSIAN_SYMMETRIC: str = "FANN_GAUSSIAN_SYMMETRIC"; break;
+			case FANN_GAUSSIAN_STEPWISE: str = "FANN_GAUSSIAN_STEPWISE"; break;
+			case FANN_ELLIOT: str = "FANN_ELLIOT"; break;
+			case FANN_ELLIOT_SYMMETRIC: str = "FANN_ELLIOT_SYMMETRIC"; break;
+			case FANN_LINEAR_PIECE: str = "FANN_LINEAR_PIECE"; break;
+			case FANN_LINEAR_PIECE_SYMMETRIC: str = "FANN_LINEAR_PIECE_SYMMETRIC"; break;
+			case FANN_SIN_SYMMETRIC: str = "FANN_SIN_SYMMETRIC"; break;
+			case FANN_COS_SYMMETRIC: str = "FANN_COS_SYMMETRIC"; break;
+			case FANN_COS: str = "FANN_COS"; break;
+			case FANN_SIN: str = "FANN_SIN"; break;
+		}
+		v8::Local<v8::Value> ret;
+		if (str) {
+			ret = Nan::New(str).ToLocalChecked();
+			Nan::Set(v8Array, idx, ret);
+		}
+	}
+	info.GetReturnValue().Set(v8Array);
 	#else
 	Nan::ThrowError("Not supported for fixed fann");
 	#endif

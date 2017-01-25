@@ -50,7 +50,7 @@ console.log('GET RPROP DELTA MIN :: ' + fanny.getRpropDeltaMin());
 console.log('GET RPROP DELTA MAX :: '  + fanny.getRpropDeltaMax());
 console.log('LAYERS ARRAY :: ' + fanny.getLayerArray().join(', '));
 console.log('BIAS ARRAY :: ' + fanny.getBiasArray().join(', '));
-
+console.log(fanny.getCascadeActivationFunctions());
 //fanny.runAsync(inputs, function(err, results) {
 //	console.log(err, results);
 //});
