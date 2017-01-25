@@ -45,6 +45,7 @@ v8::Local<v8::Value> fannDataSetToV8Array(fann_type ** data, unsigned int length
 	return scope.Escape(v8Array);
 }
 
+// TODO :: still needs testing
 v8::Local<v8::Value> trainingAlgorithmEnumToV8String(FANN::training_algorithm_enum value) {
 	Nan::EscapableHandleScope scope;
 	const char *str = NULL;
@@ -64,6 +65,7 @@ v8::Local<v8::Value> trainingAlgorithmEnumToV8String(FANN::training_algorithm_en
 	return scope.Escape(ret);
 }
 
+// TODO :: still needs testing
 bool v8StringToTrainingAlgorithmEnum(v8::Local<v8::Value> value, FANN::training_algorithm_enum &ret) {
 	if (!value->IsString()) return false;
 	std::string str(*v8::String::Utf8Value(value));
