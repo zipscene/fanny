@@ -29,7 +29,7 @@ console.log('GET RPROP INCREASE FACTOR :: ' + fanny.getRpropIncreaseFactor());
 console.log('GET RPROP DECREASE FACTOR :: ' + fanny.getRpropDecreaseFactor());
 console.log('GET RPROP DELTA ZERO :: ' + fanny.getRpropDeltaZero());
 console.log('GET RPROP DELTA MIN :: ' + fanny.getRpropDeltaMin());
-console.log('GET RPROP DELTA MAX :: '  + fanny.getRpropDeltaMax());
+console.log('GET RPROP DELTA MAX :: ' + fanny.getRpropDeltaMax());
 
 //fanny.runAsync(inputs, function(err, results) {
 //	console.log(err, results);
@@ -58,8 +58,11 @@ console.log('SCALE INPUT TRAIN DATA :: ' + td3.getInput());
 td3.scaleOutputTrainData(1, 2);
 console.log('SCALE OUTPUT TRAIN DATA :: ' + td3.getOutput());
 td3.scaleTrainData(2, 3);
-console.log('SCALE TRAIN DATA INPUT :: ' + td3.getInput());
-console.log('SCALE TRAIN DATA OUTPUT :: ' + td3.getOutput());
+console.log('SCALE TRAIN DATA INPUT :: ', td3.getInput());
+console.log('SCALE TRAIN DATA OUTPUT :: ', td3.getOutput());
+td3.subsetTrainData(1, 1);
+console.log('SUBSET TRAIN DATA INPUT :: ', td3.getInput());
+console.log('SUBSET TRAIN DATA OUTPUT :: ', td3.getOutput());
 //FANNY.loadFile("/asdasd", function(e, r) {
 //	console.log('loadFile result', e, r);
 //});

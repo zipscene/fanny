@@ -69,6 +69,7 @@ void TrainingData::Init(v8::Local<v8::Object> target) {
 	Nan::SetPrototypeMethod(tpl, "scaleInputTrainData", scaleInputTrainData);
 	Nan::SetPrototypeMethod(tpl, "scaleOutputTrainData", scaleOutputTrainData);
 	Nan::SetPrototypeMethod(tpl, "scaleTrainData", scaleTrainData);
+	Nan::SetPrototypeMethod(tpl, "subsetTrainData", subsetTrainData);
 	Nan::SetPrototypeMethod(tpl, "shuffle", shuffle);
 	Nan::SetPrototypeMethod(tpl, "merge", merge);
 	Nan::SetPrototypeMethod(tpl, "length", length);
@@ -302,6 +303,17 @@ NAN_METHOD(TrainingData::scaleTrainData) {
 
 	TrainingData *self = Nan::ObjectWrap::Unwrap<TrainingData>(info.Holder());
 	self->trainingData->scale_train_data(newMin, newMax);
+}
+
+NAN_METHOD(TrainingData::subsetTrainData) {
+	if (info.Length() != 2) return Nan::ThrowError("Must have 2 arguments: pos, legth");
+	if (!info[0]->IsNumber() || !info[1]->IsNumber()) return Nan::ThrowError("Arguments must be numbers");
+
+	unsigned int pos = info[0]->Uint32Value();
+	unsigned int length = info[1]->Uint32Value();
+
+	TrainingData *self = Nan::ObjectWrap::Unwrap<TrainingData>(info.Holder());
+	self->trainingData->subset_train_data(pos, length);
 }
 
 }

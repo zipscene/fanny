@@ -49,7 +49,7 @@ private:
 	static NAN_METHOD(scaleInputTrainData);
 	static NAN_METHOD(scaleOutputTrainData);
 	static NAN_METHOD(scaleTrainData);
-	// static NAN_METHOD(subsetTrainData);
+	static NAN_METHOD(subsetTrainData);
 
 };
 
