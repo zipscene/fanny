@@ -149,6 +149,8 @@ void FANNY::Init(v8::Local<v8::Object> target) {
 	Nan::SetPrototypeMethod(tpl, "runAsync", runAsync);
 	Nan::SetPrototypeMethod(tpl, "initWeights", initWeights);
 	Nan::SetPrototypeMethod(tpl, "testData", testData);
+	Nan::SetPrototypeMethod(tpl, "getLayerArray", getLayerArray);
+	Nan::SetPrototypeMethod(tpl, "getBiasArray", getBiasArray);
 
 	// Create the loadFile function
 	v8::Local<v8::FunctionTemplate> loadFileTpl = Nan::New<v8::FunctionTemplate>(loadFile);
@@ -439,6 +441,32 @@ NAN_METHOD(FANNY::testData) {
 	TrainingData *fannyTrainingData = Nan::ObjectWrap::Unwrap<TrainingData>(info[0].As<v8::Object>());
 	float num = fanny->fann->test_data(*fannyTrainingData->trainingData);
 	info.GetReturnValue().Set(num);
+}
+
+NAN_METHOD(FANNY::getLayerArray) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	std::vector<unsigned int> retArrayVector(fanny->fann->get_num_layers());
+	fanny->fann->get_layer_array(&retArrayVector[0]);
+	uint32_t size = retArrayVector.size();
+	v8::Local<v8::Array> v8Array = Nan::New<v8::Array>(size);
+	for (uint32_t idx = 0; idx < size; ++idx) {
+		v8::Local<v8::Value> value = Nan::New<v8::Number>(retArrayVector[idx]);
+		Nan::Set(v8Array, idx, value);
+	}
+	info.GetReturnValue().Set(v8Array);
+}
+
+NAN_METHOD(FANNY::getBiasArray) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	std::vector<unsigned int> retArrayVector(fanny->fann->get_num_layers());
+	fanny->fann->get_bias_array(&retArrayVector[0]);
+	uint32_t size = retArrayVector.size();
+	v8::Local<v8::Array> v8Array = Nan::New<v8::Array>(size);
+	for (uint32_t idx = 0; idx < size; ++idx) {
+		v8::Local<v8::Value> value = Nan::New<v8::Number>(retArrayVector[idx]);
+		Nan::Set(v8Array, idx, value);
+	}
+	info.GetReturnValue().Set(v8Array);
 }
 
 }

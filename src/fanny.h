@@ -56,6 +56,8 @@ private:
 	static NAN_METHOD(getRpropDeltaMax);
 	static NAN_METHOD(initWeights);
 	static NAN_METHOD(testData);
+	static NAN_METHOD(getLayerArray);
+	static NAN_METHOD(getBiasArray);
 
 	// constructor & destructor
 	explicit FANNY(FANN::neural_net *fann);

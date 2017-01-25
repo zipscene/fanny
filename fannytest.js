@@ -30,6 +30,8 @@ console.log('GET RPROP DECREASE FACTOR :: ' + fanny.getRpropDecreaseFactor());
 console.log('GET RPROP DELTA ZERO :: ' + fanny.getRpropDeltaZero());
 console.log('GET RPROP DELTA MIN :: ' + fanny.getRpropDeltaMin());
 console.log('GET RPROP DELTA MAX :: '  + fanny.getRpropDeltaMax());
+console.log('LAYERS ARRAY :: ' + fanny.getLayerArray().join(', '));
+console.log('BIAS ARRAY :: ' + fanny.getBiasArray().join(', '));
 
 //fanny.runAsync(inputs, function(err, results) {
 //	console.log(err, results);
