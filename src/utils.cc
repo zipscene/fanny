@@ -45,6 +45,25 @@ v8::Local<v8::Value> fannDataSetToV8Array(fann_type ** data, unsigned int length
 	return scope.Escape(v8Array);
 }
 
+v8::Local<v8::Value> trainingAlgorithmEnumToV8String(FANN::training_algorithm_enum value) {
+	Nan::EscapableHandleScope scope;
+	const char *str = NULL;
+	switch(value) {
+		case FANN::TRAIN_INCREMENTAL: str = "TRAIN_INCREMENTAL"; break;
+		case FANN::TRAIN_BATCH: str = "TRAIN_BATCH"; break;
+		case FANN::TRAIN_RPROP: str = "TRAIN_RPROP"; break;
+		case FANN::TRAIN_QUICKPROP: str = "TRAIN_QUICKPROP"; break;
+		case FANN::TRAIN_SARPROP: str = "FANN_TRAIN_SARPROP"; break;
+	}
+	v8::Local<v8::Value> ret;
+	if (str) {
+		ret = Nan::New<v8::String>(str).ToLocalChecked();
+	} else {
+		ret = Nan::Null();
+	}
+	return scope.Escape(ret);
+}
+
 }
 
 
