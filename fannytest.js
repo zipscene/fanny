@@ -93,6 +93,26 @@ console.log('SUBSET TRAIN DATA OUTPUT :: ', td3.getOutput());
 //	console.log('loadFile result', e, r);
 //});
 
+var fanny5 = new FANNY(fanny)
+var td5 = new TrainingData();
+td5.setTrainData([
+	[ 2, 1 ],
+	[ 1, 2 ],
+	[ 1, 1 ],
+	[ 2, 2 ]
+], [
+	// AND, OR, NAND, NOR, XOR
+	[ 1, 2, 2, 1, 2 ],
+	[ 1, 2, 2, 1, 2 ],
+	[ 1, 2, 2, 1, 1 ],
+	[ 2, 2, 1, 1, 1 ]
+]);
+fanny5.setScalingParams(td5, 2, 3, 2, 3);
+fanny5.scaleTrain(td5);
+console.log('SCALE TRAIN INPUT :: ', td5.getInput());
+console.log('SCALE TRAIN OUTPUT :: ', td5.getOutput());
+
+
 fanny.save("/tmp/testfann", function(err) {
 	console.log('FANN Save result', err);
 });
