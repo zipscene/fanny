@@ -22,7 +22,7 @@ console.log(results);
 
 console.log('BIT FAIL :: ' + fanny.getBitFail());
 console.log('GET MSE :: ' + fanny.getMSE());
-console.log('GET LEARNING RATE :: ' + fanny.getLearningRate()); // default should be 0.7
+console.log('GET LEARNING RATE :: ' + fanny.getLearningRate());
 console.log('GET PROP DECAY :: ' + fanny.getQuickPropDecay());
 console.log('GET PROP MU :: ' + fanny.getQuickPropMu());
 console.log('GET RPROP INCREASE FACTOR :: ' + fanny.getRpropIncreaseFactor());

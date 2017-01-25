@@ -54,6 +54,42 @@ fann_type v8NumberToFannType(v8::Local<v8::Value> number) {
 		fannNumber = number->NumberValue();
 		#endif
 	}
+}
+
+// TODO :: still needs testing
+v8::Local<v8::Value> trainingAlgorithmEnumToV8String(FANN::training_algorithm_enum value) {
+	Nan::EscapableHandleScope scope;
+	const char *str = NULL;
+	switch(value) {
+		case FANN::TRAIN_INCREMENTAL: str = "TRAIN_INCREMENTAL"; break;
+		case FANN::TRAIN_BATCH: str = "TRAIN_BATCH"; break;
+		case FANN::TRAIN_RPROP: str = "TRAIN_RPROP"; break;
+		case FANN::TRAIN_QUICKPROP: str = "TRAIN_QUICKPROP"; break;
+		case FANN::TRAIN_SARPROP: str = "FANN_TRAIN_SARPROP"; break;
+	}
+	v8::Local<v8::Value> ret;
+	if (str) {
+		ret = Nan::New<v8::String>(str).ToLocalChecked();
+	} else {
+		ret = Nan::Null();
+	}
+	return scope.Escape(ret);
+}
+
+// TODO :: still needs testing
+bool v8StringToTrainingAlgorithmEnum(v8::Local<v8::Value> value, FANN::training_algorithm_enum &ret) {
+	if (!value->IsString()) return false;
+	std::string str(*v8::String::Utf8Value(value));
+	if (str.compare("TRAIN_INCREMENTAL")) ret = FANN::TRAIN_INCREMENTAL;
+	else if (str.compare("TRAIN_BATCH")) ret = FANN::TRAIN_BATCH;
+	else if (str.compare("TRAIN_RPROP")) ret = FANN::TRAIN_RPROP;
+	else if (str.compare("TRAIN_QUICKPROP")) ret = FANN::TRAIN_QUICKPROP;
+	else if (str.compare("FANN_TRAIN_SARPROP")) ret = FANN::TRAIN_SARPROP;
+	else return false;
+	return true;
+}
+
+}
 
 	return fannNumber;
 }
