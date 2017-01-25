@@ -232,6 +232,10 @@ void FANNY::Init(v8::Local<v8::Object> target) {
 	Nan::SetPrototypeMethod(tpl, "train", train);
 	Nan::SetPrototypeMethod(tpl, "test", test);
 	Nan::SetPrototypeMethod(tpl, "scaleTrain", scaleTrain);
+	Nan::SetPrototypeMethod(tpl, "descaleTrain", descaleTrain);
+	Nan::SetPrototypeMethod(tpl, "clearScalingParams", clearScalingParams);
+	Nan::SetPrototypeMethod(tpl, "setInputScalingParams", setInputScalingParams);
+	Nan::SetPrototypeMethod(tpl, "setOutputScalingParams", setOutputScalingParams);
 	Nan::SetPrototypeMethod(tpl, "setScalingParams", setScalingParams);
 
 	// Create the loadFile function
@@ -690,6 +694,81 @@ NAN_METHOD(FANNY::scaleTrain) {
 	}
 	TrainingData *fannyTrainingData = Nan::ObjectWrap::Unwrap<TrainingData>(info[0].As<v8::Object>());
 	fanny->fann->scale_train(*fannyTrainingData->trainingData);
+
+	#else
+	Nan::ThrowError("Not supported for fixed fann");
+	#endif
+}
+
+NAN_METHOD(FANNY::descaleTrain) {
+	#ifndef FANNY_FIXED
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 1) return Nan::ThrowError("Must have an argument: tainingData");
+	if (!Nan::New(TrainingData::constructorFunctionTpl)->HasInstance(info[0])) {
+		return Nan::ThrowError("Argument must be an instance of TrainingData");
+	}
+	TrainingData *fannyTrainingData = Nan::ObjectWrap::Unwrap<TrainingData>(info[0].As<v8::Object>());
+	fanny->fann->descale_train(*fannyTrainingData->trainingData);
+
+	#else
+	Nan::ThrowError("Not supported for fixed fann");
+	#endif
+}
+
+NAN_METHOD(FANNY::clearScalingParams) {
+	#ifndef FANNY_FIXED
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	bool result = fanny->fann->clear_scaling_params();
+
+	info.GetReturnValue().Set(result);
+
+	#else
+	Nan::ThrowError("Not supported for fixed fann");
+	#endif
+}
+NAN_METHOD(FANNY::setInputScalingParams) {
+	#ifndef FANNY_FIXED
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 3) return Nan::ThrowError("Must have 5 arguments: tainingData, new_input_min, and new_input_max");
+	if (!Nan::New(TrainingData::constructorFunctionTpl)->HasInstance(info[0])) {
+		return Nan::ThrowError("Argument must be an instance of TrainingData");
+	}
+
+	if (!info[1]->IsNumber() || !info[2]->IsNumber()) {
+		return Nan::ThrowError("new_input_min and new_input_max must be of numbers");
+	}
+
+	TrainingData *fannyTrainingData = Nan::ObjectWrap::Unwrap<TrainingData>(info[0].As<v8::Object>());
+
+	float new_input_min = info[1]->NumberValue();
+	float new_input_max = info[2]->NumberValue();
+
+
+	fanny->fann->set_input_scaling_params(*fannyTrainingData->trainingData, new_input_min, new_input_max);
+
+	#else
+	Nan::ThrowError("Not supported for fixed fann");
+	#endif
+}
+
+NAN_METHOD(FANNY::setOutputScalingParams) {
+	#ifndef FANNY_FIXED
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 3) return Nan::ThrowError("Must have 5 arguments: tainingData new_output_min, and new_output_max");
+	if (!Nan::New(TrainingData::constructorFunctionTpl)->HasInstance(info[0])) {
+		return Nan::ThrowError("Argument must be an instance of TrainingData");
+	}
+
+	if (!info[1]->IsNumber() || !info[2]->IsNumber()) {
+		return Nan::ThrowError("new_output_min and new_output_max must be of numbers");
+	}
+
+	TrainingData *fannyTrainingData = Nan::ObjectWrap::Unwrap<TrainingData>(info[0].As<v8::Object>());
+
+	float new_output_min = info[1]->NumberValue();
+	float new_output_max = info[2]->NumberValue();
+
+	fanny->fann->set_output_scaling_params(*fannyTrainingData->trainingData, new_output_min, new_output_max);
 
 	#else
 	Nan::ThrowError("Not supported for fixed fann");

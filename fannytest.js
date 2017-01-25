@@ -110,7 +110,15 @@ fanny5.setScalingParams(td5, 2, 3, 2, 3);
 fanny5.scaleTrain(td5);
 console.log('SCALE TRAIN INPUT :: ', td5.getInput());
 console.log('SCALE TRAIN OUTPUT :: ', td5.getOutput());
-
+fanny5.descaleTrain(td5);
+console.log('DESCALE TRAIN INPUT :: ', td5.getInput());
+console.log('DESCALE TRAIN OUTPUT :: ', td5.getOutput());
+console.log('CLEAR SCALING PARAMS :: ' + fanny5.clearScalingParams());
+fanny5.setInputScalingParams(td5, 3, 4);
+fanny5.setOutputScalingParams(td5, 3, 4);
+fanny5.scaleTrain(td5);
+console.log('SCALE TRAIN INPUT :: ', td5.getInput());
+console.log('SCALE TRAIN OUTPUT :: ', td5.getOutput());
 
 /* fanny.save("/tmp/testfann", function(err) {
 	console.log('FANN Save result', err);
