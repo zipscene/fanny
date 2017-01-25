@@ -49,6 +49,9 @@ td.setTrainData([
 	[ 0, 1, 1, 0, 0 ],
 	[ 1, 1, 0, 0, 0 ]
 ]);
+
+fanny.initWeights(td);
+
 td.saveTrain("boolean-logic-training-data.txt", function(err) {
 	console.log('TD Save results', err);
 });

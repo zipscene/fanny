@@ -3,6 +3,7 @@
 #include "fann-includes.h"
 #include <iostream>
 #include "utils.h"
+#include "training-data.h"
 
 namespace fanny {
 
@@ -146,6 +147,7 @@ void FANNY::Init(v8::Local<v8::Object> target) {
 	Nan::SetPrototypeMethod(tpl, "getRpropDeltaMin", getRpropDeltaMin);
 	Nan::SetPrototypeMethod(tpl, "getRpropDeltaMax", getRpropDeltaMax);
 	Nan::SetPrototypeMethod(tpl, "runAsync", runAsync);
+	Nan::SetPrototypeMethod(tpl, "initWeights", initWeights);
 
 	// Create the loadFile function
 	v8::Local<v8::FunctionTemplate> loadFileTpl = Nan::New<v8::FunctionTemplate>(loadFile);
@@ -415,6 +417,16 @@ NAN_METHOD(FANNY::getRpropDeltaMax) {
 	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
 	float num = fanny->fann->get_rprop_delta_max();
 	info.GetReturnValue().Set(num);
+}
+
+NAN_METHOD(FANNY::initWeights) {
+	if (info.Length() != 1) return Nan::ThrowError("Takes an argument");
+	if (!Nan::New(TrainingData::constructorFunctionTpl)->HasInstance(info[0])) {
+		return Nan::ThrowError("Argument must be an instance of TrainingData");
+	}
+	TrainingData *fannyTrainingData = Nan::ObjectWrap::Unwrap<TrainingData>(info[0].As<v8::Object>());
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	return fanny->fann->init_weights(*fannyTrainingData->trainingData);
 }
 
 }
