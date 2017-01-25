@@ -16,6 +16,9 @@ public:
 	// Encapsulated FANN neural_net instance
 	FANN::neural_net *fann;
 
+	// User-defined training callback function
+	Nan::Persistent<v8::Function> trainingCallbackFn;
+
 	// Constructor
 	static Nan::Persistent<v8::FunctionTemplate> constructorFunctionTpl;
 	static Nan::Persistent<v8::Function> constructorFunction;
@@ -58,6 +61,26 @@ private:
 	static NAN_METHOD(testData);
 	static NAN_METHOD(getLayerArray);
 	static NAN_METHOD(getBiasArray);
+
+	static NAN_METHOD(trainEpoch);
+	static NAN_METHOD(trainOnData);
+	static NAN_METHOD(trainOnFile);
+	static NAN_METHOD(cascadetrainOnData);
+	static NAN_METHOD(cascadetrainOnFile);
+	static NAN_METHOD(testData);
+
+	static void _doTrainOrTest(const Nan::FunctionCallbackInfo<v8::Value> &info, bool fromFile, bool isCascade, bool singleEpoch, bool isTest);
+
+	static NAN_METHOD(setCallback);
+	static int fannInternalCallback(
+		FANN::neural_net &fann,
+		FANN::training_data &train,
+		unsigned int max_epochs,
+		unsigned int epochs_between_reports,
+		float desired_error,
+		unsigned int epochs,
+		void *user_data
+	);
 
 	// constructor & destructor
 	explicit FANNY(FANN::neural_net *fann);
