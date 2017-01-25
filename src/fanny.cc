@@ -117,6 +117,78 @@ public:
 	int decimalPoint;
 };
 
+class TrainWorker : public Nan::AsyncWorker {
+public:
+	FANNY *fanny;
+	TrainingData *trainingData;
+	bool trainFromFile;
+	std::string filename;
+	bool isCascade;
+	unsigned int maxIterations;
+	unsigned int iterationsBetweenReports;
+	float desiredError;
+	bool singleEpoch;
+	bool isTest;
+
+	float retVal;
+
+	TrainWorker(
+		Nan::Callback *callback,
+		v8::Local<v8::Object> fannyHolder,
+		Nan::MaybeLocal<v8::Object> maybeTrainingDataHolder,
+		bool _trainFromFile,
+		std::string _filename,
+		bool _isCascade,
+		unsigned int _maxIterations,
+		unsigned int _iterationsBetweenReports,
+		float _desiredError,
+		bool _singleEpoch,
+		bool _isTest
+	) : Nan::AsyncWorker(callback), trainFromFile(_trainFromFile), filename(_filename),
+	isCascade(_isCascade), maxIterations(_maxIterations), iterationsBetweenReports(_iterationsBetweenReports),
+	desiredError(_desiredError), singleEpoch(_singleEpoch), isTest(_isTest), retVal(-1) {
+		SaveToPersistent("fannyHolder", fannyHolder);
+		fanny = Nan::ObjectWrap::Unwrap<FANNY>(fannyHolder);
+		if (!maybeTrainingDataHolder.IsEmpty()) {
+			v8::Local<v8::Object> trainingDataHolder = maybeTrainingDataHolder.ToLocalChecked();
+			SaveToPersistent("tdHolder", trainingDataHolder);
+			trainingData = Nan::ObjectWrap::Unwrap<TrainingData>(trainingDataHolder);
+		}
+	}
+	~TrainWorker() {}
+
+	void Execute() {
+		#ifndef FANNY_FIXED
+		if (isTest) {
+			retVal = fanny->fann->test_data(*trainingData->trainingData);
+		} else if (singleEpoch) {
+			retVal = fanny->fann->train_epoch(*trainingData->trainingData);
+		} else if (!trainFromFile && !isCascade) {
+			fanny->fann->train_on_data(*trainingData->trainingData, maxIterations, iterationsBetweenReports, desiredError);
+		} else if (trainFromFile && !isCascade) {
+			fanny->fann->train_on_file(filename, maxIterations, iterationsBetweenReports, desiredError);
+		} else if (!trainFromFile && isCascade) {
+			fanny->fann->cascadetrain_on_data(*trainingData->trainingData, maxIterations, iterationsBetweenReports, desiredError);
+		} else if (trainFromFile && isCascade) {
+			fanny->fann->cascadetrain_on_file(filename, maxIterations, iterationsBetweenReports, desiredError);
+		}
+		if (fanny->fann->get_errno()) {
+			SetErrorMessage(fanny->fann->get_errstr().c_str());
+			fanny->fann->reset_errno();
+			fanny->fann->reset_errstr();
+		} else if (!singleEpoch && !isTest) {
+			retVal = fanny->fann->get_MSE();
+		}
+		#endif
+	}
+
+	void HandleOKCallback() {
+		Nan::HandleScope scope;
+		v8::Local<v8::Value> args[] = { Nan::Null(), Nan::New(retVal) };
+		callback->Call(2, args);
+	}
+};
+
 void FANNY::Init(v8::Local<v8::Object> target) {
 	// Create new function template for this JS class constructor
 	v8::Local<v8::FunctionTemplate> tpl = Nan::New<v8::FunctionTemplate>(New);
@@ -130,6 +202,12 @@ void FANNY::Init(v8::Local<v8::Object> target) {
 	// Add prototype methods
 	Nan::SetPrototypeMethod(tpl, "save", save);
 	Nan::SetPrototypeMethod(tpl, "saveToFixed", saveToFixed);
+	Nan::SetPrototypeMethod(tpl, "setCallback", setCallback);
+	Nan::SetPrototypeMethod(tpl, "trainEpoch", trainEpoch);
+	Nan::SetPrototypeMethod(tpl, "trainOnData", trainOnData);
+	Nan::SetPrototypeMethod(tpl, "trainOnFile", trainOnFile);
+	Nan::SetPrototypeMethod(tpl, "cascadetrainOnData", cascadetrainOnData);
+	Nan::SetPrototypeMethod(tpl, "cascadetrainOnFile", cascadetrainOnFile);
 	Nan::SetPrototypeMethod(tpl, "run", run);
 	Nan::SetPrototypeMethod(tpl, "getNumInput", getNumInput);
 	Nan::SetPrototypeMethod(tpl, "getNumOutput", getNumOutput);
@@ -305,6 +383,111 @@ NAN_METHOD(FANNY::saveToFixed) {
 	Nan::AsyncQueueWorker(new SaveFileWorker(callback, info.Holder(), filename, true));
 }
 
+int FANNY::fannInternalCallback(
+	FANN::neural_net &fann,
+	FANN::training_data &train,
+	unsigned int max_epochs,
+	unsigned int epochs_between_reports,
+	float desired_error,
+	unsigned int epochs,
+	void *user_data
+) {
+	FANNY *fanny = (FANNY *)user_data;
+
+}
+
+NAN_METHOD(FANNY::setCallback) {
+	#ifndef FANNY_FIXED
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() == 0 || !info[0]->IsFunction()) {
+		fanny->trainingCallbackFn.Reset();
+		fanny->fann->set_callback(NULL, NULL);
+	} else {
+		fanny->trainingCallbackFn.Reset(info[0].As<v8::Function>());
+		fanny->fann->set_callback(fannInternalCallback, fanny);
+	}
+	#else
+	Nan::ThrowError("Not supported for fixed FANN");
+	#endif
+}
+
+void FANNY::_doTrainOrTest(
+	const Nan::FunctionCallbackInfo<v8::Value> &info,
+	bool fromFile,
+	bool isCascade,
+	bool singleEpoch,
+	bool isTest
+) {
+	#ifndef FANNY_FIXED
+	bool hasConfigParams = !singleEpoch && !isTest;
+	unsigned int numArgs = hasConfigParams ? 5 : 2;
+	if (info.Length() != numArgs) return Nan::ThrowError("Invalid arguments");
+	std::string filename;
+	Nan::MaybeLocal<v8::Object> maybeTrainingData;
+	if (fromFile) {
+		if (!info[0]->IsString()) return Nan::ThrowTypeError("First argument must be a string");
+		filename = std::string(*v8::String::Utf8Value(info[0]));
+	} else {
+		if (!info[0]->IsObject()) return Nan::ThrowTypeError("First argument must be TrainingData");
+		if (!Nan::New(TrainingData::constructorFunctionTpl)->HasInstance(info[0])) return Nan::ThrowTypeError("First argument must be TrainingData");
+		v8::Local<v8::Object> trainingDataHolder = info[0].As<v8::Object>();
+		maybeTrainingData = Nan::MaybeLocal<v8::Object>(trainingDataHolder);
+	}
+	unsigned int maxIterations = 0;
+	unsigned int iterationsBetweenReports = 0;
+	float desiredError = 0;
+	if (hasConfigParams) {
+		if (!info[1]->IsNumber() || !info[2]->IsNumber() || !info[3]->IsNumber()) {
+			return Nan::ThrowTypeError("Arguments must be numbers");
+		}
+		maxIterations = info[1]->Uint32Value();
+		iterationsBetweenReports = info[2]->Uint32Value();
+		desiredError = (float)info[3]->NumberValue();
+	}
+	if (!info[numArgs - 1]->IsFunction()) return Nan::ThrowTypeError("Last argument must be callback");
+	Nan::Callback *callback = new Nan::Callback(info[numArgs - 1].As<v8::Function>());
+	Nan::AsyncQueueWorker(new TrainWorker(
+		callback,
+		info.Holder(),
+		maybeTrainingData,
+		fromFile,
+		filename,
+		isCascade,
+		maxIterations,
+		iterationsBetweenReports,
+		desiredError,
+		singleEpoch,
+		isTest
+	));
+	#else
+	Nan::ThrowError("Not supported for fixed FANN");
+	#endif
+}
+
+NAN_METHOD(FANNY::trainEpoch) {
+	_doTrainOrTest(info, false, false, true, false);
+}
+
+NAN_METHOD(FANNY::trainOnData) {
+	_doTrainOrTest(info, false, false, false, false);
+}
+
+NAN_METHOD(FANNY::trainOnFile) {
+	_doTrainOrTest(info, true, false, false, false);
+}
+
+NAN_METHOD(FANNY::cascadetrainOnData) {
+	_doTrainOrTest(info, false, true, false, false);
+}
+
+NAN_METHOD(FANNY::cascadetrainOnFile) {
+	_doTrainOrTest(info, true, true, false, false);
+}
+
+NAN_METHOD(FANNY::testData) {
+	_doTrainOrTest(info, false, false, true, true);
+}
+
 NAN_METHOD(FANNY::run) {
 	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
 	if (info.Length() != 1) return Nan::ThrowError("Takes one argument");
@@ -434,17 +617,6 @@ NAN_METHOD(FANNY::initWeights) {
 	TrainingData *fannyTrainingData = Nan::ObjectWrap::Unwrap<TrainingData>(info[0].As<v8::Object>());
 	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
 	return fanny->fann->init_weights(*fannyTrainingData->trainingData);
-}
-
-NAN_METHOD(FANNY::testData) {
-	if (info.Length() != 1) return Nan::ThrowError("Takes an argument");
-	if (!Nan::New(TrainingData::constructorFunctionTpl)->HasInstance(info[0])) {
-		return Nan::ThrowError("Argument must be an instance of TrainingData");
-	}
-	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
-	TrainingData *fannyTrainingData = Nan::ObjectWrap::Unwrap<TrainingData>(info[0].As<v8::Object>());
-	float num = fanny->fann->test_data(*fannyTrainingData->trainingData);
-	info.GetReturnValue().Set(num);
 }
 
 NAN_METHOD(FANNY::getLayerArray) {

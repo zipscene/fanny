@@ -71,7 +71,6 @@ td.setTrainData([
 ]);
 
 fanny.initWeights(td);
-console.log('GET MSE OF TRAINING DATA :: ' + fanny.testData(td));
 console.log('SHOULD HAVE UPDATED MSE :: ' + fanny.getMSE());
 
 
@@ -113,8 +112,13 @@ console.log('SCALE TRAIN INPUT :: ', td5.getInput());
 console.log('SCALE TRAIN OUTPUT :: ', td5.getOutput());
 
 
-fanny.save("/tmp/testfann", function(err) {
+/* fanny.save("/tmp/testfann", function(err) {
 	console.log('FANN Save result', err);
+	});*/
+
+console.log('Training');
+fanny.trainOnData(td, 1000, 1, 0.001, function(err, res) {
+	console.log('Training result', err, res);
 });
 
 setTimeout(function() { console.log('Done.'); }, 5000);
