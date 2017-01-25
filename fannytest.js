@@ -97,7 +97,11 @@ console.log('SUBSET TRAIN DATA OUTPUT :: ', td3.getOutput());
 	});*/
 
 console.log('Training');
-fanny.trainOnData(td, 1000, 1, 0.001, function(err, res) {
+fanny.setCallback(function(obj) {
+	console.log('TRAINING CALLBACK');
+	console.log(obj);
+});
+fanny.trainOnData(td, 100000, 1, 0.00000001, function(err, res) {
 	console.log('Training result', err, res);
 });
 

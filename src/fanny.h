@@ -6,6 +6,8 @@
 
 namespace fanny {
 
+class TrainWorker;
+
 class FANNY : public Nan::ObjectWrap {
 
 public:
@@ -22,6 +24,17 @@ public:
 	// Constructor
 	static Nan::Persistent<v8::FunctionTemplate> constructorFunctionTpl;
 	static Nan::Persistent<v8::Function> constructorFunction;
+
+	// Current training iteration data
+	class TrainingProgress {
+	public:
+		unsigned int iteration;
+		float mse;
+		unsigned int bitFail;
+	};
+	TrainingProgress currentTrainingProgress;
+	TrainWorker *currentTrainWorker;
+	bool cancelTrainingFlag;
 
 private:
 

@@ -117,7 +117,7 @@ public:
 	int decimalPoint;
 };
 
-class TrainWorker : public Nan::AsyncWorker {
+class TrainWorker : public Nan::AsyncProgressWorker {
 public:
 	FANNY *fanny;
 	TrainingData *trainingData;
@@ -131,6 +131,7 @@ public:
 	bool isTest;
 
 	float retVal;
+	const ExecutionProgress *executionProgress;
 
 	TrainWorker(
 		Nan::Callback *callback,
@@ -144,7 +145,7 @@ public:
 		float _desiredError,
 		bool _singleEpoch,
 		bool _isTest
-	) : Nan::AsyncWorker(callback), trainFromFile(_trainFromFile), filename(_filename),
+	) : Nan::AsyncProgressWorker(callback), trainFromFile(_trainFromFile), filename(_filename),
 	isCascade(_isCascade), maxIterations(_maxIterations), iterationsBetweenReports(_iterationsBetweenReports),
 	desiredError(_desiredError), singleEpoch(_singleEpoch), isTest(_isTest), retVal(-1) {
 		SaveToPersistent("fannyHolder", fannyHolder);
@@ -155,9 +156,11 @@ public:
 			trainingData = Nan::ObjectWrap::Unwrap<TrainingData>(trainingDataHolder);
 		}
 	}
-	~TrainWorker() {}
 
-	void Execute() {
+	void Execute(const ExecutionProgress &progress) {
+		executionProgress = &progress;
+		fanny->currentTrainWorker = this;
+		fanny->cancelTrainingFlag = false;
 		#ifndef FANNY_FIXED
 		if (isTest) {
 			retVal = fanny->fann->test_data(*trainingData->trainingData);
@@ -180,12 +183,29 @@ public:
 			retVal = fanny->fann->get_MSE();
 		}
 		#endif
+		fanny->currentTrainWorker = NULL;
 	}
 
 	void HandleOKCallback() {
 		Nan::HandleScope scope;
 		v8::Local<v8::Value> args[] = { Nan::Null(), Nan::New(retVal) };
 		callback->Call(2, args);
+	}
+
+	void HandleProgressCallback(const char *_discard1, size_t _discard2) {
+		Nan::HandleScope scope;
+		if (!fanny->trainingCallbackFn.IsEmpty() && !fanny->cancelTrainingFlag) {
+			v8::Local<v8::Function> trainingCallbackFn = Nan::New(fanny->trainingCallbackFn);
+			v8::Local<v8::Object> obj = Nan::New<v8::Object>();
+			Nan::Set(obj, Nan::New("iteration").ToLocalChecked(), Nan::New(fanny->currentTrainingProgress.iteration));
+			Nan::Set(obj, Nan::New("mse").ToLocalChecked(), Nan::New(fanny->currentTrainingProgress.mse));
+			Nan::Set(obj, Nan::New("bitfail").ToLocalChecked(), Nan::New(fanny->currentTrainingProgress.bitFail));
+			v8::Local<v8::Value> args[] = { obj };
+			Nan::MaybeLocal<v8::Value> ret = Nan::Call(trainingCallbackFn, GetFromPersistent("fannyHolder").As<v8::Object>(), 1, args);
+			if (!ret.IsEmpty() && ret.ToLocalChecked()->IsNumber() && ret.ToLocalChecked()->Int32Value() < 0) {
+				fanny->cancelTrainingFlag = true;
+			}
+		}
 	}
 };
 
@@ -247,7 +267,7 @@ void FANNY::Init(v8::Local<v8::Object> target) {
 Nan::Persistent<v8::FunctionTemplate> FANNY::constructorFunctionTpl;
 Nan::Persistent<v8::Function> FANNY::constructorFunction;
 
-FANNY::FANNY(FANN::neural_net *_fann) : fann(_fann) {}
+FANNY::FANNY(FANN::neural_net *_fann) : fann(_fann), currentTrainWorker(NULL) {}
 
 FANNY::~FANNY() {
 	delete fann;
@@ -391,7 +411,17 @@ int FANNY::fannInternalCallback(
 	void *user_data
 ) {
 	FANNY *fanny = (FANNY *)user_data;
-
+	fanny->currentTrainingProgress.iteration = epochs;
+	fanny->currentTrainingProgress.mse = fanny->fann->get_MSE();
+	fanny->currentTrainingProgress.bitFail = fanny->fann->get_bit_fail();
+	if (fanny->currentTrainWorker && fanny->currentTrainWorker->executionProgress) {
+		fanny->currentTrainWorker->executionProgress->Signal();
+	}
+	if (fanny->cancelTrainingFlag) {
+		return -1;
+	} else {
+		return 1;
+	}
 }
 
 NAN_METHOD(FANNY::setCallback) {
@@ -418,7 +448,7 @@ void FANNY::_doTrainOrTest(
 ) {
 	#ifndef FANNY_FIXED
 	bool hasConfigParams = !singleEpoch && !isTest;
-	unsigned int numArgs = hasConfigParams ? 5 : 2;
+	int numArgs = hasConfigParams ? 5 : 2;
 	if (info.Length() != numArgs) return Nan::ThrowError("Invalid arguments");
 	std::string filename;
 	Nan::MaybeLocal<v8::Object> maybeTrainingData;
