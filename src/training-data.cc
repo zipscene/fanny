@@ -277,3 +277,5 @@ NAN_METHOD(TrainingData::scaleInputTrainData) {
 	TrainingData *self = Nan::ObjectWrap::Unwrap<TrainingData>(info.Holder());
 	self->trainingData->scale_input_train_data(newMin, newMax);
 }
+
+}

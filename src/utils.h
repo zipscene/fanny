@@ -12,5 +12,7 @@ v8::Local<v8::Value> fannDataSetToV8Array(fann_type ** data, unsigned int length
 
 v8::Local<v8::Value> trainingAlgorithmEnumToV8String(FANN::training_algorithm_enum * value);
 
+bool v8StringToTrainingAlgorithmEnum(v8::Local<v8::Value> value, FANN::training_algorithm_enum &ret);
+
 }
 
