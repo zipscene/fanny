@@ -58,7 +58,6 @@ private:
 	static NAN_METHOD(getRpropDeltaMin);
 	static NAN_METHOD(getRpropDeltaMax);
 	static NAN_METHOD(initWeights);
-	static NAN_METHOD(testData);
 	static NAN_METHOD(getLayerArray);
 	static NAN_METHOD(getBiasArray);
 
