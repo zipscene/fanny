@@ -148,6 +148,7 @@ void FANNY::Init(v8::Local<v8::Object> target) {
 	Nan::SetPrototypeMethod(tpl, "getRpropDeltaMax", getRpropDeltaMax);
 	Nan::SetPrototypeMethod(tpl, "runAsync", runAsync);
 	Nan::SetPrototypeMethod(tpl, "initWeights", initWeights);
+	Nan::SetPrototypeMethod(tpl, "testData", testData);
 
 	// Create the loadFile function
 	v8::Local<v8::FunctionTemplate> loadFileTpl = Nan::New<v8::FunctionTemplate>(loadFile);
@@ -427,6 +428,17 @@ NAN_METHOD(FANNY::initWeights) {
 	TrainingData *fannyTrainingData = Nan::ObjectWrap::Unwrap<TrainingData>(info[0].As<v8::Object>());
 	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
 	return fanny->fann->init_weights(*fannyTrainingData->trainingData);
+}
+
+NAN_METHOD(FANNY::testData) {
+	if (info.Length() != 1) return Nan::ThrowError("Takes an argument");
+	if (!Nan::New(TrainingData::constructorFunctionTpl)->HasInstance(info[0])) {
+		return Nan::ThrowError("Argument must be an instance of TrainingData");
+	}
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	TrainingData *fannyTrainingData = Nan::ObjectWrap::Unwrap<TrainingData>(info[0].As<v8::Object>());
+	float num = fanny->fann->test_data(*fannyTrainingData->trainingData);
+	info.GetReturnValue().Set(num);
 }
 
 }

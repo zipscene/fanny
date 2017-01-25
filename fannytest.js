@@ -51,6 +51,9 @@ td.setTrainData([
 ]);
 
 fanny.initWeights(td);
+console.log('GET MSE OF TRAINING DATA :: ' + fanny.testData(td));
+console.log('SHOULD HAVE UPDATED MSE :: ' + fanny.getMSE());
+
 
 td.saveTrain("boolean-logic-training-data.txt", function(err) {
 	console.log('TD Save results', err);
