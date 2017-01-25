@@ -46,7 +46,8 @@ v8::Local<v8::Value> fannDataSetToV8Array(fann_type ** data, unsigned int length
 }
 
 fann_type v8NumberToFannType(v8::Local<v8::Value> number) {
-	fann_type fannNumber;
+	// TODO: Better error checking around this value being set
+	fann_type fannNumber = 0;
 	if (number->IsNumber()) {
 		#ifdef FANNY_FIXED
 		fannNumber = number->Uint32Value();
@@ -54,6 +55,7 @@ fann_type v8NumberToFannType(v8::Local<v8::Value> number) {
 		fannNumber = number->NumberValue();
 		#endif
 	}
+	return fannNumber;
 }
 
 // TODO :: still needs testing
@@ -87,11 +89,6 @@ bool v8StringToTrainingAlgorithmEnum(v8::Local<v8::Value> value, FANN::training_
 	else if (str.compare("FANN_TRAIN_SARPROP")) ret = FANN::TRAIN_SARPROP;
 	else return false;
 	return true;
-}
-
-}
-
-	return fannNumber;
 }
 
 }
