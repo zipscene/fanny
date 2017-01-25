@@ -53,6 +53,8 @@ td.saveTrain("boolean-logic-training-data.txt", function(err) {
 	console.log('TD Save results', err);
 });
 
+td.scaleInputTrainData(1, 2);
+console.log('SCALE INPUT TRAIN DATA', td.getInput());
 //FANNY.loadFile("/asdasd", function(e, r) {
 //	console.log('loadFile result', e, r);
 //});

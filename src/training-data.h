@@ -46,10 +46,10 @@ private:
 	static NAN_METHOD(readTrainFromFile);
 	static NAN_METHOD(saveTrain);
 	static NAN_METHOD(saveTrainToFixed);
+	static NAN_METHOD(scaleInputTrainData);
 
 };
 
 }
 
 #endif
-
