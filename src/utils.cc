@@ -45,6 +45,17 @@ v8::Local<v8::Value> fannDataSetToV8Array(fann_type ** data, unsigned int length
 	return scope.Escape(v8Array);
 }
 
+fann_type v8NumberToFannType(v8::Local<v8::Value> number) {
+	fann_type fannNumber;
+	if (number->IsNumber()) {
+		#ifdef FANNY_FIXED
+		fannNumber = number->Uint32Value();
+		#else
+		fannNumber = number->NumberValue();
+		#endif
+	}
+
+	return fannNumber;
 }
 
-
+}

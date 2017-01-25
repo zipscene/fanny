@@ -54,7 +54,12 @@ td.saveTrain("boolean-logic-training-data.txt", function(err) {
 });
 var td3 = new TrainingData(td);
 td3.scaleInputTrainData(1, 2);
-console.log('SCALE INPUT TRAIN DATA', td3.getInput());
+console.log('SCALE INPUT TRAIN DATA :: ' + td3.getInput());
+td3.scaleOutputTrainData(1, 2);
+console.log('SCALE OUTPUT TRAIN DATA :: ' + td3.getOutput());
+td3.scaleTrainData(2, 3);
+console.log('SCALE TRAIN DATA INPUT :: ' + td3.getInput());
+console.log('SCALE TRAIN DATA OUTPUT :: ' + td3.getOutput());
 //FANNY.loadFile("/asdasd", function(e, r) {
 //	console.log('loadFile result', e, r);
 //});
