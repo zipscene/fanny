@@ -28,6 +28,15 @@ fanny3.train(inputs, outputs);
 var postTrainResults = fanny3.run(inputs);
 console.log('POST TRAIN :: ', postTrainResults);
 
+var fanny4 = new FANNY(fanny)
+var outputs = [ 0.1, 0.2, 0.3, 0.4, 0.5 ];
+var preTestMSE = fanny4.getMSE();
+console.log('PRE TEST MSE :: ' + preTestMSE);
+var testOutput = fanny4.test(inputs, outputs);
+console.log('TEST OUTPUT :: ', testOutput);
+var postTestMSE = fanny4.getMSE();
+console.log('POST TEST MSE :: ' + postTestMSE);
+
 
 console.log('BIT FAIL :: ' + fanny.getBitFail());
 console.log('GET MSE :: ' + fanny.getMSE());

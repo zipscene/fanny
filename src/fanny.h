@@ -59,6 +59,7 @@ private:
 	static NAN_METHOD(getLayerArray);
 	static NAN_METHOD(getBiasArray);
 	static NAN_METHOD(train);
+	static NAN_METHOD(test);
 
 	// constructor & destructor
 	explicit FANNY(FANN::neural_net *fann);
