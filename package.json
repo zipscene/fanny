@@ -11,7 +11,8 @@
     "registry": "https://npm.zipscene.com/"
   },
   "scripts": {
-    "test": "npm run build && mocha ./dist/test --recursive -R spec"
+    "test": "node fannytest",
+		"build": "node-gyp build"
   },
   "generatorInfo": {
     "name": "generator-zs-lib",

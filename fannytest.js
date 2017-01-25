@@ -20,6 +20,15 @@ var fanny2 = new FANNY(fanny);
 results = fanny2.run(inputs);
 console.log(results);
 
+var fanny3 = new FANNY(fanny);
+var outputs = [ 0.1, 0.2, 0.3, 0.4, 0.5 ];
+var preTrainResults = fanny3.run(inputs);
+console.log('PRE TRAIN :: ', preTrainResults);
+fanny3.train(inputs, outputs);
+var postTrainResults = fanny3.run(inputs);
+console.log('POST TRAIN :: ', postTrainResults);
+
+
 console.log('BIT FAIL :: ' + fanny.getBitFail());
 console.log('GET MSE :: ' + fanny.getMSE());
 console.log('GET LEARNING RATE :: ' + fanny.getLearningRate());
