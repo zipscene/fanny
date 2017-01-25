@@ -47,6 +47,9 @@ private:
 	static NAN_METHOD(saveTrain);
 	static NAN_METHOD(saveTrainToFixed);
 	static NAN_METHOD(scaleInputTrainData);
+	static NAN_METHOD(scaleOutputTrainData);
+	static NAN_METHOD(scaleTrainData);
+	static NAN_METHOD(subsetTrainData);
 
 };
 
