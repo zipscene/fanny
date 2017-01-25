@@ -14,7 +14,7 @@ public:
 	bool isSave;
 	bool isFixed;
 	unsigned int decimalPoint;
-	
+
 
 	TDIOWorker(
 		Nan::Callback *callback,
@@ -66,6 +66,7 @@ void TrainingData::Init(v8::Local<v8::Object> target) {
 	Nan::SetPrototypeMethod(tpl, "readTrainFromFile", readTrainFromFile);
 	Nan::SetPrototypeMethod(tpl, "saveTrain", saveTrain);
 	Nan::SetPrototypeMethod(tpl, "saveTrainToFixed", saveTrainToFixed);
+	Nan::SetPrototypeMethod(tpl, "scaleInputTrainData", scaleInputTrainData);
 	Nan::SetPrototypeMethod(tpl, "shuffle", shuffle);
 	Nan::SetPrototypeMethod(tpl, "merge", merge);
 	Nan::SetPrototypeMethod(tpl, "length", length);
@@ -268,7 +269,11 @@ NAN_METHOD(TrainingData::saveTrainToFixed) {
 	AsyncQueueWorker(new TDIOWorker(callback, info.Holder(), filename, true, true, decimalPoint));
 }
 
-
+NAN_METHOD(TrainingData::scaleInputTrainData) {
+	if (info.Length() != 2) return Nan::ThrowError("Must have 2 arguments: new_min, new_max");
+	if (!info[0]->IsNumber() || !info[1]->IsNumber()) return Nan::ThrowError("Arguments must be numbers");
+	unsigned int newMin = info[0]->Uint32Value();
+	unsigned int newMax = info[1]->Uint32Value();
+	TrainingData *self = Nan::ObjectWrap::Unwrap<TrainingData>(info.Holder());
+	self->trainingData->scale_input_train_data(newMin, newMax);
 }
-
-
