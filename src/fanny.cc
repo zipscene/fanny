@@ -268,6 +268,7 @@ void FANNY::Init(v8::Local<v8::Object> target) {
 	Nan::SetPrototypeMethod(tpl, "descaleOutput", descaleOutput);
 
 	Nan::SetPrototypeMethod(tpl, "getCascadeActivationFunctions", getCascadeActivationFunctions);
+	Nan::SetPrototypeMethod(tpl, "setCascadeActivationFunctions", setCascadeActivationFunctions);
 
 	// Create the loadFile function
 	v8::Local<v8::FunctionTemplate> loadFileTpl = Nan::New<v8::FunctionTemplate>(loadFile);
@@ -927,7 +928,7 @@ NAN_METHOD(FANNY::getCascadeActivationFunctions) {
 	for (uint32_t idx = 0; idx < size; ++idx) {
 		const char *str = NULL;
 		FANN::activation_function_enum value = activationFunctions[idx];
-		fann_activationfunc_enum cValue = *reinterpret_cast<fann_activationfunc_enum *>(&value);
+		fann_activationfunc_enum cValue = *(reinterpret_cast<fann_activationfunc_enum *>(&value));
 		switch(cValue) {
 			case FANN_LINEAR: str = "FANN_LINEAR"; break;
 			case FANN_THRESHOLD: str = "FANN_THRESHOLD"; break;
@@ -955,6 +956,55 @@ NAN_METHOD(FANNY::getCascadeActivationFunctions) {
 		}
 	}
 	info.GetReturnValue().Set(v8Array);
+	#else
+	Nan::ThrowError("Not supported for fixed fann");
+	#endif
+}
+
+NAN_METHOD(FANNY::setCascadeActivationFunctions) {
+	#ifndef FANNY_FIXED
+	if (!info[0]->IsArray()) return Nan::ThrowError("1st argument must be an array");
+	if (!info[1]->IsNumber()) return Nan::ThrowError("2nd argument must be a number");
+	v8::Local<v8::Array> inputs = info[0].As<v8::Array>();
+	unsigned int size = info[1]->Uint32Value();
+	if (inputs->Length() != size) return Nan::ThrowError("The length of the array must be the second argument");
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	std::vector<FANN::activation_function_enum> activationFunctions;
+	for (uint32_t idx = 0; idx < size; ++idx) {
+		Nan::MaybeLocal<v8::Value> maybeIdxValue = Nan::Get(inputs, idx);
+		if (!maybeIdxValue.IsEmpty()) {
+			v8::Local<v8::Value> value = maybeIdxValue.ToLocalChecked();
+			if (value->IsString()) {
+				fann_activationfunc_enum ret;
+				std::string str = std::string(*(v8::String::Utf8Value(value)));
+				if (str.compare("FANN_LINEAR") == 0) ret = FANN_LINEAR;
+				else if (str.compare("FANN_THRESHOLD") == 0) ret = FANN_THRESHOLD;
+				else if (str.compare("FANN_THRESHOLD_SYMMETRIC") == 0) ret = FANN_THRESHOLD_SYMMETRIC;
+				else if (str.compare("FANN_SIGMOID") == 0) ret = FANN_SIGMOID;
+				else if (str.compare("FANN_SIGMOID_STEPWISE") == 0) ret = FANN_SIGMOID_STEPWISE;
+				else if (str.compare("FANN_SIGMOID_SYMMETRIC_STEPWISE") == 0) ret = FANN_SIGMOID_SYMMETRIC_STEPWISE;
+				else if (str.compare("FANN_GAUSSIAN") == 0) ret = FANN_GAUSSIAN;
+				else if (str.compare("FANN_GAUSSIAN_SYMMETRIC") == 0) ret = FANN_GAUSSIAN_SYMMETRIC;
+				else if (str.compare("FANN_GAUSSIAN_STEPWISE") == 0) ret = FANN_GAUSSIAN_STEPWISE;
+				else if (str.compare("FANN_ELLIOT") == 0) ret = FANN_ELLIOT;
+				else if (str.compare("FANN_ELLIOT_SYMMETRIC") == 0) ret = FANN_ELLIOT_SYMMETRIC;
+				else if (str.compare("FANN_LINEAR_PIECE") == 0) ret = FANN_LINEAR_PIECE;
+				else if (str.compare("FANN_LINEAR_PIECE_SYMMETRIC") == 0) ret = FANN_LINEAR_PIECE_SYMMETRIC;
+				else if (str.compare("FANN_SIN_SYMMETRIC") == 0) ret = FANN_SIN_SYMMETRIC;
+				else if (str.compare("FANN_COS_SYMMETRIC") == 0) ret = FANN_COS_SYMMETRIC;
+				else if (str.compare("FANN_COS") == 0) ret = FANN_COS;
+				else if (str.compare("FANN_SIN") == 0) ret = FANN_SIN;
+				else continue;
+				FANN::activation_function_enum value = *(reinterpret_cast<FANN::activation_function_enum *>(&ret)); 
+				activationFunctions.push_back(value);
+			}
+		}
+	}
+	if (activationFunctions.size() != size) {
+		return Nan::ThrowError("Some activation functions where not found");
+	} else {
+		fanny->fann->set_cascade_activation_functions(&activationFunctions[0], size);
+	}
 	#else
 	Nan::ThrowError("Not supported for fixed fann");
 	#endif
