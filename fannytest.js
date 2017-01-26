@@ -47,10 +47,15 @@ console.log('GET RPROP INCREASE FACTOR :: ' + fanny.getRpropIncreaseFactor());
 console.log('GET RPROP DECREASE FACTOR :: ' + fanny.getRpropDecreaseFactor());
 console.log('GET RPROP DELTA ZERO :: ' + fanny.getRpropDeltaZero());
 console.log('GET RPROP DELTA MIN :: ' + fanny.getRpropDeltaMin());
-console.log('GET RPROP DELTA MAX :: '  + fanny.getRpropDeltaMax());
+console.log('GET RPROP DELTA MAX :: ' + fanny.getRpropDeltaMax());
 console.log('LAYERS ARRAY :: ' + fanny.getLayerArray().join(', '));
 console.log('BIAS ARRAY :: ' + fanny.getBiasArray().join(', '));
 console.log(fanny.getCascadeActivationFunctions());
+var cascadeActivationSteepnesses = fanny.getCascadeActivationSteepnesses();
+console.log('GET CASCASDE ACTIVATION STEEPNESSES ' + cascadeActivationSteepnesses);
+fanny.setCascadeActivationSteepnesses([ 1, 2, 3 ], 3);
+console.log('SET CASCASDE ACTIVATION STEEPNESSES ' + fanny.getCascadeActivationSteepnesses());
+fanny.setCascadeActivationSteepnesses(cascadeActivationSteepnesses, cascadeActivationSteepnesses.length);
 //fanny.runAsync(inputs, function(err, results) {
 //	console.log(err, results);
 //});
@@ -146,13 +151,13 @@ console.log('POST DESCALE OUTPUT :: ', result);
 	console.log('FANN Save result', err);
 	});*/
 
-console.log('Training');
-fanny.setCallback(function(obj) {
-	console.log('TRAINING CALLBACK');
-	console.log(obj);
-});
-fanny.trainOnData(td, 100000, 1, 0.00000001, function(err, res) {
-	console.log('Training result', err, res);
-});
+// console.log('Training');
+// fanny.setCallback(function(obj) {
+// 	console.log('TRAINING CALLBACK');
+// 	console.log(obj);
+// });
+// fanny.trainOnData(td, 100000, 1, 0.00000001, function(err, res) {
+// 	console.log('Training result', err, res);
+// });
 
 setTimeout(function() { console.log('Done.'); }, 5000);
