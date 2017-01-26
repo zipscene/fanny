@@ -92,7 +92,11 @@ console.log('SUBSET TRAIN DATA OUTPUT :: ', td3.getOutput());
 //	console.log('loadFile result', e, r);
 //});
 
-var fanny5 = new FANNY(fanny)
+var fanny5 = new FANNY({
+	layers: [ 2, 20, 5 ]
+});
+var result = fanny5.run(inputs);
+console.log('PRE SCALE INPUT :: ', result);
 var td5 = new TrainingData();
 td5.setTrainData([
 	[ 2, 1 ],
@@ -124,7 +128,20 @@ fanny5.setOutputScalingParams(td5, 3, 4);
 fanny5.scaleTrain(td5);
 console.log('SCALE TRAIN INPUT :: ', td5.getInput());
 console.log('SCALE TRAIN OUTPUT :: ', td5.getOutput());
-
+// Test scaleInput and descaleInput
+var inputVector = [ 0, 1 ];
+console.log('PRE SCALE INPUT :: ', inputVector);
+result = fanny5.scaleInput(inputVector);
+console.log('POST SCALE INPUT :: ', result);
+result = fanny5.descaleInput(inputVector);
+console.log('POST DESCALE INPUT :: ', result);
+// Test scaleOutput and descaleOutput
+var outputVector = [ 0, 1, 2, 3, 4 ];
+console.log('PRE SCALE OUTPUT :: ', outputVector);
+result = fanny5.scaleOutput(outputVector);
+console.log('POST SCALE OUTPUT :: ', result);
+result = fanny5.descaleOutput(outputVector);
+console.log('POST DESCALE OUTPUT :: ', result);
 /* fanny.save("/tmp/testfann", function(err) {
 	console.log('FANN Save result', err);
 	});*/

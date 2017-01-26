@@ -82,6 +82,10 @@ private:
 	static NAN_METHOD(setInputScalingParams);
 	static NAN_METHOD(setOutputScalingParams);
 	static NAN_METHOD(setScalingParams);
+	static NAN_METHOD(scaleInput);
+	static NAN_METHOD(scaleOutput);
+	static NAN_METHOD(descaleInput);
+	static NAN_METHOD(descaleOutput);
 
 	static NAN_METHOD(trainEpoch);
 	static NAN_METHOD(trainOnData);
