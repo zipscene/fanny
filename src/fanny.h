@@ -74,6 +74,7 @@ private:
 	static NAN_METHOD(getLayerArray);
 	static NAN_METHOD(getBiasArray);
 	static NAN_METHOD(getCascadeActivationFunctions);
+	static NAN_METHOD(setCascadeActivationFunctions);
 	static NAN_METHOD(getCascadeActivationSteepnesses);
 	static NAN_METHOD(setCascadeActivationSteepnesses);
 	static NAN_METHOD(train);

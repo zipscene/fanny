@@ -50,6 +50,7 @@ console.log('GET RPROP DELTA MIN :: ' + fanny.getRpropDeltaMin());
 console.log('GET RPROP DELTA MAX :: ' + fanny.getRpropDeltaMax());
 console.log('LAYERS ARRAY :: ' + fanny.getLayerArray().join(', '));
 console.log('BIAS ARRAY :: ' + fanny.getBiasArray().join(', '));
+fanny.setCascadeActivationFunctions([ "FANN_LINEAR", "FANN_THRESHOLD"], 2);
 console.log(fanny.getCascadeActivationFunctions());
 var cascadeActivationSteepnesses = fanny.getCascadeActivationSteepnesses();
 console.log('GET CASCASDE ACTIVATION STEEPNESSES ' + cascadeActivationSteepnesses);

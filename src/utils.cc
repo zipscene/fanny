@@ -82,11 +82,11 @@ v8::Local<v8::Value> trainingAlgorithmEnumToV8String(FANN::training_algorithm_en
 bool v8StringToTrainingAlgorithmEnum(v8::Local<v8::Value> value, FANN::training_algorithm_enum &ret) {
 	if (!value->IsString()) return false;
 	std::string str(*v8::String::Utf8Value(value));
-	if (str.compare("TRAIN_INCREMENTAL")) ret = FANN::TRAIN_INCREMENTAL;
-	else if (str.compare("TRAIN_BATCH")) ret = FANN::TRAIN_BATCH;
-	else if (str.compare("TRAIN_RPROP")) ret = FANN::TRAIN_RPROP;
-	else if (str.compare("TRAIN_QUICKPROP")) ret = FANN::TRAIN_QUICKPROP;
-	else if (str.compare("FANN_TRAIN_SARPROP")) ret = FANN::TRAIN_SARPROP;
+	if (str.compare("TRAIN_INCREMENTAL") == 0) ret = FANN::TRAIN_INCREMENTAL;
+	else if (str.compare("TRAIN_BATCH") == 0) ret = FANN::TRAIN_BATCH;
+	else if (str.compare("TRAIN_RPROP") == 0) ret = FANN::TRAIN_RPROP;
+	else if (str.compare("TRAIN_QUICKPROP") == 0) ret = FANN::TRAIN_QUICKPROP;
+	else if (str.compare("FANN_TRAIN_SARPROP") == 0) ret = FANN::TRAIN_SARPROP;
 	else return false;
 	return true;
 }
