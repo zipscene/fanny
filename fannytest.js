@@ -151,13 +151,13 @@ console.log('POST DESCALE OUTPUT :: ', result);
 	console.log('FANN Save result', err);
 	});*/
 
-// console.log('Training');
-// fanny.setCallback(function(obj) {
-// 	console.log('TRAINING CALLBACK');
-// 	console.log(obj);
-// });
-// fanny.trainOnData(td, 100000, 1, 0.00000001, function(err, res) {
-// 	console.log('Training result', err, res);
-// });
+console.log('Training');
+fanny.setCallback(function(obj) {
+	console.log('TRAINING CALLBACK');
+	console.log(obj);
+});
+fanny.trainOnData(td, 100000, 1, 0.00000001, function(err, res) {
+	console.log('Training result', err, res);
+});
 
 setTimeout(function() { console.log('Done.'); }, 5000);
