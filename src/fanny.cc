@@ -237,6 +237,11 @@ void FANNY::Init(v8::Local<v8::Object> target) {
 	Nan::SetPrototypeMethod(tpl, "setInputScalingParams", setInputScalingParams);
 	Nan::SetPrototypeMethod(tpl, "setOutputScalingParams", setOutputScalingParams);
 	Nan::SetPrototypeMethod(tpl, "setScalingParams", setScalingParams);
+	Nan::SetPrototypeMethod(tpl, "scaleInput", scaleInput);
+	Nan::SetPrototypeMethod(tpl, "scaleOutput", scaleOutput);
+	Nan::SetPrototypeMethod(tpl, "descaleInput", descaleInput);
+	Nan::SetPrototypeMethod(tpl, "descaleOutput", descaleOutput);
+
 	Nan::SetPrototypeMethod(tpl, "getCascadeActivationFunctions", getCascadeActivationFunctions);
 
 	// Create the loadFile function
@@ -802,6 +807,82 @@ NAN_METHOD(FANNY::setScalingParams) {
 	#endif
 }
 
+NAN_METHOD(FANNY::scaleInput) {
+	#ifndef FANNY_FIXED
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: input_vector");
+	if (!info[0]->IsArray()) return Nan::ThrowError("Argument not an array");
+
+	std::vector<fann_type> input = v8ArrayToFannData(info[0]);
+
+	if (input.size() != fanny->fann->get_num_input()) return Nan::ThrowError("Wrong number of inputs");
+
+	fanny->fann->scale_input(&input[0]);
+
+	info.GetReturnValue().Set(fannDataToV8Array(&input[0], fanny->fann->get_num_input()));
+
+	#else
+	Nan::ThrowError("Not supported for fixed fann");
+	#endif
+}
+
+NAN_METHOD(FANNY::scaleOutput) {
+	#ifndef FANNY_FIXED
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: output_vector");
+	if (!info[0]->IsArray()) return Nan::ThrowError("Argument not an array");
+
+	std::vector<fann_type> output = v8ArrayToFannData(info[0]);
+
+	if (output.size() != fanny->fann->get_num_output()) return Nan::ThrowError("Wrong number of outputs");
+
+	fanny->fann->scale_output(&output[0]);
+
+	info.GetReturnValue().Set(fannDataToV8Array(&output[0], fanny->fann->get_num_output()));
+
+	#else
+	Nan::ThrowError("Not supported for fixed fann");
+	#endif
+}
+
+NAN_METHOD(FANNY::descaleInput) {
+	#ifndef FANNY_FIXED
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: input_vector");
+	if (!info[0]->IsArray()) return Nan::ThrowError("Argument not an array");
+
+	std::vector<fann_type> input = v8ArrayToFannData(info[0]);
+
+	if (input.size() != fanny->fann->get_num_input()) return Nan::ThrowError("Wrong number of inputs");
+
+	fanny->fann->descale_input(&input[0]);
+
+	info.GetReturnValue().Set(fannDataToV8Array(&input[0], fanny->fann->get_num_input()));
+
+	#else
+	Nan::ThrowError("Not supported for fixed fann");
+	#endif
+}
+
+NAN_METHOD(FANNY::descaleOutput) {
+	#ifndef FANNY_FIXED
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: output_vector");
+	if (!info[0]->IsArray()) return Nan::ThrowError("Argument not an array");
+
+	std::vector<fann_type> output = v8ArrayToFannData(info[0]);
+
+	if (output.size() != fanny->fann->get_num_output()) return Nan::ThrowError("Wrong number of outputs");
+
+	fanny->fann->descale_output(&output[0]);
+
+	info.GetReturnValue().Set(fannDataToV8Array(&output[0], fanny->fann->get_num_output()));
+
+	#else
+	Nan::ThrowError("Not supported for fixed fann");
+	#endif
+}
+
 NAN_METHOD(FANNY::getCascadeActivationFunctions) {
 	#ifndef FANNY_FIXED
 	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
@@ -815,7 +896,7 @@ NAN_METHOD(FANNY::getCascadeActivationFunctions) {
 		switch(cValue) {
 			case FANN_LINEAR: str = "FANN_LINEAR"; break;
 			case FANN_THRESHOLD: str = "FANN_THRESHOLD"; break;
-			case FANN_THRESHOLD_SYMMETRIC: str = "FANN_THRESHOLD_SYMMETRIC"; break; 
+			case FANN_THRESHOLD_SYMMETRIC: str = "FANN_THRESHOLD_SYMMETRIC"; break;
 			case FANN_SIGMOID: str = "FANN_SIGMOID"; break;
 			case FANN_SIGMOID_STEPWISE: str = "FANN_SIGMOID_STEPWISE"; break;
 			case FANN_SIGMOID_SYMMETRIC: str = "FANN_SIGMOID_SYMMETRIC"; break;
