@@ -269,6 +269,8 @@ void FANNY::Init(v8::Local<v8::Object> target) {
 
 	Nan::SetPrototypeMethod(tpl, "getCascadeActivationFunctions", getCascadeActivationFunctions);
 	Nan::SetPrototypeMethod(tpl, "setCascadeActivationFunctions", setCascadeActivationFunctions);
+	Nan::SetPrototypeMethod(tpl, "getCascadeActivationSteepnesses", getCascadeActivationSteepnesses);
+	Nan::SetPrototypeMethod(tpl, "setCascadeActivationSteepnesses", setCascadeActivationSteepnesses);
 
 	// Create the loadFile function
 	v8::Local<v8::FunctionTemplate> loadFileTpl = Nan::New<v8::FunctionTemplate>(loadFile);
@@ -995,7 +997,7 @@ NAN_METHOD(FANNY::setCascadeActivationFunctions) {
 				else if (str.compare("FANN_COS") == 0) ret = FANN_COS;
 				else if (str.compare("FANN_SIN") == 0) ret = FANN_SIN;
 				else continue;
-				FANN::activation_function_enum value = *(reinterpret_cast<FANN::activation_function_enum *>(&ret)); 
+				FANN::activation_function_enum value = *(reinterpret_cast<FANN::activation_function_enum *>(&ret));
 				activationFunctions.push_back(value);
 			}
 		}
@@ -1005,6 +1007,39 @@ NAN_METHOD(FANNY::setCascadeActivationFunctions) {
 	} else {
 		fanny->fann->set_cascade_activation_functions(&activationFunctions[0], size);
 	}
+
+	#else
+	Nan::ThrowError("Not supported for fixed fann");
+	#endif
+}
+
+NAN_METHOD(FANNY::getCascadeActivationSteepnesses) {
+	#ifndef FANNY_FIXED
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+
+	fann_type *cascadeActivationSteepnesses = fanny->fann->get_cascade_activation_steepnesses();
+
+	info.GetReturnValue().Set(fannDataToV8Array(cascadeActivationSteepnesses, fanny->fann->get_cascade_activation_steepnesses_count()));
+
+	#else
+	Nan::ThrowError("Not supported for fixed fann");
+	#endif
+}
+
+NAN_METHOD(FANNY::setCascadeActivationSteepnesses) {
+	#ifndef FANNY_FIXED
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 2) return Nan::ThrowError("Must have 2 arguments: 	cascade_activation_steepnesses and cascade_activation_steepnesses_count");
+	if (!info[0]->IsArray()) return Nan::ThrowError("cascade_activation_steepnesse not an array");
+	if (!info[1]->IsNumber()) return Nan::ThrowError("cascade_activation_steepnesses_count not a number");
+
+	std::vector<fann_type> cascadeActivationSteepnesses = v8ArrayToFannData(info[0]);
+	unsigned int cascadeActivationSteepnessesCount = info[1]->Uint32Value();
+
+	if (cascadeActivationSteepnesses.size() != cascadeActivationSteepnessesCount) return Nan::ThrowError("Wrong number of steepnesses or count");
+
+	fanny->fann->set_cascade_activation_steepnesses(&cascadeActivationSteepnesses[0], cascadeActivationSteepnessesCount);
+
 	#else
 	Nan::ThrowError("Not supported for fixed fann");
 	#endif

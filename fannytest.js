@@ -47,11 +47,16 @@ console.log('GET RPROP INCREASE FACTOR :: ' + fanny.getRpropIncreaseFactor());
 console.log('GET RPROP DECREASE FACTOR :: ' + fanny.getRpropDecreaseFactor());
 console.log('GET RPROP DELTA ZERO :: ' + fanny.getRpropDeltaZero());
 console.log('GET RPROP DELTA MIN :: ' + fanny.getRpropDeltaMin());
-console.log('GET RPROP DELTA MAX :: '  + fanny.getRpropDeltaMax());
+console.log('GET RPROP DELTA MAX :: ' + fanny.getRpropDeltaMax());
 console.log('LAYERS ARRAY :: ' + fanny.getLayerArray().join(', '));
 console.log('BIAS ARRAY :: ' + fanny.getBiasArray().join(', '));
 fanny.setCascadeActivationFunctions([ "FANN_LINEAR", "FANN_THRESHOLD"], 2);
 console.log(fanny.getCascadeActivationFunctions());
+var cascadeActivationSteepnesses = fanny.getCascadeActivationSteepnesses();
+console.log('GET CASCASDE ACTIVATION STEEPNESSES ' + cascadeActivationSteepnesses);
+fanny.setCascadeActivationSteepnesses([ 1, 2, 3 ], 3);
+console.log('SET CASCASDE ACTIVATION STEEPNESSES ' + fanny.getCascadeActivationSteepnesses());
+fanny.setCascadeActivationSteepnesses(cascadeActivationSteepnesses, cascadeActivationSteepnesses.length);
 //fanny.runAsync(inputs, function(err, results) {
 //	console.log(err, results);
 //});
