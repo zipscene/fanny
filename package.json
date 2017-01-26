@@ -11,7 +11,7 @@
     "registry": "https://npm.zipscene.com/"
   },
   "scripts": {
-    "test": "node fannytest",
+    "test": "./node_modules/.bin/mocha",
     "build": "node-gyp build"
   },
   "generatorInfo": {
