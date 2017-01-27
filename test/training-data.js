@@ -109,5 +109,14 @@ describe.only('Training Data', function() {
 			this.td.merge(td2);
 			expect(this.td.getLength()).to.equal(data.length + booleanTrainingData.length);
 		});
+		it('should shuffle the inputs', function() {
+			var inputData =  this.td.getOneInputData(0);
+			var outputData = this.td.getOutputData(0);
+			expect(inputData).to.exist;
+			expect(outputData).to.exist;
+			this.td.shuffle();
+			expect(this.td.getOneInputData(0)).to.not.deep.equal(inputData);
+			expect(this.td.getOneOutputData(0)).to.not.deep.equal(outputData);
+		});
 	});
 });
