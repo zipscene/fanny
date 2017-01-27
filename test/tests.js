@@ -136,7 +136,7 @@ describe('Tests', function() {
 			}
 		};
 
-		var stringTest = function(optionToTest, validValues, invalidValue) {
+		var stringTest = function(optionToTest, validValues) {
 			var ann = createANN({ layers: [ 2, 20, 5 ] });
 			var initalValue = ann.getOption(optionToTest);
 			var testValue = (initalValue === validValues[0]) ? validValues[1] : validValues[0];
@@ -146,7 +146,7 @@ describe('Tests', function() {
 			expect(setTestFunc).to.not.throw();
 		};
 
-		var numberTest = function(optionToTest, lowerValidNumber, upperValidNumber) {
+		var numberTest = function(optionToTest) {
 			var ann = createANN({ layers: [ 2, 20, 5 ] });
 			var initalValue = ann.getOption(optionToTest);
 			var testValue = initalValue + 0.1;
@@ -155,7 +155,7 @@ describe('Tests', function() {
 			expect(setTestFunc).to.not.throw();
 		};
 
-		var arrayTest = function(optionToTest, validArray, inValidArray) {
+		var arrayTest = function(optionToTest, validArray) {
 			var ann = createANN({ layers: [ 2, 20, 5 ] });
 			var initalValue = ann.getOption(optionToTest);
 			var setTestFunc = function() { ann.setOption(optionToTest, validArray); }
@@ -171,7 +171,7 @@ describe('Tests', function() {
 				var testType = testSettings.type;
 				switch (testType) {
 					case String:
-						stringTest(optionToTest, testSettings.enum, 'I am not a valid fann enum anywhere');
+						stringTest(optionToTest, testSettings.enum);
 						break;
 					case Number:
 						numberTest(optionToTest);
@@ -180,7 +180,7 @@ describe('Tests', function() {
 						var testArray;
 						if (testSettings.elements.type === String) testArray = testSettings.elements.enum
 						else if (testSettings.elements.type === Number) testArray = [ 0, 1, 2 ];
-						arrayTest(optionToTest, testArray, ['I am not a valid value anywhere']);
+						arrayTest(optionToTest, testArray);
 						break;
 					default:
 						expect(true).to.be.false;
