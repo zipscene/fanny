@@ -11,7 +11,7 @@
     "registry": "https://npm.zipscene.com/"
   },
   "scripts": {
-    "test": "node fannytest",
+    "test": "./node_modules/.bin/mocha",
     "build": "node-gyp build"
   },
   "generatorInfo": {
@@ -21,6 +21,7 @@
   "dependencies": {
     "common-schema": "^1.9.0",
     "nan": "^2.5.0",
+    "pasync": "^1.4.1",
     "xerror": "^1.1.2"
   },
   "devDependencies": {

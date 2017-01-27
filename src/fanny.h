@@ -61,10 +61,12 @@ private:
 	static NAN_METHOD(getTotalConnections);
 	static NAN_METHOD(getNumLayers);
 	static NAN_METHOD(getBitFail);
+	static NAN_METHOD(getBitFailLimit);
+	static NAN_METHOD(setBitFailLimit);
 	static NAN_METHOD(getMSE);
 	static NAN_METHOD(getLearningRate);
-	static NAN_METHOD(getQuickPropDecay);
-	static NAN_METHOD(getQuickPropMu);
+	static NAN_METHOD(getQuickpropDecay);
+	static NAN_METHOD(getQuickpropMu);
 	static NAN_METHOD(getRpropIncreaseFactor);
 	static NAN_METHOD(getRpropDecreaseFactor);
 	static NAN_METHOD(getRpropDeltaZero);
@@ -77,6 +79,35 @@ private:
 	static NAN_METHOD(setCascadeActivationFunctions);
 	static NAN_METHOD(getCascadeActivationSteepnesses);
 	static NAN_METHOD(setCascadeActivationSteepnesses);
+
+	static NAN_METHOD(getCascadeOutputChangeFraction);
+	static NAN_METHOD(getCascadeOutputStagnationEpochs);
+	static NAN_METHOD(getCascadeCandidateChangeFraction);
+	static NAN_METHOD(getCascadeCandidateStagnationEpochs);
+	static NAN_METHOD(getCascadeWeightMultiplier);
+	static NAN_METHOD(getCascadeCandidateLimit);
+	static NAN_METHOD(getCascadeMaxOutEpochs);
+	static NAN_METHOD(getCascadeMaxCandEpochs);
+	static NAN_METHOD(getCascadeNumCandidateGroups);
+
+	static NAN_METHOD(setCascadeOutputChangeFraction);
+	static NAN_METHOD(setCascadeOutputStagnationEpochs);
+	static NAN_METHOD(setCascadeCandidateChangeFraction);
+	static NAN_METHOD(setCascadeCandidateStagnationEpochs);
+	static NAN_METHOD(setCascadeWeightMultiplier);
+	static NAN_METHOD(setCascadeCandidateLimit);
+	static NAN_METHOD(setCascadeMaxOutEpochs);
+	static NAN_METHOD(setCascadeMaxCandEpochs);
+	static NAN_METHOD(setCascadeNumCandidateGroups);
+
+	static NAN_METHOD(setLearningRate);
+	static NAN_METHOD(setQuickpropDecay);
+	static NAN_METHOD(setQuickpropMu);
+	static NAN_METHOD(setRpropIncreaseFactor);
+	static NAN_METHOD(setRpropDecreaseFactor);
+	static NAN_METHOD(setRpropDeltaZero);
+	static NAN_METHOD(setRpropDeltaMin);
+	static NAN_METHOD(setRpropDeltaMax);
 	static NAN_METHOD(train);
 	static NAN_METHOD(test);
 	static NAN_METHOD(scaleTrain);
@@ -90,12 +121,30 @@ private:
 	static NAN_METHOD(descaleInput);
 	static NAN_METHOD(descaleOutput);
 
+	static NAN_METHOD(getTrainingAlgorithm);
+	static NAN_METHOD(setTrainingAlgorithm);
+	static NAN_METHOD(getTrainErrorFunction);
+	static NAN_METHOD(setTrainErrorFunction);
+	static NAN_METHOD(getTrainStopFunction);
+	static NAN_METHOD(setTrainStopFunction);
+
 	static NAN_METHOD(trainEpoch);
 	static NAN_METHOD(trainOnData);
 	static NAN_METHOD(trainOnFile);
 	static NAN_METHOD(cascadetrainOnData);
 	static NAN_METHOD(cascadetrainOnFile);
 	static NAN_METHOD(testData);
+
+	static NAN_METHOD(getSarpropWeightDecayShift);
+	static NAN_METHOD(getSarpropStepErrorThresholdFactor);
+	static NAN_METHOD(getSarpropStepErrorShift);
+	static NAN_METHOD(getSarpropTemperature);
+	static NAN_METHOD(getLearningMomentum);
+	static NAN_METHOD(setSarpropWeightDecayShift);
+	static NAN_METHOD(setSarpropStepErrorThresholdFactor);
+	static NAN_METHOD(setSarpropStepErrorShift);
+	static NAN_METHOD(setSarpropTemperature);
+	static NAN_METHOD(setLearningMomentum);
 
 	static void _doTrainOrTest(const Nan::FunctionCallbackInfo<v8::Value> &info, bool fromFile, bool isCascade, bool singleEpoch, bool isTest);
 

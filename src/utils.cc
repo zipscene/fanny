@@ -91,4 +91,56 @@ bool v8StringToTrainingAlgorithmEnum(v8::Local<v8::Value> value, FANN::training_
 	return true;
 }
 
+v8::Local<v8::Value> errorFunctionEnumToV8String(FANN::error_function_enum value) {
+	Nan::EscapableHandleScope scope;
+	const char *str = NULL;
+	switch(value) {
+		case FANN::ERRORFUNC_LINEAR: str = "ERRORFUNC_LINEAR"; break;
+		case FANN::ERRORFUNC_TANH: str = "ERRORFUNC_TANH"; break;
+	}
+	v8::Local<v8::Value> ret;
+	if (str) {
+		ret = Nan::New<v8::String>(str).ToLocalChecked();
+	} else {
+		ret = Nan::Null();
+	}
+	return scope.Escape(ret);
+}
+
+// TODO :: still needs testing
+bool v8StringToErrorFunctionEnum(v8::Local<v8::Value> value, FANN::error_function_enum &ret) {
+	if (!value->IsString()) return false;
+	std::string str(*v8::String::Utf8Value(value));
+	if (str.compare("ERRORFUNC_LINEAR") == 0) ret = FANN::ERRORFUNC_LINEAR;
+	else if (str.compare("ERRORFUNC_TANH") == 0) ret = FANN::ERRORFUNC_TANH;
+	else return false;
+	return true;
+}
+
+v8::Local<v8::Value> stopFunctionEnumToV8String(FANN::stop_function_enum value) {
+	Nan::EscapableHandleScope scope;
+	const char *str = NULL;
+	switch(value) {
+		case FANN::STOPFUNC_MSE: str = "STOPFUNC_MSE"; break;
+		case FANN::STOPFUNC_BIT: str = "STOPFUNC_BIT"; break;
+	}
+	v8::Local<v8::Value> ret;
+	if (str) {
+		ret = Nan::New<v8::String>(str).ToLocalChecked();
+	} else {
+		ret = Nan::Null();
+	}
+	return scope.Escape(ret);
+}
+
+// TODO :: still needs testing
+bool v8StringToStopFunctionEnum(v8::Local<v8::Value> value, FANN::stop_function_enum &ret) {
+	if (!value->IsString()) return false;
+	std::string str(*v8::String::Utf8Value(value));
+	if (str.compare("STOPFUNC_MSE") == 0) ret = FANN::STOPFUNC_MSE;
+	else if (str.compare("STOPFUNC_BIT") == 0) ret = FANN::STOPFUNC_BIT;
+	else return false;
+	return true;
+}
+
 }
