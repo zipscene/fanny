@@ -13,7 +13,7 @@ var dataset = [
 	{ input: [ 1, 0 ], output: [ 1 ] },
 	{ input: [ 1, 1 ], output: [ 0 ] }
 ];
-// Train until a MSE (mean squared error) of 0.05.  Returns a Promise.
+// Train until a MSE (mean squared error) of 0.025.  Returns a Promise.
 ann.train(fanny.createTrainingData(dataset), { desiredError: 0.025 })
 	.then(function() {
 		// Training complete.  Do some test runs.
