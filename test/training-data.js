@@ -100,5 +100,14 @@ describe.only('Training Data', function() {
 			expect(this.td.getInputData()).to.deep.equal(booleanInputData.slice(1, 4));
 			expect(this.td.getOutputData()).to.deep.equal(booleanOutputData.slice(1, 4));
 		});
+		it.only('should merge two training datas together', function() {
+			var data = [
+				[ [ 1, 0 ], [ 0, 1, 1, 0, 1 ] ],
+				[ [ 1, 0 ], [ 0, 1, 1, 0, 1 ] ]
+			];
+			var td2 = createTrainingData(data);
+			this.td.merge(td2);
+			expect(this.td.getLength()).to.equal(data.length + booleanTrainingData.length);
+		});
 	});
 });
