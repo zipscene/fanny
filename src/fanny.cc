@@ -728,7 +728,7 @@ NAN_METHOD(FANNY::setLearningRate) {
 	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: learning_rate");
 	if (!info[0]->IsNumber()) return Nan::ThrowError("learning_rate not a number");
 
-	float value = info[1]->NumberValue();
+	float value = info[0]->NumberValue();
 
 	fanny->fann->set_learning_rate(value);
 }
@@ -745,7 +745,7 @@ NAN_METHOD(FANNY::setQuickpropDecay) {
 	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: quickprop_decay");
 	if (!info[0]->IsNumber()) return Nan::ThrowError("quickprop_decay not a number");
 
-	float value = info[1]->NumberValue();
+	float value = info[0]->NumberValue();
 
 	fanny->fann->set_quickprop_decay(value);
 }
@@ -762,7 +762,7 @@ NAN_METHOD(FANNY::setQuickpropMu) {
 	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: quickprop_mu");
 	if (!info[0]->IsNumber()) return Nan::ThrowError("quickprop_mu not a number");
 
-	float value = info[1]->NumberValue();
+	float value = info[0]->NumberValue();
 
 	fanny->fann->set_quickprop_mu(value);
 }
@@ -779,7 +779,7 @@ NAN_METHOD(FANNY::setRpropIncreaseFactor) {
 	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: rprop_increase_factor");
 	if (!info[0]->IsNumber()) return Nan::ThrowError("rprop_increase_factor not a number");
 
-	float value = info[1]->NumberValue();
+	float value = info[0]->NumberValue();
 
 	fanny->fann->set_rprop_increase_factor(value);
 }
@@ -796,7 +796,7 @@ NAN_METHOD(FANNY::setRpropDecreaseFactor) {
 	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: rprop_decrease_factor");
 	if (!info[0]->IsNumber()) return Nan::ThrowError("rprop_decrease_factor not a number");
 
-	float value = info[1]->NumberValue();
+	float value = info[0]->NumberValue();
 
 	fanny->fann->set_rprop_decrease_factor(value);
 }
@@ -813,7 +813,7 @@ NAN_METHOD(FANNY::setRpropDeltaZero) {
 	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: rprop_delta_zero");
 	if (!info[0]->IsNumber()) return Nan::ThrowError("rprop_delta_zero not a number");
 
-	float value = info[1]->NumberValue();
+	float value = info[0]->NumberValue();
 
 	fanny->fann->set_rprop_delta_zero(value);
 }
@@ -830,7 +830,7 @@ NAN_METHOD(FANNY::setRpropDeltaMin) {
 	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: rprop_delta_min");
 	if (!info[0]->IsNumber()) return Nan::ThrowError("rprop_delta_min not a number");
 
-	float value = info[1]->NumberValue();
+	float value = info[0]->NumberValue();
 
 	fanny->fann->set_rprop_delta_min(value);
 }
@@ -847,7 +847,7 @@ NAN_METHOD(FANNY::setRpropDeltaMax) {
 	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: rprop_delta_max");
 	if (!info[0]->IsNumber()) return Nan::ThrowError("rprop_delta_max not a number");
 
-	float value = info[1]->NumberValue();
+	float value = info[0]->NumberValue();
 
 	fanny->fann->set_rprop_delta_max(value);
 }
@@ -864,7 +864,7 @@ NAN_METHOD(FANNY::setSarpropWeightDecayShift) {
 	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: sarprop_weight_decay_shift");
 	if (!info[0]->IsNumber()) return Nan::ThrowError("sarprop_weight_decay_shift not a number");
 
-	float value = info[1]->NumberValue();
+	float value = info[0]->NumberValue();
 
 	fanny->fann->set_sarprop_weight_decay_shift(value);
 }
@@ -881,7 +881,7 @@ NAN_METHOD(FANNY::setSarpropStepErrorThresholdFactor) {
 	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: sarprop_step_error_threshold_factor");
 	if (!info[0]->IsNumber()) return Nan::ThrowError("sarprop_step_error_threshold_factor not a number");
 
-	float value = info[1]->NumberValue();
+	float value = info[0]->NumberValue();
 
 	fanny->fann->set_sarprop_step_error_threshold_factor(value);
 }
@@ -898,7 +898,7 @@ NAN_METHOD(FANNY::setSarpropStepErrorShift) {
 	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: sarprop_step_error_shift");
 	if (!info[0]->IsNumber()) return Nan::ThrowError("sarprop_step_error_shift not a number");
 
-	float value = info[1]->NumberValue();
+	float value = info[0]->NumberValue();
 
 	fanny->fann->set_sarprop_step_error_shift(value);
 }
@@ -915,7 +915,7 @@ NAN_METHOD(FANNY::setSarpropTemperature) {
 	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: sarprop_temperature");
 	if (!info[0]->IsNumber()) return Nan::ThrowError("sarprop_temperature not a number");
 
-	float value = info[1]->NumberValue();
+	float value = info[0]->NumberValue();
 
 	fanny->fann->set_sarprop_temperature(value);
 }
@@ -932,7 +932,7 @@ NAN_METHOD(FANNY::setLearningMomentum) {
 	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: learning_momentum");
 	if (!info[0]->IsNumber()) return Nan::ThrowError("learning_momentum not a number");
 
-	float value = info[1]->NumberValue();
+	float value = info[0]->NumberValue();
 
 	fanny->fann->set_learning_momentum(value);
 }
@@ -1374,7 +1374,7 @@ NAN_METHOD(FANNY::setCascadeOutputStagnationEpochs) {
 	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: cascade_output_stagnation_epochs");
 	if (!info[0]->IsNumber()) return Nan::ThrowError("cascade_output_stagnation_epochs not a number");
 
-	float value = info[0]->Uint32Value();
+	float value = info[0]->NumberValue();
 
 	fanny->fann->set_cascade_output_stagnation_epochs(value);
 
@@ -1430,7 +1430,7 @@ NAN_METHOD(FANNY::setCascadeCandidateStagnationEpochs) {
 	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: cascade_candidate_stagnation_epochs");
 	if (!info[0]->IsNumber()) return Nan::ThrowError("cascade_candidate_stagnation_epochs not a number");
 
-	float value = info[0]->Uint32Value();
+	float value = info[0]->NumberValue();
 
 	fanny->fann->set_cascade_candidate_stagnation_epochs(value);
 
@@ -1506,7 +1506,7 @@ NAN_METHOD(FANNY::setCascadeMaxOutEpochs) {
 	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: cascade_max_out_epochs");
 	if (!info[0]->IsNumber()) return Nan::ThrowError("cascade_max_out_epochs not a number");
 
-	float value = info[0]->Uint32Value();
+	float value = info[0]->NumberValue();
 
 	fanny->fann->set_cascade_max_out_epochs(value);
 
@@ -1534,7 +1534,7 @@ NAN_METHOD(FANNY::setCascadeMaxCandEpochs) {
 	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: cascade_max_cand_epochs");
 	if (!info[0]->IsNumber()) return Nan::ThrowError("cascade_max_cand_epochs not a number");
 
-	float value = info[0]->Uint32Value();
+	float value = info[0]->NumberValue();
 
 	fanny->fann->set_cascade_max_cand_epochs(value);
 
@@ -1562,7 +1562,7 @@ NAN_METHOD(FANNY::setCascadeNumCandidateGroups) {
 	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: cascade_num_candidate_groups");
 	if (!info[0]->IsNumber()) return Nan::ThrowError("cascade_num_candidate_groups not a number");
 
-	float value = info[0]->Uint32Value();
+	float value = info[0]->NumberValue();
 
 	fanny->fann->set_cascade_num_candidate_groups(value);
 
