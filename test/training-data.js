@@ -2,7 +2,7 @@ var expect = require('chai').expect;
 var fanny = require('../lib');
 var zstreams = require('zstreams');
 var fs = require('fs');
-var path = require('path');
+var XError = require('xerror');
 
 var createTrainingData = fanny.createTrainingData;
 var loadTrainingData = fanny.loadTrainingData;
@@ -76,8 +76,20 @@ describe.only('Training Data', function() {
 		it('#getOneInputData', function() {
 			expect(this.td.getOneInputData(3)).to.deep.equal(booleanInputData[3]);
 		});
+		it('#getOneInputData error', function() {
+			var self = this;
+			expect(function() {
+				return self.td.getOneInputData('3');
+			}).to.throw(XError.INVALID_ARGUMENT);
+		});
 		it('#getOneOutputData', function() {
 			expect(this.td.getOneOutputData(3)).to.deep.equal(booleanOutputData[3]);
+		});
+		it('#getOneOutputData error', function() {
+			var self = this;
+			expect(function() {
+				return self.td.getOneOutputData('3');
+			}).to.throw(XError.INVALID_ARGUMENT);
 		});
 		it('#getMinInput', function() {
 			expect(this.td.getMinInput()).to.equal(0);
@@ -98,12 +110,32 @@ describe.only('Training Data', function() {
 			expect(this.td.getMinInput()).to.equal(min);
 			expect(this.td.getMaxInput()).to.equal(max);
 		});
+		it('#scaleInput Error', function() {
+			var self = this;
+			expect(function() {
+				return self.td.scaleInput('3', 1);
+			}).to.throw(XError.INVALID_ARGUMENT);
+
+			expect(function() {
+				return self.td.scaleInput(3, '1');
+			}).to.throw(XError.INVALID_ARGUMENT);
+		});
 		it('#scaleOutput', function() {
 			var min = -1;
 			var max = 2;
 			this.td.scaleOutput(min, max);
 			expect(this.td.getMinOutput()).to.equal(min);
 			expect(this.td.getMaxOutput()).to.equal(max);
+		});
+		it('#scaleOutput Error', function() {
+			var self = this;
+			expect(function() {
+				return self.td.scaleOutput('1', -1);
+			}).to.throw(XError.INVALID_ARGUMENT);
+
+			expect(function() {
+				return self.td.scaleOutput(1, '-1');
+			}).to.throw(XError.INVALID_ARGUMENT);
 		});
 		it('#scale', function() {
 			var min = -1;
@@ -114,10 +146,30 @@ describe.only('Training Data', function() {
 			expect(this.td.getMinOutput()).to.equal(min);
 			expect(this.td.getMaxOutput()).to.equal(max);
 		});
+		it('#scale Error', function() {
+			var self = this;
+			expect(function() {
+				return self.td.scale('1', -1);
+			}).to.throw(XError.INVALID_ARGUMENT);
+
+			expect(function() {
+				return self.td.scale(1, '-1');
+			}).to.throw(XError.INVALID_ARGUMENT);
+		});
 		it('#subset', function() {
 			this.td.subset(1, 3);
 			expect(this.td.getInputData()).to.deep.equal(booleanInputData.slice(1, 4));
 			expect(this.td.getOutputData()).to.deep.equal(booleanOutputData.slice(1, 4));
+		});
+		it('#subset Error', function() {
+			var self = this;
+			expect(function() {
+				return self.td.subset('1', 1);
+			}).to.throw(XError.INVALID_ARGUMENT);
+
+			expect(function() {
+				return self.td.subset(1, '1');
+			}).to.throw(XError.INVALID_ARGUMENT);
 		});
 		it('#merge', function() {
 			var data = [
@@ -127,6 +179,12 @@ describe.only('Training Data', function() {
 			var td2 = createTrainingData(data);
 			this.td.merge(td2);
 			expect(this.td.getLength()).to.equal(data.length + booleanTrainingData.length);
+		});
+		it('#merge Error', function() {
+			var self = this;
+			expect(function() {
+				return self.td.merge([ [ 1, 0 ], [ 0 , 1, 1, 0, 1]]);
+			}).to.throw(XError.INVALID_ARGUMENT);
 		});
 		it('#shuffle', function() {
 			var inputData =  this.td.getOneInputData(0);
@@ -149,9 +207,19 @@ describe.only('Training Data', function() {
 			expect(this.td.getInputData()).to.deep.equal(inputData);
 			expect(this.td.getOutputData()).to.deep.equal(outputData);
 		});
+		it('#setData Error', function() {
+			var self = this;
+			expect(function() {
+				return self.td.setData([ 0, 1 ], [ 1, 0, 1, 0, 0 ]);
+			}).to.throw(XError.INVALID_ARGUMENT);
+
+			expect(function() {
+				return self.td.subset({ input: [ 0, 1 ] });
+			}).to.throw(XError.INVALID_ARGUMENT);
+		});
 		it('#save', function() {
 			var self = this;
-			self.filename = "test/test-bool-data.txt"; 
+			self.filename = 'test/test-bool-data.txt';
 			return self.td.save(self.filename)
 				.then(function() {
 					return zstreams.fromFile(self.filename)
