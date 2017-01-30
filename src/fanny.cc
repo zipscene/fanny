@@ -251,7 +251,6 @@ void FANNY::Init(v8::Local<v8::Object> target) {
 	Nan::SetPrototypeMethod(tpl, "getBitFailLimit", getBitFailLimit);
 	Nan::SetPrototypeMethod(tpl, "setBitFailLimit", setBitFailLimit);
 	Nan::SetPrototypeMethod(tpl, "getMSE", getMSE);
-	Nan::SetPrototypeMethod(tpl, "getLearningRate", getLearningRate);
 	Nan::SetPrototypeMethod(tpl, "getQuickpropDecay", getQuickpropDecay);
 	Nan::SetPrototypeMethod(tpl, "getQuickpropMu", getQuickpropMu);
 	Nan::SetPrototypeMethod(tpl, "getRpropIncreaseFactor", getRpropIncreaseFactor);
@@ -1374,7 +1373,7 @@ NAN_METHOD(FANNY::setCascadeOutputStagnationEpochs) {
 	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: cascade_output_stagnation_epochs");
 	if (!info[0]->IsNumber()) return Nan::ThrowError("cascade_output_stagnation_epochs not a number");
 
-	float value = info[0]->NumberValue();
+	unsigned int value = info[0]->Uint32Value();
 
 	fanny->fann->set_cascade_output_stagnation_epochs(value);
 
@@ -1430,7 +1429,7 @@ NAN_METHOD(FANNY::setCascadeCandidateStagnationEpochs) {
 	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: cascade_candidate_stagnation_epochs");
 	if (!info[0]->IsNumber()) return Nan::ThrowError("cascade_candidate_stagnation_epochs not a number");
 
-	float value = info[0]->NumberValue();
+	unsigned int value = info[0]->Uint32Value();
 
 	fanny->fann->set_cascade_candidate_stagnation_epochs(value);
 
@@ -1506,7 +1505,7 @@ NAN_METHOD(FANNY::setCascadeMaxOutEpochs) {
 	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: cascade_max_out_epochs");
 	if (!info[0]->IsNumber()) return Nan::ThrowError("cascade_max_out_epochs not a number");
 
-	float value = info[0]->NumberValue();
+	unsigned int value = info[0]->Uint32Value();
 
 	fanny->fann->set_cascade_max_out_epochs(value);
 
@@ -1534,7 +1533,7 @@ NAN_METHOD(FANNY::setCascadeMaxCandEpochs) {
 	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: cascade_max_cand_epochs");
 	if (!info[0]->IsNumber()) return Nan::ThrowError("cascade_max_cand_epochs not a number");
 
-	float value = info[0]->NumberValue();
+	unsigned int value = info[0]->Uint32Value();
 
 	fanny->fann->set_cascade_max_cand_epochs(value);
 
