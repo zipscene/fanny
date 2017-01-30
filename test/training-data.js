@@ -207,6 +207,19 @@ describe.only('Training Data', function() {
 			expect(this.td.getInputData()).to.deep.equal(inputData);
 			expect(this.td.getOutputData()).to.deep.equal(outputData);
 		});
+		it('#setData by object', function() {
+			var input = [ [ 0, 1 ] ];
+			var output = [ [ 1, 0, 0, 0, 1 ] ];
+			var data = [
+				{
+					input: input[0],
+					output: output[0]
+				}
+			];
+			this.td.setData(data);
+			expect(this.td.getInputData()).to.deep.equal(input);
+			expect(this.td.getOutputData()).to.deep.equal(output);
+		});
 		it('#setData Error', function() {
 			var self = this;
 			expect(function() {
