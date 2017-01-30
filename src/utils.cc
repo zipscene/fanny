@@ -46,7 +46,6 @@ v8::Local<v8::Value> fannDataSetToV8Array(fann_type ** data, unsigned int length
 }
 
 fann_type v8NumberToFannType(v8::Local<v8::Value> number) {
-	// TODO: Better error checking around this value being set
 	fann_type fannNumber = 0;
 	if (number->IsNumber()) {
 		#ifdef FANNY_FIXED
@@ -58,7 +57,6 @@ fann_type v8NumberToFannType(v8::Local<v8::Value> number) {
 	return fannNumber;
 }
 
-// TODO :: still needs testing
 v8::Local<v8::Value> trainingAlgorithmEnumToV8String(FANN::training_algorithm_enum value) {
 	Nan::EscapableHandleScope scope;
 	const char *str = NULL;
@@ -78,7 +76,6 @@ v8::Local<v8::Value> trainingAlgorithmEnumToV8String(FANN::training_algorithm_en
 	return scope.Escape(ret);
 }
 
-// TODO :: still needs testing
 bool v8StringToTrainingAlgorithmEnum(v8::Local<v8::Value> value, FANN::training_algorithm_enum &ret) {
 	if (!value->IsString()) return false;
 	std::string str(*v8::String::Utf8Value(value));
@@ -107,7 +104,6 @@ v8::Local<v8::Value> errorFunctionEnumToV8String(FANN::error_function_enum value
 	return scope.Escape(ret);
 }
 
-// TODO :: still needs testing
 bool v8StringToErrorFunctionEnum(v8::Local<v8::Value> value, FANN::error_function_enum &ret) {
 	if (!value->IsString()) return false;
 	std::string str(*v8::String::Utf8Value(value));
@@ -133,7 +129,6 @@ v8::Local<v8::Value> stopFunctionEnumToV8String(FANN::stop_function_enum value) 
 	return scope.Escape(ret);
 }
 
-// TODO :: still needs testing
 bool v8StringToStopFunctionEnum(v8::Local<v8::Value> value, FANN::stop_function_enum &ret) {
 	if (!value->IsString()) return false;
 	std::string str(*v8::String::Utf8Value(value));
