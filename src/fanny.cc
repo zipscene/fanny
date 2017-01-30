@@ -225,6 +225,9 @@ void FANNY::Init(v8::Local<v8::Object> target) {
 	FANNY::constructorFunctionTpl.Reset(tpl);
 
 	// Add prototype methods
+
+	Nan::SetPrototypeMethod(tpl, "printConnections", printConnections);
+
 	Nan::SetPrototypeMethod(tpl, "save", save);
 	Nan::SetPrototypeMethod(tpl, "saveToFixed", saveToFixed);
 	Nan::SetPrototypeMethod(tpl, "setCallback", setCallback);
@@ -293,6 +296,11 @@ FANNY::~FANNY() {
 	delete fann;
 	constructorFunctionTpl.Empty();
 	constructorFunction.Empty();
+}
+
+NAN_METHOD(FANNY::printConnections) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	fanny->fann->print_connections();
 }
 
 NAN_METHOD(FANNY::loadFile) {

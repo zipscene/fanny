@@ -77,6 +77,40 @@ private:
 	static NAN_METHOD(setCascadeActivationFunctions);
 	static NAN_METHOD(getCascadeActivationSteepnesses);
 	static NAN_METHOD(setCascadeActivationSteepnesses);
+<<<<<<< Updated upstream
+=======
+
+	static NAN_METHOD(printConnections);
+
+	static NAN_METHOD(getCascadeOutputChangeFraction);
+	static NAN_METHOD(getCascadeOutputStagnationEpochs);
+	static NAN_METHOD(getCascadeCandidateChangeFraction);
+	static NAN_METHOD(getCascadeCandidateStagnationEpochs);
+	static NAN_METHOD(getCascadeWeightMultiplier);
+	static NAN_METHOD(getCascadeCandidateLimit);
+	static NAN_METHOD(getCascadeMaxOutEpochs);
+	static NAN_METHOD(getCascadeMaxCandEpochs);
+	static NAN_METHOD(getCascadeNumCandidateGroups);
+
+	static NAN_METHOD(setCascadeOutputChangeFraction);
+	static NAN_METHOD(setCascadeOutputStagnationEpochs);
+	static NAN_METHOD(setCascadeCandidateChangeFraction);
+	static NAN_METHOD(setCascadeCandidateStagnationEpochs);
+	static NAN_METHOD(setCascadeWeightMultiplier);
+	static NAN_METHOD(setCascadeCandidateLimit);
+	static NAN_METHOD(setCascadeMaxOutEpochs);
+	static NAN_METHOD(setCascadeMaxCandEpochs);
+	static NAN_METHOD(setCascadeNumCandidateGroups);
+
+	static NAN_METHOD(setLearningRate);
+	static NAN_METHOD(setQuickpropDecay);
+	static NAN_METHOD(setQuickpropMu);
+	static NAN_METHOD(setRpropIncreaseFactor);
+	static NAN_METHOD(setRpropDecreaseFactor);
+	static NAN_METHOD(setRpropDeltaZero);
+	static NAN_METHOD(setRpropDeltaMin);
+	static NAN_METHOD(setRpropDeltaMax);
+>>>>>>> Stashed changes
 	static NAN_METHOD(train);
 	static NAN_METHOD(test);
 	static NAN_METHOD(scaleTrain);
