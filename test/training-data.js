@@ -1,5 +1,8 @@
 var expect = require('chai').expect;
 var fanny = require('../lib');
+var zstreams = require('zstreams');
+var fs = require('fs');
+var path = require('path');
 
 var createTrainingData = fanny.createTrainingData;
 var loadTrainingData = fanny.loadTrainingData;
@@ -29,64 +32,80 @@ var booleanOutputData = [
 describe.only('Training Data', function() {
 	it('#createTrainingData', function() {
 		var td = createTrainingData(booleanTrainingData, 'float');
-		expect(td).to.exist;
+		var td2 = createTrainingData(booleanInputData, booleanOutputData, 'float');
 		expect(td._fannyTrainingData).to.exist;
 		expect(td._datatype).to.exist;
 		expect(td._datatype).to.equal('float');
+		expect(td2._fannyTrainingData).to.exist;
+		expect(td2._datatype).to.exist;
+		expect(td2._datatype).to.equal('float');
+	});
+	it('#loadTrainingData', function() {
+		return loadTrainingData('test/examples/training-data.txt', 'float')
+			.then((td) => {
+				expect(td._fannyTrainingData).to.exist;
+				expect(td._datatype).to.exist;
+				expect(td._datatype).to.equal('float');
+			});
 	});
 	describe('prototype functions', function() {
 		beforeEach(function() {
 			this.td = createTrainingData(booleanTrainingData, 'float');
 		});
-		it('should return the length of the training data', function() {
+		after(function() {
+			if (this.filename) {
+				fs.unlinkSync(this.filename);
+			}
+		});
+		it('#getLength', function() {
 			var length = this.td.getLength();
 			expect(length).to.equal(booleanTrainingData.length);
 		});
-		it('should return the number of inputs', function() {
+		it('#getNumInputs', function() {
 			expect(this.td.getNumInputs()).to.equal(2);
 		});
-		it('should return the number of outputs', function() {
+		it('#getNumOutputs', function() {
 			expect(this.td.getNumOutputs()).to.equal(5);
 		});
-		it('should return the inputs', function() {
+		it('#getInputData', function() {
 			expect(this.td.getInputData()).to.deep.equal(booleanInputData);
 		});
-		it('should return the outputs', function() {
+		it('#getOutputData', function() {
 			expect(this.td.getOutputData()).to.deep.equal(booleanOutputData);
 		});
-		it('should return an input at the specified position', function() {
+		it('#getOneInputData', function() {
 			expect(this.td.getOneInputData(3)).to.deep.equal(booleanInputData[3]);
 		});
-		it('should return an output at the specified position', function() {
+		it('#getOneOutputData', function() {
 			expect(this.td.getOneOutputData(3)).to.deep.equal(booleanOutputData[3]);
 		});
-		it('should return the min input', function() {
+		it('#getMinInput', function() {
 			expect(this.td.getMinInput()).to.equal(0);
 		});
-		it('should return the max input', function() {
+		it('#getMaxInput', function() {
 			expect(this.td.getMaxInput()).to.equal(1);
 		});
-		it('should return the min output', function() {
+		it('#getMinOutput', function() {
 			expect(this.td.getMinOutput()).to.equal(0);
 		});
-		it('should return the max output', function() {
+		it('#getMaxOutput', function() {
 			expect(this.td.getMaxOutput()).to.equal(1);
 		});
-		it('should reset the max and min input', function() {
+		it('#scaleInput', function() {
 			var min = -1;
 			var max = 2;
 			this.td.scaleInput(min, max);
 			expect(this.td.getMinInput()).to.equal(min);
 			expect(this.td.getMaxInput()).to.equal(max);
 		});
-		it('should reset the max and min output', function() {
+		it('#scaleOutput', function() {
 			var min = -1;
 			var max = 2;
 			this.td.scaleOutput(min, max);
 			expect(this.td.getMinOutput()).to.equal(min);
 			expect(this.td.getMaxOutput()).to.equal(max);
 		});
-		it('should scale the input and output', function() {
+		it('#scale', function() {
 			var min = -1;
 			var max = 2;
 			this.td.scale(min, max);
@@ -95,12 +114,12 @@ describe.only('Training Data', function() {
 			expect(this.td.getMinOutput()).to.equal(min);
 			expect(this.td.getMaxOutput()).to.equal(max);
 		});
-		it('should return a subset of the training data', function() {
+		it('#subset', function() {
 			this.td.subset(1, 3);
 			expect(this.td.getInputData()).to.deep.equal(booleanInputData.slice(1, 4));
 			expect(this.td.getOutputData()).to.deep.equal(booleanOutputData.slice(1, 4));
 		});
-		it('should merge two training datas together', function() {
+		it('#merge', function() {
 			var data = [
 				[ [ 1, 0 ], [ 0, 1, 1, 0, 1 ] ],
 				[ [ 1, 0 ], [ 0, 1, 1, 0, 1 ] ]
@@ -109,7 +128,7 @@ describe.only('Training Data', function() {
 			this.td.merge(td2);
 			expect(this.td.getLength()).to.equal(data.length + booleanTrainingData.length);
 		});
-		it('should shuffle the inputs', function() {
+		it('#shuffle', function() {
 			var inputData =  this.td.getOneInputData(0);
 			var outputData = this.td.getOutputData(0);
 			expect(inputData).to.exist;
@@ -117,6 +136,40 @@ describe.only('Training Data', function() {
 			this.td.shuffle();
 			expect(this.td.getOneInputData(0)).to.not.deep.equal(inputData);
 			expect(this.td.getOneOutputData(0)).to.not.deep.equal(outputData);
+		});
+		it('#clone', function() {
+			var tdClone = this.td.clone();
+			expect(tdClone.getInputData()).to.deep.equal(this.td.getInputData());
+			expect(tdClone.getOutputData()).to.deep.equal(this.td.getOutputData());
+		});
+		it('#setData', function() {
+			var inputData = [ [ 0, 1 ] ];
+			var outputData = [ [ 1, 0, 1, 0, 0 ] ];
+			this.td.setData(inputData, outputData);
+			expect(this.td.getInputData()).to.deep.equal(inputData);
+			expect(this.td.getOutputData()).to.deep.equal(outputData);
+		});
+		it('#save', function() {
+			var self = this;
+			self.filename = "test/test-bool-data.txt"; 
+			return self.td.save(self.filename)
+				.then(function() {
+					return zstreams.fromFile(self.filename)
+						.split('\n')
+						.through((data) => {
+							return data
+								.trim()
+								.split(/\s/g)
+								.map(function(d) { return parseInt(d, 10) });
+						})
+						.intoArray()
+				})
+				.then(function(array) {
+					var input = [ array[1], array[3], array[5], array[7] ];
+					var output = [ array[2], array[4], array[6], array[8] ];
+					expect(input).to.deep.equal(booleanInputData);
+					expect(output).to.deep.equal(booleanOutputData);
+				});
 		});
 	});
 });
