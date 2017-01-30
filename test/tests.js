@@ -1,6 +1,7 @@
 var expect = require('chai').expect;
 var fanny = require('../lib');
 
+var annOptionsSchema = fanny.annOptionsSchema;
 var createANN = fanny.createANN;
 var loadANN = fanny.loadANN;
 var createTrainingData = fanny.createTrainingData;
@@ -33,108 +34,7 @@ describe('Tests', function() {
 	});
 
 	describe('Options Tests', function() {
-		var optionsToTest = {
-			trainingAlgorithm: {
-				type: String,
-				enum: [ 'INCREMENTAL', 'BATCH', 'RPROP', 'QUICKPROP', 'SARPROP' ]
-			},
-			learningRate: {
-				type: Number
-			},
-			trainErrorFunction: {
-				type: String,
-				enum: [ 'LINEAR', 'TANH' ]
-			},
-			quickpropDecay: {
-				type: Number
-			},
-			quickpropMu: {
-				type: Number
-			},
-			rpropIncreaseFactor: {
-				type: Number
-			},
-			rpropDecreaseFactor: {
-				type: Number
-			},
-			rpropDeltaZero: {
-				type: Number
-			},
-			rpropDeltaMin: {
-				type: Number
-			},
-			rpropDeltaMax: {
-				type: Number
-			},
-			sarpropWeightDecayShift: {
-				type: Number
-			},
-			sarpropStepErrorThresholdFactor: {
-				type: Number
-			},
-			sarpropStepErrorShift: {
-				type: Number
-			},
-			sarpropTemperature: {
-				type: Number
-			},
-			learningMomentum: {
-				type: Number
-			},
-			trainStopFunction: {
-				type: String,
-				enum: [ 'BIT', 'MSE' ]
-			},
-			bitFailLimit: {
-				type: Number
-			},
-			cascadeOutputChangeFraction: {
-				type: Number
-			},
-			cascadeOutputStagnationEpochs: {
-				type: Number
-			},
-			cascadeCandidateChangeFraction: {
-				type: Number
-			},
-			cascadeCandidateStagnationEpochs: {
-				type: Number
-			},
-			cascadeWeightMultiplier: {
-				type: Number
-			},
-			cascadeCandidateLimit: {
-				type: Number
-			},
-			cascadeMaxOutEpochs: {
-				type: Number
-			},
-			cascadeMaxCandEpochs: {
-				type: Number
-			},
-			cascadeActivationFunctions: {
-				type: 'array',
-				elements: {
-					type: String,
-					required: true,
-					enum: [
-						'LINEAR', 'THRESHOLD', 'THRESHOLD_SYMMETRIC', 'SIGMOID', 'SIGMOID_STEPWISE',
-						'SIGMOID_SYMMETRIC', 'SIGMOID_SYMMETRIC_STEPWISE', 'GAUSSIAN', 'GAUSSIAN_SYMMETRIC',
-						'ELLIOT', 'ELLIOT_SYMMETRIC', 'LINEAR_PIECE', 'LINEAR_PIECE_SYMMETRIC', 'SIN_SYMMETRIC',
-						'COS_SYMMETRIC'
-					]
-				}
-			},
-			cascadeActivationSteepnesses: {
-				type: 'array',
-				elements: {
-					type: Number
-				}
-			},
-			cascadeNumCandidateGroups: {
-				type: Number
-			}
-		};
+		var optionsToTest = annOptionsSchema.toJSONSchema().properties;
 
 		var stringTest = function(optionToTest, validValues) {
 			var ann = createANN({ layers: [ 2, 20, 5 ] });
@@ -170,16 +70,16 @@ describe('Tests', function() {
 				expect(testSettings).to.have.property('type');
 				var testType = testSettings.type;
 				switch (testType) {
-					case String:
+					case 'string':
 						stringTest(optionToTest, testSettings.enum);
 						break;
-					case Number:
+					case 'number':
 						numberTest(optionToTest);
 						break;
 					case 'array':
 						var testArray;
-						if (testSettings.elements.type === String) testArray = testSettings.elements.enum
-						else if (testSettings.elements.type === Number) testArray = [ 0, 1, 2 ];
+						if (testSettings.items.type === String) testArray = testSettings.items.enum
+						else if (testSettings.items.type === Number) testArray = [ 0, 1, 2 ];
 						arrayTest(optionToTest, testArray);
 						break;
 					default:
