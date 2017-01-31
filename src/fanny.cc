@@ -1157,7 +1157,7 @@ NAN_METHOD(FANNY::clearScalingParams) {
 NAN_METHOD(FANNY::setInputScalingParams) {
 	#ifndef FANNY_FIXED
 	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
-	if (info.Length() != 3) return Nan::ThrowError("Must have 5 arguments: tainingData, new_input_min, and new_input_max");
+	if (info.Length() != 3) return Nan::ThrowError("Must have 3 arguments: tainingData, new_input_min, and new_input_max");
 	if (!Nan::New(TrainingData::constructorFunctionTpl)->HasInstance(info[0])) {
 		return Nan::ThrowError("Argument must be an instance of TrainingData");
 	}
@@ -1182,7 +1182,7 @@ NAN_METHOD(FANNY::setInputScalingParams) {
 NAN_METHOD(FANNY::setOutputScalingParams) {
 	#ifndef FANNY_FIXED
 	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
-	if (info.Length() != 3) return Nan::ThrowError("Must have 5 arguments: tainingData new_output_min, and new_output_max");
+	if (info.Length() != 3) return Nan::ThrowError("Must have 3 arguments: tainingData new_output_min, and new_output_max");
 	if (!Nan::New(TrainingData::constructorFunctionTpl)->HasInstance(info[0])) {
 		return Nan::ThrowError("Argument must be an instance of TrainingData");
 	}
