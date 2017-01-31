@@ -67,6 +67,9 @@ private:
 	static NAN_METHOD(getMSE);
 	static NAN_METHOD(resetMSE);
 	static NAN_METHOD(getLearningRate);
+	static NAN_METHOD(setLearningRate);
+	static NAN_METHOD(getActivationFunction);
+	static NAN_METHOD(setActivationFunction);
 	static NAN_METHOD(getQuickpropDecay);
 	static NAN_METHOD(getQuickpropMu);
 	static NAN_METHOD(getRpropIncreaseFactor);
@@ -90,8 +93,6 @@ private:
 	// TODO
 	/*
 	- train (rename to trainOne)
-	- getActivationFunction
-	- setActivationFunction
 	- setActivationFunctionLayer
 	- setActivationFunctionHidden
 	- setActivationFunctionOutput
@@ -124,7 +125,6 @@ private:
 	static NAN_METHOD(setCascadeMaxCandEpochs);
 	static NAN_METHOD(setCascadeNumCandidateGroups);
 
-	static NAN_METHOD(setLearningRate);
 	static NAN_METHOD(setQuickpropDecay);
 	static NAN_METHOD(setQuickpropMu);
 	static NAN_METHOD(setRpropIncreaseFactor);

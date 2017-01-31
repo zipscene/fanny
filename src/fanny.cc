@@ -247,6 +247,8 @@ void FANNY::Init(v8::Local<v8::Object> target) {
 	Nan::SetPrototypeMethod(tpl, "setTrainStopFunction", setTrainStopFunction);
 	Nan::SetPrototypeMethod(tpl, "getLearningRate", getLearningRate);
 	Nan::SetPrototypeMethod(tpl, "setLearningRate", setLearningRate);
+	Nan::SetPrototypeMethod(tpl, "getActivationFunction", getActivationFunction);
+	Nan::SetPrototypeMethod(tpl, "setActivationFunction", setActivationFunction);
 	Nan::SetPrototypeMethod(tpl, "getNumInput", getNumInput);
 	Nan::SetPrototypeMethod(tpl, "getNumOutput", getNumOutput);
 	Nan::SetPrototypeMethod(tpl, "getTotalNeurons", getTotalNeurons);
@@ -308,7 +310,6 @@ void FANNY::Init(v8::Local<v8::Object> target) {
 	Nan::SetPrototypeMethod(tpl, "setCascadeMaxCandEpochs", setCascadeMaxCandEpochs);
 	Nan::SetPrototypeMethod(tpl, "setCascadeNumCandidateGroups", setCascadeNumCandidateGroups);
 
-	Nan::SetPrototypeMethod(tpl, "setLearningRate", setLearningRate);
 	Nan::SetPrototypeMethod(tpl, "setQuickpropDecay", setQuickpropDecay);
 	Nan::SetPrototypeMethod(tpl, "setQuickpropMu", setQuickpropMu);
 	Nan::SetPrototypeMethod(tpl, "setRpropIncreaseFactor", setRpropIncreaseFactor);
@@ -774,6 +775,32 @@ NAN_METHOD(FANNY::setLearningRate) {
 	float value = info[0]->NumberValue();
 
 	fanny->fann->set_learning_rate(value);
+}
+
+NAN_METHOD(FANNY::getActivationFunction) {
+	if (info.Length() != 2) return Nan::ThrowError("Must have 2 arguments: layer and neuron");
+	if (!info[0]->IsNumber()) return Nan::ThrowError("layer must be a number");
+	if (!info[1]->IsNumber()) return Nan::ThrowError("neuron must be a number");
+
+	unsigned int layer = info[1]->Uint32Value();
+	unsigned int neuron = info[1]->Uint32Value();
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	FANN::activation_function_enum activationFunction = fanny->fann->get_activation_function(layer, neuron);
+	info.GetReturnValue().Set(activationFunctionEnumToV8String(activationFunction));
+}
+
+NAN_METHOD(FANNY::setActivationFunction) {
+	if (info.Length() != 3) return Nan::ThrowError("Must have 3 arguments: activation_function, layer, and neuron");
+	if (!info[0]->IsString()) return Nan::ThrowError("activation_function must be a string");
+	if (!info[1]->IsNumber()) return Nan::ThrowError("layer must be a number");
+	if (!info[2]->IsNumber()) return Nan::ThrowError("neuron must be a number");
+
+	unsigned int layer = info[1]->Uint32Value();
+	unsigned int neuron = info[1]->Uint32Value();
+
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	FANN::activation_function_enum activationFunction;
+	if(v8StringToActivationFunctionEnum(info[0], activationFunction)) fanny->fann->set_activation_function(activationFunction, layer, neuron);
 }
 
 // by default -0.0001

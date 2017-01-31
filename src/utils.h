@@ -31,4 +31,9 @@ bool v8StringToStopFunctionEnum(v8::Local<v8::Value> value, FANN::stop_function_
 v8::Local<v8::Object> connectionToV8Object(FANN::connection connection);
 
 v8::Local<v8::Value> connectionArrayToToV8Array(std::vector<FANN::connection> connectionArray, unsigned int size);
+
+// activation_function_enum converters
+v8::Local<v8::Value> activationFunctionEnumToV8String(FANN::activation_function_enum value);
+
+bool v8StringToActivationFunctionEnum(v8::Local<v8::Value> value, FANN::activation_function_enum &ret);
 }

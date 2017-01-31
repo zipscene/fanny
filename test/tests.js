@@ -188,4 +188,55 @@ describe('Tests', function() {
 			expect(testFunc).to.not.throw();
 		});
 	});
+	describe('Get Activation Function', function() {
+		it('Can call getActivationFunction', function() {
+			var ann = createANN({ layers: [ 2, 2, 2 ] });
+			var activationFunction = ann.getActivationFunction(1, 1);
+			expect(activationFunction).to.be.a('string').and.to.equal('SIGMOID_STEPWISE');
+		});
+		it('Returns null for calls outside the network', function() {
+			var ann = createANN({ layers: [ 2, 2, 2 ] });
+			var activationFunction = ann.getActivationFunction(3, 3);
+			expect(activationFunction).to.be.null;
+		});
+	});
+
+	describe('Set Activation Function', function() {
+		it('Can call setActivationFunction', function() {
+			var ann = createANN({ layers: [ 2, 2, 2 ] });
+			var initialActivationFunction = ann.getActivationFunction(1, 1);
+			expect(initialActivationFunction).to.be.a('string').and.to.equal('SIGMOID_STEPWISE');
+			ann.setActivationFunction('LINEAR', 1, 1);
+			var updatedActivationFunction = ann.getActivationFunction(1, 1);
+			expect(updatedActivationFunction).to.be.a('string').and.to.equal('LINEAR');
+		});
+
+		it('Can set to all ActivationFunction enum values', function() {
+			var activationFunctions = [
+				'LINEAR', 'THRESHOLD', 'THRESHOLD_SYMMETRIC', 'SIGMOID', 'SIGMOID_STEPWISE',
+				'SIGMOID_SYMMETRIC', 'SIGMOID_SYMMETRIC_STEPWISE', 'GAUSSIAN', 'GAUSSIAN_SYMMETRIC',
+				'ELLIOT', 'ELLIOT_SYMMETRIC', 'LINEAR_PIECE', 'LINEAR_PIECE_SYMMETRIC', 'SIN_SYMMETRIC',
+				'COS_SYMMETRIC'
+			];
+
+			var ann = createANN({ layers: [ 2, 2, 2 ] });
+			// Test all enum values
+			for (var activationFunction of activationFunctions) {
+				ann.setActivationFunction(activationFunction, 1, 1);
+				var setActivationFunction = ann.getActivationFunction(1, 1);
+				expect(setActivationFunction).to.equal(activationFunction);
+			}
+		});
+
+		it('Calls outside the network have no effect', function() {
+			var ann = createANN({ layers: [ 1, 1, 1 ] });
+			var initalActivationFunction1 = ann.getActivationFunction(0, 1);
+			var initalActivationFunction2 = ann.getActivationFunction(1, 1);
+			var initalActivationFunction3 = ann.getActivationFunction(2, 1);
+			ann.setActivationFunction('LINEAR_PIECE', 3, 1);
+			expect(ann.getActivationFunction(0, 1)).to.be.a('string').and.to.equal(initalActivationFunction1);
+			expect(ann.getActivationFunction(1, 1)).to.be.a('string').and.to.equal(initalActivationFunction2);
+			expect(ann.getActivationFunction(2, 1)).to.be.a('string').and.to.equal(initalActivationFunction3);
+		});
+	});
 });
