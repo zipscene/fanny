@@ -227,6 +227,7 @@ void FANNY::Init(v8::Local<v8::Object> target) {
 	// Add prototype methods
 
 	Nan::SetPrototypeMethod(tpl, "printConnections", printConnections);
+	Nan::SetPrototypeMethod(tpl, "printParameters", printParameters);
 	Nan::SetPrototypeMethod(tpl, "randomizeWeights", randomizeWeights);
 
 	Nan::SetPrototypeMethod(tpl, "save", save);
@@ -353,6 +354,11 @@ FANNY::~FANNY() {
 NAN_METHOD(FANNY::printConnections) {
 	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
 	fanny->fann->print_connections();
+}
+
+NAN_METHOD(FANNY::printParameters) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	fanny->fann->print_parameters();
 }
 
 NAN_METHOD(FANNY::randomizeWeights) {

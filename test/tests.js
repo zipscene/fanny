@@ -160,10 +160,15 @@ describe('Tests', function() {
 		});
 	});
 
-	describe('Print Connections', function() {
+	describe('Print Commands', function() {
 		it('Can call printConnections', function() {
 			var ann = createANN({ layers: [ 2, 2, 2 ] });
 			var testFunc = function() { ann.printConnections(); }
+			expect(testFunc).to.not.throw();
+		});
+		it('Can call printParameters', function() {
+			var ann = createANN({ layers: [ 2, 2, 2 ] });
+			var testFunc = function() { ann.printParameters(); }
 			expect(testFunc).to.not.throw();
 		});
 	});

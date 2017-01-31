@@ -83,12 +83,13 @@ private:
 	static NAN_METHOD(setCascadeActivationSteepnesses);
 
 	static NAN_METHOD(printConnections);
+	static NAN_METHOD(printParameters);
+
 	static NAN_METHOD(randomizeWeights);
 
 	// TODO
 	/*
 	- train (rename to trainOne)
-	- printParameters
 	- getActivationFunction
 	- setActivationFunction
 	- setActivationFunctionLayer
