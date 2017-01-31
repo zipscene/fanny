@@ -227,6 +227,7 @@ void FANNY::Init(v8::Local<v8::Object> target) {
 	// Add prototype methods
 
 	Nan::SetPrototypeMethod(tpl, "printConnections", printConnections);
+	Nan::SetPrototypeMethod(tpl, "randomizeWeights", randomizeWeights);
 
 	Nan::SetPrototypeMethod(tpl, "save", save);
 	Nan::SetPrototypeMethod(tpl, "saveToFixed", saveToFixed);
@@ -241,6 +242,7 @@ void FANNY::Init(v8::Local<v8::Object> target) {
 	Nan::SetPrototypeMethod(tpl, "getNumOutput", getNumOutput);
 	Nan::SetPrototypeMethod(tpl, "getTotalNeurons", getTotalNeurons);
 	Nan::SetPrototypeMethod(tpl, "getTotalConnections", getTotalConnections);
+	Nan::SetPrototypeMethod(tpl, "getConnectionArray", getConnectionArray);
 	Nan::SetPrototypeMethod(tpl, "getNumLayers", getNumLayers);
 	Nan::SetPrototypeMethod(tpl, "getBitFail", getBitFail);
 	Nan::SetPrototypeMethod(tpl, "getMSE", getMSE);
@@ -301,6 +303,19 @@ FANNY::~FANNY() {
 NAN_METHOD(FANNY::printConnections) {
 	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
 	fanny->fann->print_connections();
+}
+
+NAN_METHOD(FANNY::randomizeWeights) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 2) return Nan::ThrowError("Must have 2 arguments: min_weight and max_weight");
+
+	if (!info[0]->IsNumber() || !info[1]->IsNumber()) {
+		return Nan::ThrowError(" min_weight and max_weight must be numbers");
+	}
+	fann_type min_weight = v8NumberToFannType(info[0]);
+	fann_type max_weight = v8NumberToFannType(info[1]);
+
+	fanny->fann->randomize_weights(min_weight, max_weight);
 }
 
 NAN_METHOD(FANNY::loadFile) {
@@ -591,6 +606,15 @@ NAN_METHOD(FANNY::getTotalConnections) {
 	info.GetReturnValue().Set(num);
 }
 
+NAN_METHOD(FANNY::getConnectionArray) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	unsigned int size = fanny->fann->get_total_connections();
+	std::vector<FANN::connection> connections(size);
+	fanny->fann->get_connection_array(&connections[0]);
+
+	info.GetReturnValue().Set(connectionArrayToToV8Array(connections, size));
+}
+
 NAN_METHOD(FANNY::getNumLayers) {
 	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
 	unsigned int num = fanny->fann->get_num_layers();
@@ -788,7 +812,7 @@ NAN_METHOD(FANNY::setInputScalingParams) {
 	}
 
 	if (!info[1]->IsNumber() || !info[2]->IsNumber()) {
-		return Nan::ThrowError("new_input_min and new_input_max must be of numbers");
+		return Nan::ThrowError("new_input_min and new_input_max must be numbers");
 	}
 
 	TrainingData *fannyTrainingData = Nan::ObjectWrap::Unwrap<TrainingData>(info[0].As<v8::Object>());
@@ -813,7 +837,7 @@ NAN_METHOD(FANNY::setOutputScalingParams) {
 	}
 
 	if (!info[1]->IsNumber() || !info[2]->IsNumber()) {
-		return Nan::ThrowError("new_output_min and new_output_max must be of numbers");
+		return Nan::ThrowError("new_output_min and new_output_max must be numbers");
 	}
 
 	TrainingData *fannyTrainingData = Nan::ObjectWrap::Unwrap<TrainingData>(info[0].As<v8::Object>());
@@ -837,7 +861,7 @@ NAN_METHOD(FANNY::setScalingParams) {
 	}
 
 	if (!info[1]->IsNumber() || !info[2]->IsNumber() || !info[3]->IsNumber() || !info[4]->IsNumber()) {
-		return Nan::ThrowError("new_input_min, new_input_max, new_output_min, and new_output_max must be of numbers");
+		return Nan::ThrowError("new_input_min, new_input_max, new_output_min, and new_output_max must be numbers");
 	}
 
 	TrainingData *fannyTrainingData = Nan::ObjectWrap::Unwrap<TrainingData>(info[0].As<v8::Object>());

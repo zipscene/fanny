@@ -31,8 +31,6 @@ describe('Tests', function() {
 			});
 	});
 
-<<<<<<< Updated upstream
-=======
 	describe('Options Tests', function() {
 		var optionsToTest = annOptionsSchema.toJSONSchema().properties;
 
@@ -93,9 +91,28 @@ describe('Tests', function() {
 		}
 	});
 
-	describe.only('Print Connections', function() {
-		var ann = createANN({ layers: [ 2, 20, 5 ] });
-		ann.printConnections();
-	})
->>>>>>> Stashed changes
+	describe('Randomize Weights', function() {
+		it('Can call randomizeWeights', function() {
+			var ann = createANN({ layers: [ 2, 1, 2 ] });
+			var initalConnections = ann.getConnectionArray();
+			ann.randomizeWeights(-5, 5);
+			var updatedConnections = ann.getConnectionArray();
+			expect(initalConnections).to.be.an('array');
+			expect(updatedConnections).to.be.an('array');
+			expect(updatedConnections).to.have.lengthOf(initalConnections.length);
+			for (var i = 0; i < updatedConnections.length; i++) {
+				expect(updatedConnections[i]).to.have.property('from_neuron').that.equals(initalConnections[i].from_neuron);
+				expect(updatedConnections[i]).to.have.property('to_neuron').that.equals(initalConnections[i].to_neuron);
+				expect(updatedConnections[i]).to.have.property('weight').that.is.not.equal(initalConnections[i].weight);
+			}
+		});
+	});
+
+	describe('Print Connections', function() {
+		it('Can call printConnections', function() {
+			var ann = createANN({ layers: [ 2, 2, 2 ] });
+			var testFunc = function() { ann.printConnections(); }
+			expect(testFunc).to.not.throw();
+		});
+	});
 });

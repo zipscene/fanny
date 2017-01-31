@@ -59,6 +59,7 @@ private:
 	static NAN_METHOD(getNumOutput);
 	static NAN_METHOD(getTotalNeurons);
 	static NAN_METHOD(getTotalConnections);
+	static NAN_METHOD(getConnectionArray);
 	static NAN_METHOD(getNumLayers);
 	static NAN_METHOD(getBitFail);
 	static NAN_METHOD(getMSE);
@@ -77,10 +78,28 @@ private:
 	static NAN_METHOD(setCascadeActivationFunctions);
 	static NAN_METHOD(getCascadeActivationSteepnesses);
 	static NAN_METHOD(setCascadeActivationSteepnesses);
-<<<<<<< Updated upstream
-=======
 
 	static NAN_METHOD(printConnections);
+	static NAN_METHOD(randomizeWeights);
+
+	// TODO
+	/*
+	- train (rename to trainOne)
+	- resetMSE
+	- printParameters
+	- getActivationFunction
+	- setActivationFunction
+	- setActivationFunctionLayer
+	- setActivationFunctionHidden
+	- setActivationFunctionOutput
+	- getActivationSteepness
+	- setActivationSteepness
+	- setActivationSteepnessLayer
+	- setActivationSteepnessHidden
+	- setActivationSteepnessOutput
+	- setWeightArray
+	- setWeight
+	*/
 
 	static NAN_METHOD(getCascadeOutputChangeFraction);
 	static NAN_METHOD(getCascadeOutputStagnationEpochs);
@@ -110,7 +129,7 @@ private:
 	static NAN_METHOD(setRpropDeltaZero);
 	static NAN_METHOD(setRpropDeltaMin);
 	static NAN_METHOD(setRpropDeltaMax);
->>>>>>> Stashed changes
+
 	static NAN_METHOD(train);
 	static NAN_METHOD(test);
 	static NAN_METHOD(scaleTrain);

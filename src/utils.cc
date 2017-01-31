@@ -91,4 +91,27 @@ bool v8StringToTrainingAlgorithmEnum(v8::Local<v8::Value> value, FANN::training_
 	return true;
 }
 
+v8::Local<v8::Object> connectionToV8Object(FANN::connection connection) {
+	v8::Local<v8::Object> conncetionObject = Nan::New<v8::Object>();
+	v8::Local<v8::Value> fromNeuron = Nan::New<v8::Number>(connection.from_neuron);
+	v8::Local<v8::Value> toNeuron = Nan::New<v8::Number>(connection.to_neuron);
+	v8::Local<v8::Value> weight = Nan::New<v8::Number>(connection.weight);
+
+	Nan::Set(conncetionObject, Nan::New<v8::String>("from_neuron").ToLocalChecked(), fromNeuron);
+	Nan::Set(conncetionObject, Nan::New<v8::String>("to_neuron").ToLocalChecked(), toNeuron);
+	Nan::Set(conncetionObject, Nan::New<v8::String>("weight").ToLocalChecked(), weight);
+
+	return conncetionObject;
+}
+
+v8::Local<v8::Value> connectionArrayToToV8Array(std::vector<FANN::connection> connectionArray, unsigned int size) {
+	Nan::EscapableHandleScope scope;
+	v8::Local<v8::Array> v8Array = Nan::New<v8::Array>(size);
+	for (uint32_t idx = 0; idx < size; ++idx) {
+		v8::Local<v8::Object> value = connectionToV8Object(connectionArray[idx]);
+		Nan::Set(v8Array, idx, value);
+	}
+	return scope.Escape(v8Array);
+}
+
 }

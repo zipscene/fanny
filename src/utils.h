@@ -16,4 +16,7 @@ v8::Local<v8::Value> trainingAlgorithmEnumToV8String(FANN::training_algorithm_en
 
 bool v8StringToTrainingAlgorithmEnum(v8::Local<v8::Value> value, FANN::training_algorithm_enum &ret);
 
+v8::Local<v8::Object> connectionToV8Object(FANN::connection connection);
+
+v8::Local<v8::Value> connectionArrayToToV8Array(std::vector<FANN::connection> connectionArray, unsigned int size);
 }
