@@ -41,7 +41,7 @@ describe.only('Training Data', function() {
 		expect(td2._datatype).to.equal('float');
 	});
 	it('#loadTrainingData', function() {
-		return loadTrainingData('test/examples/training-data.txt', 'float')
+		return loadTrainingData('test/resources/training-data.txt', 'float')
 			.then((td) => {
 				expect(td._fannyTrainingData).to.exist;
 				expect(td._datatype).to.exist;
@@ -49,163 +49,178 @@ describe.only('Training Data', function() {
 			});
 	});
 	describe('prototype functions', function() {
-		beforeEach(function() {
-			this.td = createTrainingData(booleanTrainingData, 'float');
-		});
-		after(function() {
-			if (this.filename) {
-				fs.unlinkSync(this.filename);
-			}
-		});
 		it('#getLength', function() {
-			var length = this.td.getLength();
+			var td = createTrainingData(booleanTrainingData, 'float');
+			var length = td.getLength();
 			expect(length).to.equal(booleanTrainingData.length);
 		});
 		it('#getNumInputs', function() {
-			expect(this.td.getNumInputs()).to.equal(2);
+			var td = createTrainingData(booleanTrainingData, 'float');
+			expect(td.getNumInputs()).to.equal(2);
 		});
 		it('#getNumOutputs', function() {
-			expect(this.td.getNumOutputs()).to.equal(5);
+			var td = createTrainingData(booleanTrainingData, 'float');
+			expect(td.getNumOutputs()).to.equal(5);
 		});
 		it('#getInputData', function() {
-			expect(this.td.getInputData()).to.deep.equal(booleanInputData);
+			var td = createTrainingData(booleanTrainingData, 'float');
+			expect(td.getInputData()).to.deep.equal(booleanInputData);
 		});
 		it('#getOutputData', function() {
-			expect(this.td.getOutputData()).to.deep.equal(booleanOutputData);
+			var td = createTrainingData(booleanTrainingData, 'float');
+			expect(td.getOutputData()).to.deep.equal(booleanOutputData);
 		});
 		it('#getOneInputData', function() {
-			expect(this.td.getOneInputData(3)).to.deep.equal(booleanInputData[3]);
+			var td = createTrainingData(booleanTrainingData, 'float');
+			expect(td.getOneInputData(3)).to.deep.equal(booleanInputData[3]);
 		});
 		it('#getOneInputData error', function() {
-			var self = this;
 			expect(function() {
-				return self.td.getOneInputData('3');
+				var td = createTrainingData(booleanTrainingData, 'float');
+				return td.getOneInputData('3');
 			}).to.throw(XError.INVALID_ARGUMENT);
 		});
 		it('#getOneOutputData', function() {
-			expect(this.td.getOneOutputData(3)).to.deep.equal(booleanOutputData[3]);
+			var td = createTrainingData(booleanTrainingData, 'float');
+			expect(td.getOneOutputData(3)).to.deep.equal(booleanOutputData[3]);
 		});
 		it('#getOneOutputData error', function() {
-			var self = this;
 			expect(function() {
-				return self.td.getOneOutputData('3');
+				var td = createTrainingData(booleanTrainingData, 'float');
+				return td.getOneOutputData('3');
 			}).to.throw(XError.INVALID_ARGUMENT);
 		});
 		it('#getMinInput', function() {
-			expect(this.td.getMinInput()).to.equal(0);
+			var td = createTrainingData(booleanTrainingData, 'float');
+			expect(td.getMinInput()).to.equal(0);
 		});
 		it('#getMaxInput', function() {
-			expect(this.td.getMaxInput()).to.equal(1);
+			var td = createTrainingData(booleanTrainingData, 'float');
+			expect(td.getMaxInput()).to.equal(1);
 		});
 		it('#getMinOutput', function() {
-			expect(this.td.getMinOutput()).to.equal(0);
+			var td = createTrainingData(booleanTrainingData, 'float');
+			expect(td.getMinOutput()).to.equal(0);
 		});
 		it('#getMaxOutput', function() {
-			expect(this.td.getMaxOutput()).to.equal(1);
+			var td = createTrainingData(booleanTrainingData, 'float');
+			expect(td.getMaxOutput()).to.equal(1);
 		});
 		it('#scaleInput', function() {
 			var min = -1;
 			var max = 2;
-			this.td.scaleInput(min, max);
-			expect(this.td.getMinInput()).to.equal(min);
-			expect(this.td.getMaxInput()).to.equal(max);
+			var td = createTrainingData(booleanTrainingData, 'float');
+			td.scaleInput(min, max);
+			expect(td.getMinInput()).to.equal(min);
+			expect(td.getMaxInput()).to.equal(max);
 		});
 		it('#scaleInput Error', function() {
-			var self = this;
 			expect(function() {
-				return self.td.scaleInput('3', 1);
+				var td = createTrainingData(booleanTrainingData, 'float');
+				return td.scaleInput('3', 1);
 			}).to.throw(XError.INVALID_ARGUMENT);
 
 			expect(function() {
-				return self.td.scaleInput(3, '1');
+				var td = createTrainingData(booleanTrainingData, 'float');
+				return td.scaleInput(3, '1');
 			}).to.throw(XError.INVALID_ARGUMENT);
 		});
 		it('#scaleOutput', function() {
 			var min = -1;
 			var max = 2;
-			this.td.scaleOutput(min, max);
-			expect(this.td.getMinOutput()).to.equal(min);
-			expect(this.td.getMaxOutput()).to.equal(max);
+			var td = createTrainingData(booleanTrainingData, 'float');
+			td.scaleOutput(min, max);
+			expect(td.getMinOutput()).to.equal(min);
+			expect(td.getMaxOutput()).to.equal(max);
 		});
 		it('#scaleOutput Error', function() {
-			var self = this;
 			expect(function() {
-				return self.td.scaleOutput('1', -1);
+				var td = createTrainingData(booleanTrainingData, 'float');
+				return td.scaleOutput('1', -1);
 			}).to.throw(XError.INVALID_ARGUMENT);
 
 			expect(function() {
-				return self.td.scaleOutput(1, '-1');
+				var td = createTrainingData(booleanTrainingData, 'float');
+				return td.scaleOutput(1, '-1');
 			}).to.throw(XError.INVALID_ARGUMENT);
 		});
 		it('#scale', function() {
 			var min = -1;
 			var max = 2;
-			this.td.scale(min, max);
-			expect(this.td.getMinInput()).to.equal(min);
-			expect(this.td.getMaxInput()).to.equal(max);
-			expect(this.td.getMinOutput()).to.equal(min);
-			expect(this.td.getMaxOutput()).to.equal(max);
+			var td = createTrainingData(booleanTrainingData, 'float');
+			td.scale(min, max);
+			expect(td.getMinInput()).to.equal(min);
+			expect(td.getMaxInput()).to.equal(max);
+			expect(td.getMinOutput()).to.equal(min);
+			expect(td.getMaxOutput()).to.equal(max);
 		});
 		it('#scale Error', function() {
-			var self = this;
 			expect(function() {
-				return self.td.scale('1', -1);
+				var td = createTrainingData(booleanTrainingData, 'float');
+				return td.scale('1', -1);
 			}).to.throw(XError.INVALID_ARGUMENT);
 
 			expect(function() {
-				return self.td.scale(1, '-1');
+				var td = createTrainingData(booleanTrainingData, 'float');
+				return td.scale(1, '-1');
 			}).to.throw(XError.INVALID_ARGUMENT);
 		});
 		it('#subset', function() {
-			this.td.subset(1, 3);
-			expect(this.td.getInputData()).to.deep.equal(booleanInputData.slice(1, 4));
-			expect(this.td.getOutputData()).to.deep.equal(booleanOutputData.slice(1, 4));
+			var td = createTrainingData(booleanTrainingData, 'float');
+			td.subset(1, 3);
+			expect(td.getInputData()).to.deep.equal(booleanInputData.slice(1, 4));
+			expect(td.getOutputData()).to.deep.equal(booleanOutputData.slice(1, 4));
 		});
 		it('#subset Error', function() {
-			var self = this;
 			expect(function() {
-				return self.td.subset('1', 1);
+				var td = createTrainingData(booleanTrainingData, 'float');
+				return td.subset('1', 1);
 			}).to.throw(XError.INVALID_ARGUMENT);
 
 			expect(function() {
-				return self.td.subset(1, '1');
+				var td = createTrainingData(booleanTrainingData, 'float');
+				return td.subset(1, '1');
 			}).to.throw(XError.INVALID_ARGUMENT);
 		});
 		it('#merge', function() {
+			var td = createTrainingData(booleanTrainingData, 'float');
 			var data = [
 				[ [ 1, 0 ], [ 0, 1, 1, 0, 1 ] ],
 				[ [ 1, 0 ], [ 0, 1, 1, 0, 1 ] ]
 			];
 			var td2 = createTrainingData(data);
-			this.td.merge(td2);
-			expect(this.td.getLength()).to.equal(data.length + booleanTrainingData.length);
+			td.merge(td2);
+			expect(td.getLength()).to.equal(data.length + booleanTrainingData.length);
 		});
 		it('#merge Error', function() {
-			var self = this;
 			expect(function() {
-				return self.td.merge([ [ 1, 0 ], [ 0 , 1, 1, 0, 1]]);
+				var td = createTrainingData(booleanTrainingData, 'float');
+				return td.merge([ [ 1, 0 ], [ 0 , 1, 1, 0, 1]]);
 			}).to.throw(XError.INVALID_ARGUMENT);
 		});
 		it('#shuffle', function() {
-			var inputData =  this.td.getOneInputData(0);
-			var outputData = this.td.getOutputData(0);
+			var td = createTrainingData(booleanTrainingData, 'float');
+			var inputData =  td.getOneInputData(0);
+			var outputData = td.getOutputData(0);
 			expect(inputData).to.exist;
 			expect(outputData).to.exist;
-			this.td.shuffle();
-			expect(this.td.getOneInputData(0)).to.not.deep.equal(inputData);
-			expect(this.td.getOneOutputData(0)).to.not.deep.equal(outputData);
+			td.shuffle();
+			expect(td.getOneInputData(0)).to.not.deep.equal(inputData);
+			expect(td.getOneOutputData(0)).to.not.deep.equal(outputData);
 		});
 		it('#clone', function() {
-			var tdClone = this.td.clone();
-			expect(tdClone.getInputData()).to.deep.equal(this.td.getInputData());
-			expect(tdClone.getOutputData()).to.deep.equal(this.td.getOutputData());
+			var td = createTrainingData(booleanTrainingData, 'float');
+			var tdClone = td.clone();
+			expect(tdClone.getInputData()).to.deep.equal(td.getInputData());
+			expect(tdClone.getOutputData()).to.deep.equal(td.getOutputData());
 		});
 		it('#setData', function() {
 			var inputData = [ [ 0, 1 ] ];
 			var outputData = [ [ 1, 0, 1, 0, 0 ] ];
-			this.td.setData(inputData, outputData);
-			expect(this.td.getInputData()).to.deep.equal(inputData);
-			expect(this.td.getOutputData()).to.deep.equal(outputData);
+			var td = createTrainingData(booleanTrainingData, 'float');
+			td.setData(inputData, outputData);
+			expect(td.getInputData()).to.deep.equal(inputData);
+			expect(td.getOutputData()).to.deep.equal(outputData);
 		});
 		it('#setData by object', function() {
 			var input = [ [ 0, 1 ] ];
@@ -216,26 +231,28 @@ describe.only('Training Data', function() {
 					output: output[0]
 				}
 			];
-			this.td.setData(data);
-			expect(this.td.getInputData()).to.deep.equal(input);
-			expect(this.td.getOutputData()).to.deep.equal(output);
+			var td = createTrainingData(booleanTrainingData, 'float');
+			td.setData(data);
+			expect(td.getInputData()).to.deep.equal(input);
+			expect(td.getOutputData()).to.deep.equal(output);
 		});
 		it('#setData Error', function() {
-			var self = this;
 			expect(function() {
-				return self.td.setData([ 0, 1 ], [ 1, 0, 1, 0, 0 ]);
+				var td = createTrainingData(booleanTrainingData, 'float');
+				return td.setData([ 0, 1 ], [ 1, 0, 1, 0, 0 ]);
 			}).to.throw(XError.INVALID_ARGUMENT);
 
 			expect(function() {
-				return self.td.subset({ input: [ 0, 1 ] });
+				var td = createTrainingData(booleanTrainingData, 'float');
+				return td.subset({ input: [ 0, 1 ] });
 			}).to.throw(XError.INVALID_ARGUMENT);
 		});
 		it('#save', function() {
-			var self = this;
-			self.filename = 'test/test-bool-data.txt';
-			return self.td.save(self.filename)
+			var td = createTrainingData(booleanTrainingData, 'float');
+			var filename = 'test/test-bool-data.txt';
+			return td.save(filename)
 				.then(function() {
-					return zstreams.fromFile(self.filename)
+					return zstreams.fromFile(filename)
 						.split('\n')
 						.through((data) => {
 							return data
@@ -250,6 +267,10 @@ describe.only('Training Data', function() {
 					var output = [ array[2], array[4], array[6], array[8] ];
 					expect(input).to.deep.equal(booleanInputData);
 					expect(output).to.deep.equal(booleanOutputData);
+					return fs.unlinkSync(filename);
+				}, (err) => {
+					fs.unlinkSync(filename);
+					throw err;
 				});
 		});
 	});
