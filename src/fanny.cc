@@ -249,6 +249,9 @@ void FANNY::Init(v8::Local<v8::Object> target) {
 	Nan::SetPrototypeMethod(tpl, "setLearningRate", setLearningRate);
 	Nan::SetPrototypeMethod(tpl, "getActivationFunction", getActivationFunction);
 	Nan::SetPrototypeMethod(tpl, "setActivationFunction", setActivationFunction);
+	Nan::SetPrototypeMethod(tpl, "setActivationFunctionLayer", setActivationFunctionLayer);
+	Nan::SetPrototypeMethod(tpl, "setActivationFunctionHidden", setActivationFunctionHidden);
+	Nan::SetPrototypeMethod(tpl, "setActivationFunctionOutput", setActivationFunctionOutput);
 	Nan::SetPrototypeMethod(tpl, "getNumInput", getNumInput);
 	Nan::SetPrototypeMethod(tpl, "getNumOutput", getNumOutput);
 	Nan::SetPrototypeMethod(tpl, "getTotalNeurons", getTotalNeurons);
@@ -782,7 +785,7 @@ NAN_METHOD(FANNY::getActivationFunction) {
 	if (!info[0]->IsNumber()) return Nan::ThrowError("layer must be a number");
 	if (!info[1]->IsNumber()) return Nan::ThrowError("neuron must be a number");
 
-	unsigned int layer = info[1]->Uint32Value();
+	unsigned int layer = info[0]->Uint32Value();
 	unsigned int neuron = info[1]->Uint32Value();
 	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
 	FANN::activation_function_enum activationFunction = fanny->fann->get_activation_function(layer, neuron);
@@ -796,11 +799,41 @@ NAN_METHOD(FANNY::setActivationFunction) {
 	if (!info[2]->IsNumber()) return Nan::ThrowError("neuron must be a number");
 
 	unsigned int layer = info[1]->Uint32Value();
-	unsigned int neuron = info[1]->Uint32Value();
+	unsigned int neuron = info[2]->Uint32Value();
 
 	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
 	FANN::activation_function_enum activationFunction;
 	if(v8StringToActivationFunctionEnum(info[0], activationFunction)) fanny->fann->set_activation_function(activationFunction, layer, neuron);
+}
+
+NAN_METHOD(FANNY::setActivationFunctionLayer) {
+	if (info.Length() != 2) return Nan::ThrowError("Must have 2 arguments: activation_function, layer");
+	if (!info[0]->IsString()) return Nan::ThrowError("activation_function must be a string");
+	if (!info[1]->IsNumber()) return Nan::ThrowError("layer must be a number");
+
+	unsigned int layer = info[1]->Uint32Value();
+
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	FANN::activation_function_enum activationFunction;
+	if(v8StringToActivationFunctionEnum(info[0], activationFunction)) fanny->fann->set_activation_function_layer(activationFunction, layer);
+}
+
+NAN_METHOD(FANNY::setActivationFunctionHidden) {
+	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: activation_function,");
+	if (!info[0]->IsString()) return Nan::ThrowError("activation_function must be a string");
+
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	FANN::activation_function_enum activationFunction;
+	if(v8StringToActivationFunctionEnum(info[0], activationFunction)) fanny->fann->set_activation_function_hidden(activationFunction);
+}
+
+NAN_METHOD(FANNY::setActivationFunctionOutput) {
+	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: activation_function,");
+	if (!info[0]->IsString()) return Nan::ThrowError("activation_function must be a string");
+
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	FANN::activation_function_enum activationFunction;
+	if(v8StringToActivationFunctionEnum(info[0], activationFunction)) fanny->fann->set_activation_function_output(activationFunction);
 }
 
 // by default -0.0001

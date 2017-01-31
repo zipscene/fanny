@@ -230,13 +230,59 @@ describe('Tests', function() {
 
 		it('Calls outside the network have no effect', function() {
 			var ann = createANN({ layers: [ 1, 1, 1 ] });
-			var initalActivationFunction1 = ann.getActivationFunction(0, 1);
-			var initalActivationFunction2 = ann.getActivationFunction(1, 1);
-			var initalActivationFunction3 = ann.getActivationFunction(2, 1);
+			var initalActivationFunction1 = ann.getActivationFunction(1, 1);
+			var initalActivationFunction2 = ann.getActivationFunction(2, 1);
 			ann.setActivationFunction('LINEAR_PIECE', 3, 1);
-			expect(ann.getActivationFunction(0, 1)).to.be.a('string').and.to.equal(initalActivationFunction1);
-			expect(ann.getActivationFunction(1, 1)).to.be.a('string').and.to.equal(initalActivationFunction2);
-			expect(ann.getActivationFunction(2, 1)).to.be.a('string').and.to.equal(initalActivationFunction3);
+			expect(ann.getActivationFunction(1, 1)).to.be.a('string').and.to.equal(initalActivationFunction1);
+			expect(ann.getActivationFunction(2, 1)).to.be.a('string').and.to.equal(initalActivationFunction2);
+		});
+
+		it('Can call setActivationFunctionLayer', function() {
+			var ann = createANN({ layers: [ 2, 2, 2 ] });
+			// Setup state of functions
+			ann.setActivationFunction('SIGMOID_STEPWISE', 1, 1);
+			ann.setActivationFunction('SIGMOID_STEPWISE', 1, 2);
+			var initialActivationFunction1 = ann.getActivationFunction(1, 1);
+			var initialActivationFunction2 = ann.getActivationFunction(1, 2);
+			expect(initialActivationFunction1).to.be.a('string').and.to.equal('SIGMOID_STEPWISE');
+			expect(initialActivationFunction2).to.be.a('string').and.to.equal('SIGMOID_STEPWISE');
+			ann.setActivationFunctionLayer('LINEAR', 1);
+			var updatedActivationFunction1 = ann.getActivationFunction(1, 1);
+			var updatedActivationFunction2 = ann.getActivationFunction(1, 2);
+			expect(updatedActivationFunction1).to.be.a('string').and.to.equal('LINEAR');
+			expect(updatedActivationFunction2).to.be.a('string').and.to.equal('LINEAR');
+		});
+
+		it('Can call setActivationFunctionHidden', function() {
+			var ann = createANN({ layers: [ 2, 2, 2 ] });
+			// Setup state of functions
+			ann.setActivationFunction('SIGMOID_STEPWISE', 1, 1);
+			ann.setActivationFunction('SIGMOID_STEPWISE', 1, 2);
+			var initialActivationFunction1 = ann.getActivationFunction(1, 1);
+			var initialActivationFunction2 = ann.getActivationFunction(1, 2);
+			expect(initialActivationFunction1).to.be.a('string').and.to.equal('SIGMOID_STEPWISE');
+			expect(initialActivationFunction2).to.be.a('string').and.to.equal('SIGMOID_STEPWISE');
+			ann.setActivationFunctionHidden('LINEAR');
+			var updatedActivationFunction1 = ann.getActivationFunction(1, 1);
+			var updatedActivationFunction2 = ann.getActivationFunction(1, 2);
+			expect(updatedActivationFunction1).to.be.a('string').and.to.equal('LINEAR');
+			expect(updatedActivationFunction2).to.be.a('string').and.to.equal('LINEAR');
+		});
+
+		it('Can call setActivationFunctionOutput', function() {
+			var ann = createANN({ layers: [ 2, 2, 2 ] });
+			// Setup state of functions
+			ann.setActivationFunction('SIGMOID_STEPWISE', 2, 1);
+			ann.setActivationFunction('SIGMOID_STEPWISE', 2, 2);
+			var initialActivationFunction1 = ann.getActivationFunction(2, 1);
+			var initialActivationFunction2 = ann.getActivationFunction(2, 2);
+			expect(initialActivationFunction1).to.be.a('string').and.to.equal('SIGMOID_STEPWISE');
+			expect(initialActivationFunction2).to.be.a('string').and.to.equal('SIGMOID_STEPWISE');
+			ann.setActivationFunctionOutput('LINEAR');
+			var updatedActivationFunction1 = ann.getActivationFunction(2, 1);
+			var updatedActivationFunction2 = ann.getActivationFunction(2, 2);
+			expect(updatedActivationFunction1).to.be.a('string').and.to.equal('LINEAR');
+			expect(updatedActivationFunction2).to.be.a('string').and.to.equal('LINEAR');
 		});
 	});
 });

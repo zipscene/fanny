@@ -70,6 +70,9 @@ private:
 	static NAN_METHOD(setLearningRate);
 	static NAN_METHOD(getActivationFunction);
 	static NAN_METHOD(setActivationFunction);
+	static NAN_METHOD(setActivationFunctionLayer);
+	static NAN_METHOD(setActivationFunctionHidden);
+	static NAN_METHOD(setActivationFunctionOutput);
 	static NAN_METHOD(getQuickpropDecay);
 	static NAN_METHOD(getQuickpropMu);
 	static NAN_METHOD(getRpropIncreaseFactor);
@@ -93,9 +96,6 @@ private:
 	// TODO
 	/*
 	- train (rename to trainOne)
-	- setActivationFunctionLayer
-	- setActivationFunctionHidden
-	- setActivationFunctionOutput
 	- getActivationSteepness
 	- setActivationSteepness
 	- setActivationSteepnessLayer
