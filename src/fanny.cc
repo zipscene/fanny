@@ -238,6 +238,14 @@ void FANNY::Init(v8::Local<v8::Object> target) {
 	Nan::SetPrototypeMethod(tpl, "cascadetrainOnData", cascadetrainOnData);
 	Nan::SetPrototypeMethod(tpl, "cascadetrainOnFile", cascadetrainOnFile);
 	Nan::SetPrototypeMethod(tpl, "run", run);
+	Nan::SetPrototypeMethod(tpl, "getTrainingAlgorithm", getTrainingAlgorithm);
+	Nan::SetPrototypeMethod(tpl, "setTrainingAlgorithm", setTrainingAlgorithm);
+	Nan::SetPrototypeMethod(tpl, "getTrainErrorFunction", getTrainErrorFunction);
+	Nan::SetPrototypeMethod(tpl, "setTrainErrorFunction", setTrainErrorFunction);
+	Nan::SetPrototypeMethod(tpl, "getTrainStopFunction", getTrainStopFunction);
+	Nan::SetPrototypeMethod(tpl, "setTrainStopFunction", setTrainStopFunction);
+	Nan::SetPrototypeMethod(tpl, "getLearningRate", getLearningRate);
+	Nan::SetPrototypeMethod(tpl, "setLearningRate", setLearningRate);
 	Nan::SetPrototypeMethod(tpl, "getNumInput", getNumInput);
 	Nan::SetPrototypeMethod(tpl, "getNumOutput", getNumOutput);
 	Nan::SetPrototypeMethod(tpl, "getTotalNeurons", getTotalNeurons);
@@ -245,10 +253,11 @@ void FANNY::Init(v8::Local<v8::Object> target) {
 	Nan::SetPrototypeMethod(tpl, "getConnectionArray", getConnectionArray);
 	Nan::SetPrototypeMethod(tpl, "getNumLayers", getNumLayers);
 	Nan::SetPrototypeMethod(tpl, "getBitFail", getBitFail);
+	Nan::SetPrototypeMethod(tpl, "getBitFailLimit", getBitFailLimit);
+	Nan::SetPrototypeMethod(tpl, "setBitFailLimit", setBitFailLimit);
 	Nan::SetPrototypeMethod(tpl, "getMSE", getMSE);
-	Nan::SetPrototypeMethod(tpl, "getLearningRate", getLearningRate);
-	Nan::SetPrototypeMethod(tpl, "getQuickPropDecay", getQuickPropDecay);
-	Nan::SetPrototypeMethod(tpl, "getQuickPropMu", getQuickPropMu);
+	Nan::SetPrototypeMethod(tpl, "getQuickpropDecay", getQuickpropDecay);
+	Nan::SetPrototypeMethod(tpl, "getQuickpropMu", getQuickpropMu);
 	Nan::SetPrototypeMethod(tpl, "getRpropIncreaseFactor", getRpropIncreaseFactor);
 	Nan::SetPrototypeMethod(tpl, "getRpropDecreaseFactor", getRpropDecreaseFactor);
 	Nan::SetPrototypeMethod(tpl, "getRpropDeltaZero", getRpropDeltaZero);
@@ -276,6 +285,46 @@ void FANNY::Init(v8::Local<v8::Object> target) {
 	Nan::SetPrototypeMethod(tpl, "setCascadeActivationFunctions", setCascadeActivationFunctions);
 	Nan::SetPrototypeMethod(tpl, "getCascadeActivationSteepnesses", getCascadeActivationSteepnesses);
 	Nan::SetPrototypeMethod(tpl, "setCascadeActivationSteepnesses", setCascadeActivationSteepnesses);
+
+	Nan::SetPrototypeMethod(tpl, "getCascadeOutputChangeFraction", getCascadeOutputChangeFraction);
+	Nan::SetPrototypeMethod(tpl, "getCascadeOutputStagnationEpochs", getCascadeOutputStagnationEpochs);
+	Nan::SetPrototypeMethod(tpl, "getCascadeCandidateChangeFraction", getCascadeCandidateChangeFraction);
+	Nan::SetPrototypeMethod(tpl, "getCascadeCandidateStagnationEpochs", getCascadeCandidateStagnationEpochs);
+	Nan::SetPrototypeMethod(tpl, "getCascadeWeightMultiplier", getCascadeWeightMultiplier);
+	Nan::SetPrototypeMethod(tpl, "getCascadeCandidateLimit", getCascadeCandidateLimit);
+	Nan::SetPrototypeMethod(tpl, "getCascadeMaxOutEpochs", getCascadeMaxOutEpochs);
+	Nan::SetPrototypeMethod(tpl, "getCascadeMaxCandEpochs", getCascadeMaxCandEpochs);
+	Nan::SetPrototypeMethod(tpl, "getCascadeNumCandidateGroups", getCascadeNumCandidateGroups);
+
+	Nan::SetPrototypeMethod(tpl, "setCascadeOutputChangeFraction", setCascadeOutputChangeFraction);
+	Nan::SetPrototypeMethod(tpl, "setCascadeOutputStagnationEpochs", setCascadeOutputStagnationEpochs);
+	Nan::SetPrototypeMethod(tpl, "setCascadeCandidateChangeFraction", setCascadeCandidateChangeFraction);
+	Nan::SetPrototypeMethod(tpl, "setCascadeCandidateStagnationEpochs", setCascadeCandidateStagnationEpochs);
+	Nan::SetPrototypeMethod(tpl, "setCascadeWeightMultiplier", setCascadeWeightMultiplier);
+	Nan::SetPrototypeMethod(tpl, "setCascadeCandidateLimit", setCascadeCandidateLimit);
+	Nan::SetPrototypeMethod(tpl, "setCascadeMaxOutEpochs", setCascadeMaxOutEpochs);
+	Nan::SetPrototypeMethod(tpl, "setCascadeMaxCandEpochs", setCascadeMaxCandEpochs);
+	Nan::SetPrototypeMethod(tpl, "setCascadeNumCandidateGroups", setCascadeNumCandidateGroups);
+
+	Nan::SetPrototypeMethod(tpl, "setLearningRate", setLearningRate);
+	Nan::SetPrototypeMethod(tpl, "setQuickpropDecay", setQuickpropDecay);
+	Nan::SetPrototypeMethod(tpl, "setQuickpropMu", setQuickpropMu);
+	Nan::SetPrototypeMethod(tpl, "setRpropIncreaseFactor", setRpropIncreaseFactor);
+	Nan::SetPrototypeMethod(tpl, "setRpropDecreaseFactor", setRpropDecreaseFactor);
+	Nan::SetPrototypeMethod(tpl, "setRpropDeltaZero", setRpropDeltaZero);
+	Nan::SetPrototypeMethod(tpl, "setRpropDeltaMin", setRpropDeltaMin);
+	Nan::SetPrototypeMethod(tpl, "setRpropDeltaMax", setRpropDeltaMax);
+
+	Nan::SetPrototypeMethod(tpl, "getSarpropWeightDecayShift", getSarpropWeightDecayShift);
+	Nan::SetPrototypeMethod(tpl, "getSarpropStepErrorThresholdFactor", getSarpropStepErrorThresholdFactor);
+	Nan::SetPrototypeMethod(tpl, "getSarpropStepErrorShift", getSarpropStepErrorShift);
+	Nan::SetPrototypeMethod(tpl, "getSarpropTemperature", getSarpropTemperature);
+	Nan::SetPrototypeMethod(tpl, "getLearningMomentum", getLearningMomentum);
+	Nan::SetPrototypeMethod(tpl, "setSarpropWeightDecayShift", setSarpropWeightDecayShift);
+	Nan::SetPrototypeMethod(tpl, "setSarpropStepErrorThresholdFactor", setSarpropStepErrorThresholdFactor);
+	Nan::SetPrototypeMethod(tpl, "setSarpropStepErrorShift", setSarpropStepErrorShift);
+	Nan::SetPrototypeMethod(tpl, "setSarpropTemperature", setSarpropTemperature);
+	Nan::SetPrototypeMethod(tpl, "setLearningMomentum", setLearningMomentum);
 
 	// Create the loadFile function
 	v8::Local<v8::FunctionTemplate> loadFileTpl = Nan::New<v8::FunctionTemplate>(loadFile);
@@ -582,6 +631,54 @@ NAN_METHOD(FANNY::runAsync) {
 	Nan::AsyncQueueWorker(new RunWorker(callback, inputs, info.Holder()));
 }
 
+NAN_METHOD(FANNY::getTrainingAlgorithm) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	FANN::training_algorithm_enum value = fanny->fann->get_training_algorithm();
+
+	info.GetReturnValue().Set(trainingAlgorithmEnumToV8String(value));
+}
+
+NAN_METHOD(FANNY::setTrainingAlgorithm) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: training_algorithm");
+	if (!info[0]->IsString()) return Nan::ThrowError("training_algorithm not a string");
+
+	FANN::training_algorithm_enum value;
+	if(v8StringToTrainingAlgorithmEnum(info[0], value)) fanny->fann->set_training_algorithm(value);
+}
+
+NAN_METHOD(FANNY::getTrainErrorFunction) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	FANN::error_function_enum value = fanny->fann->get_train_error_function();
+
+	info.GetReturnValue().Set(errorFunctionEnumToV8String(value));
+}
+
+NAN_METHOD(FANNY::setTrainErrorFunction) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: train_error_function");
+	if (!info[0]->IsString()) return Nan::ThrowError("train_error_function not a string");
+
+	FANN::error_function_enum value;
+	if(v8StringToErrorFunctionEnum(info[0], value)) fanny->fann->set_train_error_function(value);
+}
+
+NAN_METHOD(FANNY::getTrainStopFunction) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	FANN::stop_function_enum value = fanny->fann->get_train_stop_function();
+
+	info.GetReturnValue().Set(stopFunctionEnumToV8String(value));
+}
+
+NAN_METHOD(FANNY::setTrainStopFunction) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: train_stop_function");
+	if (!info[0]->IsString()) return Nan::ThrowError("train_stop_function not a string");
+
+	FANN::stop_function_enum value;
+	if(v8StringToStopFunctionEnum(info[0], value)) fanny->fann->set_train_stop_function(value);
+}
+
 NAN_METHOD(FANNY::getNumInput) {
 	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
 	unsigned int num = fanny->fann->get_num_input();
@@ -627,6 +724,22 @@ NAN_METHOD(FANNY::getBitFail) {
 	info.GetReturnValue().Set(num);
 }
 
+NAN_METHOD(FANNY::getBitFailLimit) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	fann_type num = fanny->fann->get_bit_fail_limit();
+	info.GetReturnValue().Set(num);
+}
+
+NAN_METHOD(FANNY::setBitFailLimit) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: bit_fail_limit");
+	if (!info[0]->IsNumber()) return Nan::ThrowError("bit_fail_limit not a number");
+
+	fann_type value = v8NumberToFannType(info[0]);
+
+	fanny->fann->set_bit_fail_limit(value);
+}
+
 NAN_METHOD(FANNY::getMSE) {
 	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
 	float num = fanny->fann->get_MSE();
@@ -640,18 +753,49 @@ NAN_METHOD(FANNY::getLearningRate) {
 	info.GetReturnValue().Set(num);
 }
 
+NAN_METHOD(FANNY::setLearningRate) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+
+	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: learning_rate");
+	if (!info[0]->IsNumber()) return Nan::ThrowError("learning_rate not a number");
+
+	float value = info[0]->NumberValue();
+
+	fanny->fann->set_learning_rate(value);
+}
+
 // by default -0.0001
-NAN_METHOD(FANNY::getQuickPropDecay) {
+NAN_METHOD(FANNY::getQuickpropDecay) {
 	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
 	float num = fanny->fann->get_quickprop_decay();
 	info.GetReturnValue().Set(num);
 }
 
+NAN_METHOD(FANNY::setQuickpropDecay) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: quickprop_decay");
+	if (!info[0]->IsNumber()) return Nan::ThrowError("quickprop_decay not a number");
+
+	float value = info[0]->NumberValue();
+
+	fanny->fann->set_quickprop_decay(value);
+}
+
 // by default 1.75
-NAN_METHOD(FANNY::getQuickPropMu) {
+NAN_METHOD(FANNY::getQuickpropMu) {
 	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
 	float num = fanny->fann->get_quickprop_mu();
 	info.GetReturnValue().Set(num);
+}
+
+NAN_METHOD(FANNY::setQuickpropMu) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: quickprop_mu");
+	if (!info[0]->IsNumber()) return Nan::ThrowError("quickprop_mu not a number");
+
+	float value = info[0]->NumberValue();
+
+	fanny->fann->set_quickprop_mu(value);
 }
 
 // by default 1.2
@@ -661,11 +805,31 @@ NAN_METHOD(FANNY::getRpropIncreaseFactor) {
 	info.GetReturnValue().Set(num);
 }
 
+NAN_METHOD(FANNY::setRpropIncreaseFactor) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: rprop_increase_factor");
+	if (!info[0]->IsNumber()) return Nan::ThrowError("rprop_increase_factor not a number");
+
+	float value = info[0]->NumberValue();
+
+	fanny->fann->set_rprop_increase_factor(value);
+}
+
 // by default 0.5
 NAN_METHOD(FANNY::getRpropDecreaseFactor) {
 	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
 	float num = fanny->fann->get_rprop_decrease_factor();
 	info.GetReturnValue().Set(num);
+}
+
+NAN_METHOD(FANNY::setRpropDecreaseFactor) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: rprop_decrease_factor");
+	if (!info[0]->IsNumber()) return Nan::ThrowError("rprop_decrease_factor not a number");
+
+	float value = info[0]->NumberValue();
+
+	fanny->fann->set_rprop_decrease_factor(value);
 }
 
 // by default 0.1
@@ -675,6 +839,16 @@ NAN_METHOD(FANNY::getRpropDeltaZero) {
 	info.GetReturnValue().Set(num);
 }
 
+NAN_METHOD(FANNY::setRpropDeltaZero) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: rprop_delta_zero");
+	if (!info[0]->IsNumber()) return Nan::ThrowError("rprop_delta_zero not a number");
+
+	float value = info[0]->NumberValue();
+
+	fanny->fann->set_rprop_delta_zero(value);
+}
+
 // by default 0.0
 NAN_METHOD(FANNY::getRpropDeltaMin) {
 	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
@@ -682,11 +856,116 @@ NAN_METHOD(FANNY::getRpropDeltaMin) {
 	info.GetReturnValue().Set(num);
 }
 
+NAN_METHOD(FANNY::setRpropDeltaMin) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: rprop_delta_min");
+	if (!info[0]->IsNumber()) return Nan::ThrowError("rprop_delta_min not a number");
+
+	float value = info[0]->NumberValue();
+
+	fanny->fann->set_rprop_delta_min(value);
+}
+
 // by default 50.0
 NAN_METHOD(FANNY::getRpropDeltaMax) {
 	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
 	float num = fanny->fann->get_rprop_delta_max();
 	info.GetReturnValue().Set(num);
+}
+
+NAN_METHOD(FANNY::setRpropDeltaMax) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: rprop_delta_max");
+	if (!info[0]->IsNumber()) return Nan::ThrowError("rprop_delta_max not a number");
+
+	float value = info[0]->NumberValue();
+
+	fanny->fann->set_rprop_delta_max(value);
+}
+
+// The default delta max is -6.644
+NAN_METHOD(FANNY::getSarpropWeightDecayShift) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	float num = fanny->fann->get_sarprop_weight_decay_shift();
+	info.GetReturnValue().Set(num);
+}
+
+NAN_METHOD(FANNY::setSarpropWeightDecayShift) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: sarprop_weight_decay_shift");
+	if (!info[0]->IsNumber()) return Nan::ThrowError("sarprop_weight_decay_shift not a number");
+
+	float value = info[0]->NumberValue();
+
+	fanny->fann->set_sarprop_weight_decay_shift(value);
+}
+
+// The default delta max is 0.1
+NAN_METHOD(FANNY::getSarpropStepErrorThresholdFactor) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	float num = fanny->fann->get_sarprop_step_error_threshold_factor();
+	info.GetReturnValue().Set(num);
+}
+
+NAN_METHOD(FANNY::setSarpropStepErrorThresholdFactor) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: sarprop_step_error_threshold_factor");
+	if (!info[0]->IsNumber()) return Nan::ThrowError("sarprop_step_error_threshold_factor not a number");
+
+	float value = info[0]->NumberValue();
+
+	fanny->fann->set_sarprop_step_error_threshold_factor(value);
+}
+
+// The default delta max is 1.385
+NAN_METHOD(FANNY::getSarpropStepErrorShift) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	float num = fanny->fann->get_sarprop_step_error_shift();
+	info.GetReturnValue().Set(num);
+}
+
+NAN_METHOD(FANNY::setSarpropStepErrorShift) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: sarprop_step_error_shift");
+	if (!info[0]->IsNumber()) return Nan::ThrowError("sarprop_step_error_shift not a number");
+
+	float value = info[0]->NumberValue();
+
+	fanny->fann->set_sarprop_step_error_shift(value);
+}
+
+// The default delta max is 0.015
+NAN_METHOD(FANNY::getSarpropTemperature) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	float num = fanny->fann->get_sarprop_temperature();
+	info.GetReturnValue().Set(num);
+}
+
+NAN_METHOD(FANNY::setSarpropTemperature) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: sarprop_temperature");
+	if (!info[0]->IsNumber()) return Nan::ThrowError("sarprop_temperature not a number");
+
+	float value = info[0]->NumberValue();
+
+	fanny->fann->set_sarprop_temperature(value);
+}
+
+// The default is 0
+NAN_METHOD(FANNY::getLearningMomentum) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	float num = fanny->fann->get_learning_momentum();
+	info.GetReturnValue().Set(num);
+}
+
+NAN_METHOD(FANNY::setLearningMomentum) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: learning_momentum");
+	if (!info[0]->IsNumber()) return Nan::ThrowError("learning_momentum not a number");
+
+	float value = info[0]->NumberValue();
+
+	fanny->fann->set_learning_momentum(value);
 }
 
 NAN_METHOD(FANNY::initWeights) {
@@ -1016,6 +1295,7 @@ NAN_METHOD(FANNY::setCascadeActivationFunctions) {
 				else if (str.compare("FANN_THRESHOLD_SYMMETRIC") == 0) ret = FANN_THRESHOLD_SYMMETRIC;
 				else if (str.compare("FANN_SIGMOID") == 0) ret = FANN_SIGMOID;
 				else if (str.compare("FANN_SIGMOID_STEPWISE") == 0) ret = FANN_SIGMOID_STEPWISE;
+				else if (str.compare("FANN_SIGMOID_SYMMETRIC") == 0) ret = FANN_SIGMOID_SYMMETRIC;
 				else if (str.compare("FANN_SIGMOID_SYMMETRIC_STEPWISE") == 0) ret = FANN_SIGMOID_SYMMETRIC_STEPWISE;
 				else if (str.compare("FANN_GAUSSIAN") == 0) ret = FANN_GAUSSIAN;
 				else if (str.compare("FANN_GAUSSIAN_SYMMETRIC") == 0) ret = FANN_GAUSSIAN_SYMMETRIC;
@@ -1034,6 +1314,7 @@ NAN_METHOD(FANNY::setCascadeActivationFunctions) {
 			}
 		}
 	}
+
 	if (activationFunctions.size() != size) {
 		return Nan::ThrowError("Some activation functions where not found");
 	} else {
@@ -1071,6 +1352,250 @@ NAN_METHOD(FANNY::setCascadeActivationSteepnesses) {
 	if (cascadeActivationSteepnesses.size() != cascadeActivationSteepnessesCount) return Nan::ThrowError("Wrong number of steepnesses or count");
 
 	fanny->fann->set_cascade_activation_steepnesses(&cascadeActivationSteepnesses[0], cascadeActivationSteepnessesCount);
+
+	#else
+	Nan::ThrowError("Not supported for fixed fann");
+	#endif
+}
+
+NAN_METHOD(FANNY::getCascadeOutputChangeFraction) {
+	#ifndef FANNY_FIXED
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+
+	float num = fanny->fann->get_cascade_output_change_fraction();
+
+	info.GetReturnValue().Set(num);
+
+	#else
+	Nan::ThrowError("Not supported for fixed fann");
+	#endif
+}
+
+NAN_METHOD(FANNY::setCascadeOutputChangeFraction) {
+	#ifndef FANNY_FIXED
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: cascade_output_change_fraction");
+	if (!info[0]->IsNumber()) return Nan::ThrowError("cascade_output_change_fraction not a number");
+
+	float value = info[0]->NumberValue();
+
+	fanny->fann->set_cascade_output_change_fraction(value);
+
+	#else
+	Nan::ThrowError("Not supported for fixed fann");
+	#endif
+}
+
+NAN_METHOD(FANNY::getCascadeOutputStagnationEpochs) {
+	#ifndef FANNY_FIXED
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+
+	unsigned int num = fanny->fann->get_cascade_output_stagnation_epochs();
+
+	info.GetReturnValue().Set(num);
+
+	#else
+	Nan::ThrowError("Not supported for fixed fann");
+	#endif
+}
+
+NAN_METHOD(FANNY::setCascadeOutputStagnationEpochs) {
+	#ifndef FANNY_FIXED
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: cascade_output_stagnation_epochs");
+	if (!info[0]->IsNumber()) return Nan::ThrowError("cascade_output_stagnation_epochs not a number");
+
+	unsigned int value = info[0]->Uint32Value();
+
+	fanny->fann->set_cascade_output_stagnation_epochs(value);
+
+	#else
+	Nan::ThrowError("Not supported for fixed fann");
+	#endif
+}
+
+NAN_METHOD(FANNY::getCascadeCandidateChangeFraction) {
+	#ifndef FANNY_FIXED
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+
+	float num = fanny->fann->get_cascade_candidate_change_fraction();
+
+	info.GetReturnValue().Set(num);
+
+	#else
+	Nan::ThrowError("Not supported for fixed fann");
+	#endif
+}
+
+NAN_METHOD(FANNY::setCascadeCandidateChangeFraction) {
+	#ifndef FANNY_FIXED
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: cascade_candidate_change_fraction");
+	if (!info[0]->IsNumber()) return Nan::ThrowError("cascade_candidate_change_fraction not a number");
+
+	float value = info[0]->NumberValue();
+
+	fanny->fann->set_cascade_candidate_change_fraction(value);
+
+	#else
+	Nan::ThrowError("Not supported for fixed fann");
+	#endif
+}
+
+NAN_METHOD(FANNY::getCascadeCandidateStagnationEpochs) {
+	#ifndef FANNY_FIXED
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+
+	unsigned int num = fanny->fann->get_cascade_candidate_stagnation_epochs();
+
+	info.GetReturnValue().Set(num);
+
+	#else
+	Nan::ThrowError("Not supported for fixed fann");
+	#endif
+}
+
+NAN_METHOD(FANNY::setCascadeCandidateStagnationEpochs) {
+	#ifndef FANNY_FIXED
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: cascade_candidate_stagnation_epochs");
+	if (!info[0]->IsNumber()) return Nan::ThrowError("cascade_candidate_stagnation_epochs not a number");
+
+	unsigned int value = info[0]->Uint32Value();
+
+	fanny->fann->set_cascade_candidate_stagnation_epochs(value);
+
+	#else
+	Nan::ThrowError("Not supported for fixed fann");
+	#endif
+}
+
+NAN_METHOD(FANNY::getCascadeWeightMultiplier) {
+	#ifndef FANNY_FIXED
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	fann_type num = fanny->fann->get_cascade_weight_multiplier();
+	info.GetReturnValue().Set(num);
+	#else
+	Nan::ThrowError("Not supported for fixed fann");
+	#endif
+}
+
+NAN_METHOD(FANNY::setCascadeWeightMultiplier) {
+	#ifndef FANNY_FIXED
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: cascade_weight_multiplier");
+	if (!info[0]->IsNumber()) return Nan::ThrowError("cascade_weight_multiplier not a number");
+
+	fann_type value = v8NumberToFannType(info[0]);
+
+	fanny->fann->set_cascade_weight_multiplier(value);
+	#else
+	Nan::ThrowError("Not supported for fixed fann");
+	#endif
+}
+
+NAN_METHOD(FANNY::getCascadeCandidateLimit) {
+	#ifndef FANNY_FIXED
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	fann_type num = fanny->fann->get_cascade_candidate_limit();
+	info.GetReturnValue().Set(num);
+	#else
+	Nan::ThrowError("Not supported for fixed fann");
+	#endif
+}
+
+NAN_METHOD(FANNY::setCascadeCandidateLimit) {
+	#ifndef FANNY_FIXED
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: cascade_candidate_limit");
+	if (!info[0]->IsNumber()) return Nan::ThrowError("cascade_candidate_limit not a number");
+
+	fann_type value = v8NumberToFannType(info[0]);
+
+	fanny->fann->set_cascade_candidate_limit(value);
+	#else
+	Nan::ThrowError("Not supported for fixed fann");
+	#endif
+}
+
+NAN_METHOD(FANNY::getCascadeMaxOutEpochs) {
+	#ifndef FANNY_FIXED
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+
+	unsigned int num = fanny->fann->get_cascade_max_out_epochs();
+
+	info.GetReturnValue().Set(num);
+
+	#else
+	Nan::ThrowError("Not supported for fixed fann");
+	#endif
+}
+
+NAN_METHOD(FANNY::setCascadeMaxOutEpochs) {
+	#ifndef FANNY_FIXED
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: cascade_max_out_epochs");
+	if (!info[0]->IsNumber()) return Nan::ThrowError("cascade_max_out_epochs not a number");
+
+	unsigned int value = info[0]->Uint32Value();
+
+	fanny->fann->set_cascade_max_out_epochs(value);
+
+	#else
+	Nan::ThrowError("Not supported for fixed fann");
+	#endif
+}
+
+NAN_METHOD(FANNY::getCascadeMaxCandEpochs) {
+	#ifndef FANNY_FIXED
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+
+	unsigned int num = fanny->fann->get_cascade_max_cand_epochs();
+
+	info.GetReturnValue().Set(num);
+
+	#else
+	Nan::ThrowError("Not supported for fixed fann");
+	#endif
+}
+
+NAN_METHOD(FANNY::setCascadeMaxCandEpochs) {
+	#ifndef FANNY_FIXED
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: cascade_max_cand_epochs");
+	if (!info[0]->IsNumber()) return Nan::ThrowError("cascade_max_cand_epochs not a number");
+
+	unsigned int value = info[0]->Uint32Value();
+
+	fanny->fann->set_cascade_max_cand_epochs(value);
+
+	#else
+	Nan::ThrowError("Not supported for fixed fann");
+	#endif
+}
+
+NAN_METHOD(FANNY::getCascadeNumCandidateGroups) {
+	#ifndef FANNY_FIXED
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+
+	unsigned int num = fanny->fann->get_cascade_num_candidate_groups();
+
+	info.GetReturnValue().Set(num);
+
+	#else
+	Nan::ThrowError("Not supported for fixed fann");
+	#endif
+}
+
+NAN_METHOD(FANNY::setCascadeNumCandidateGroups) {
+	#ifndef FANNY_FIXED
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: cascade_num_candidate_groups");
+	if (!info[0]->IsNumber()) return Nan::ThrowError("cascade_num_candidate_groups not a number");
+
+	float value = info[0]->NumberValue();
+
+	fanny->fann->set_cascade_num_candidate_groups(value);
 
 	#else
 	Nan::ThrowError("Not supported for fixed fann");
