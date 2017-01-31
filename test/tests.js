@@ -167,4 +167,20 @@ describe('Tests', function() {
 			expect(testFunc).to.not.throw();
 		});
 	});
+
+	describe('Get MSE', function() {
+		it('Can call getMSE', function() {
+			var ann = createANN({ layers: [ 2, 2, 2 ] });
+			var mse = ann.getMSE();
+			expect(mse).to.be.a('number');
+		});
+	});
+
+	describe('Reset MSE', function() {
+		it('Can call resetMSE', function() {
+			var ann = createANN({ layers: [ 2, 2, 2 ] });
+			var testFunc = function() { ann.resetMSE(); }
+			expect(testFunc).to.not.throw();
+		});
+	});
 });

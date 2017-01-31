@@ -65,6 +65,7 @@ private:
 	static NAN_METHOD(getBitFailLimit);
 	static NAN_METHOD(setBitFailLimit);
 	static NAN_METHOD(getMSE);
+	static NAN_METHOD(resetMSE);
 	static NAN_METHOD(getLearningRate);
 	static NAN_METHOD(getQuickpropDecay);
 	static NAN_METHOD(getQuickpropMu);
@@ -87,7 +88,6 @@ private:
 	// TODO
 	/*
 	- train (rename to trainOne)
-	- resetMSE
 	- printParameters
 	- getActivationFunction
 	- setActivationFunction

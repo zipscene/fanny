@@ -256,6 +256,7 @@ void FANNY::Init(v8::Local<v8::Object> target) {
 	Nan::SetPrototypeMethod(tpl, "getBitFailLimit", getBitFailLimit);
 	Nan::SetPrototypeMethod(tpl, "setBitFailLimit", setBitFailLimit);
 	Nan::SetPrototypeMethod(tpl, "getMSE", getMSE);
+	Nan::SetPrototypeMethod(tpl, "resetMSE", resetMSE);
 	Nan::SetPrototypeMethod(tpl, "getQuickpropDecay", getQuickpropDecay);
 	Nan::SetPrototypeMethod(tpl, "getQuickpropMu", getQuickpropMu);
 	Nan::SetPrototypeMethod(tpl, "getRpropIncreaseFactor", getRpropIncreaseFactor);
@@ -744,6 +745,11 @@ NAN_METHOD(FANNY::getMSE) {
 	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
 	float num = fanny->fann->get_MSE();
 	info.GetReturnValue().Set(num);
+}
+
+NAN_METHOD(FANNY::resetMSE) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	fanny->fann->reset_MSE();
 }
 
 // by default 0.7
