@@ -405,18 +405,53 @@ describe('Tests', function() {
 		});
 	});
 	describe('#clearScalingParams', function() {
-
+		it('can clear scaling params', function() {
+			expect(function() {
+				var data = createTrainingData(booleanTrainingData);
+				var ann = createANN({ layers: [ 2, 1, 5 ] });
+				ann.setScalingParams(data, 0, 1, 0, 1);
+				return ann.clearScalingParams();
+			}).to.not.throw();
+		});
 	});
 	describe('#scaleInput', function() {
-
+		it('can scale input', function() {
+			expect(function() {
+				var data = createTrainingData(booleanTrainingData);
+				var ann = createANN({ layers: [ 2, 1, 5 ] });
+				ann.setScalingParams(data, 0, 1, 0, 1);
+				return ann.scaleInput([ 0, 1 ]);
+			}).to.not.throw();
+		});
 	});
 	describe('#scaleOutput', function() {
-
+		it('can scale output', function() {
+			expect(function() {
+				var data = createTrainingData(booleanTrainingData);
+				var ann = createANN({ layers: [ 2, 1, 5 ] });
+				ann.setScalingParams(data, 0, 1, 0, 1);
+				return ann.scaleOutput([ 0, 1, 1, 1, 0 ]);
+			}).to.not.throw();
+		});
 	});
 	describe('#descaleInput', function() {
-
+		it('can descale input', function() {
+			expect(function() {
+				var data = createTrainingData(booleanTrainingData);
+				var ann = createANN({ layers: [ 2, 1, 5 ] });
+				ann.setScalingParams(data, 0, 1, 0, 1);
+				return ann.descaleInput([ 0, 1 ]);
+			}).to.not.throw();
+		});
 	});
 	describe('#descaleOutput', function() {
-
+		it('can descale output', function() {
+			expect(function() {
+				var data = createTrainingData(booleanTrainingData);
+				var ann = createANN({ layers: [ 2, 1, 5 ] });
+				ann.setScalingParams(data, 0, 1, 0, 1);
+				return ann.descaleOutput([ 0, 1, 1, 1, 0 ]);
+			}).to.not.throw();
+		});
 	});
 });
