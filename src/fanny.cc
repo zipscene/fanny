@@ -332,6 +332,7 @@ void FANNY::Init(v8::Local<v8::Object> target) {
 	Nan::SetPrototypeMethod(tpl, "setSarpropTemperature", setSarpropTemperature);
 	Nan::SetPrototypeMethod(tpl, "setLearningMomentum", setLearningMomentum);
 
+	Nan::SetPrototypeMethod(tpl, "getActivationSteepness", getActivationSteepness);
 	// Create the loadFile function
 	v8::Local<v8::FunctionTemplate> loadFileTpl = Nan::New<v8::FunctionTemplate>(loadFile);
 	v8::Local<v8::Function> loadFileFunction = Nan::GetFunction(loadFileTpl).ToLocalChecked();
@@ -1672,6 +1673,16 @@ NAN_METHOD(FANNY::setCascadeNumCandidateGroups) {
 	#else
 	Nan::ThrowError("Not supported for fixed fann");
 	#endif
+}
+
+NAN_METHOD(FANNY::getActivationSteepness) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 2) return Nan::ThrowError("Must have an arguments: layer and neuron");
+	if (!info[0]->IsNumber() || !info[1]->IsNumber()) return Nan::ThrowError("layer and neuron should be numbers");
+	unsigned int layer = info[0]->Uint32Value();
+	unsigned int neuron = info[0]->Uint32Value();
+	fann_type activationSteepness = fanny->fann->get_activation_steepness(layer, neuron);
+	info.GetReturnValue().Set(activationSteepness);
 }
 
 }

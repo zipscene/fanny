@@ -454,4 +454,13 @@ describe('Tests', function() {
 			}).to.not.throw();
 		});
 	});
+	describe('#getActivationSteepness', function() {
+		it('can get activation steepness', function() {
+			var data = createTrainingData(booleanTrainingData);
+			var ann = createANN({ layers: [ 2, 1, 5 ] });
+			var steepness = ann.getActivationSteepness(1, 1);
+			expect(steepness).to.be.a('number');
+			expect(steepness).to.not.equal(-1);
+		});
+	});
 });
