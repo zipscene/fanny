@@ -96,13 +96,6 @@ private:
 	// TODO
 	/*
 	- train (rename to trainOne)
-	- getActivationSteepness
-	- setActivationSteepness
-	- setActivationSteepnessLayer
-	- setActivationSteepnessHidden
-	- setActivationSteepnessOutput
-	- setWeightArray
-	- setWeight
 	*/
 
 	static NAN_METHOD(getCascadeOutputChangeFraction);
@@ -172,6 +165,12 @@ private:
 	static NAN_METHOD(setLearningMomentum);
 
 	static NAN_METHOD(getActivationSteepness);
+	static NAN_METHOD(setActivationSteepness);
+	static NAN_METHOD(setActivationSteepnessLayer);
+	static NAN_METHOD(setActivationSteepnessHidden);
+	static NAN_METHOD(setActivationSteepnessOutput);
+	static NAN_METHOD(setWeightArray);
+	static NAN_METHOD(setWeight);
 
 	static void _doTrainOrTest(const Nan::FunctionCallbackInfo<v8::Value> &info, bool fromFile, bool isCascade, bool singleEpoch, bool isTest);
 

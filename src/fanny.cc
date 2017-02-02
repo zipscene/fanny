@@ -333,6 +333,14 @@ void FANNY::Init(v8::Local<v8::Object> target) {
 	Nan::SetPrototypeMethod(tpl, "setLearningMomentum", setLearningMomentum);
 
 	Nan::SetPrototypeMethod(tpl, "getActivationSteepness", getActivationSteepness);
+	Nan::SetPrototypeMethod(tpl, "setActivationSteepness", setActivationSteepness);
+	Nan::SetPrototypeMethod(tpl, "setActivationSteepnessLayer", setActivationSteepnessLayer);
+	Nan::SetPrototypeMethod(tpl, "setActivationSteepnessHidden", setActivationSteepnessHidden);
+	Nan::SetPrototypeMethod(tpl, "setActivationSteepnessOutput", setActivationSteepnessOutput);
+
+	Nan::SetPrototypeMethod(tpl, "setWeightArray", setWeightArray);
+	Nan::SetPrototypeMethod(tpl, "setWeight", setWeight);
+
 	// Create the loadFile function
 	v8::Local<v8::FunctionTemplate> loadFileTpl = Nan::New<v8::FunctionTemplate>(loadFile);
 	v8::Local<v8::Function> loadFileFunction = Nan::GetFunction(loadFileTpl).ToLocalChecked();
@@ -1683,6 +1691,74 @@ NAN_METHOD(FANNY::getActivationSteepness) {
 	unsigned int neuron = info[0]->Uint32Value();
 	fann_type activationSteepness = fanny->fann->get_activation_steepness(layer, neuron);
 	info.GetReturnValue().Set(activationSteepness);
+}
+
+NAN_METHOD(FANNY::setActivationSteepness) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 3) return Nan::ThrowError("Must have 3 arguments");
+	if (!info[0]->IsNumber() || !info[1]->IsNumber() || !info[2]->IsNumber()) {
+		return Nan::ThrowError("All arguments must be numbers");
+	}
+
+	fann_type steepness = v8NumberToFannType(info[0]);
+	unsigned int layer = info[1]->Uint32Value();
+	unsigned int neuron = info[2]->Uint32Value();
+	fanny->fann->set_activation_steepness(steepness, layer, neuron);
+}
+
+NAN_METHOD(FANNY::setActivationSteepnessLayer) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 2) return Nan::ThrowError("Must have 2 arguments");
+	if (!info[0]->IsNumber() || !info[1]->IsNumber()) {
+		return Nan::ThrowError("All arguments must be numbers");
+	}
+
+	fann_type steepness = v8NumberToFannType(info[0]);
+	unsigned int layer = info[1]->Uint32Value();
+	fanny->fann->set_activation_steepness_layer(steepness, layer);
+}
+
+NAN_METHOD(FANNY::setActivationSteepnessHidden) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 1) return Nan::ThrowError("Must have 1 arguments");
+	if (!info[0]->IsNumber()) {
+		return Nan::ThrowError("steepness must be numbers");
+	}
+	fann_type steepness = v8NumberToFannType(info[0]);
+	fanny->fann->set_activation_steepness_hidden(steepness);
+}
+
+NAN_METHOD(FANNY::setActivationSteepnessOutput) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 1) return Nan::ThrowError("Must have 1 arguments");
+	if (!info[0]->IsNumber()) {
+		return Nan::ThrowError("steepness must be numbers");
+	}
+	fann_type steepness = v8NumberToFannType(info[0]);
+	fanny->fann->set_activation_steepness_output(steepness);
+}
+
+NAN_METHOD(FANNY::setWeightArray) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 2) return Nan::ThrowError("Must have two arguments");
+	if (!info[0]->IsArray()) return Nan::ThrowError("Connections must be an array");
+	if (!info[1]->IsNumber()) return Nan::ThrowError("size must be a number");
+
+	std::vector<FANN::connection> connections = v8ArrayToConnection(info[0]);
+	unsigned int num = info[1]->Uint32Value();
+	fanny->fann->set_weight_array(&connections[0], num);
+}
+
+NAN_METHOD(FANNY::setWeight) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 3) return Nan::ThrowError("Must have 3 arguments");
+	if (!info[0]->IsNumber() || !info[1]->IsNumber() || !info[2]->IsNumber()) {
+		return Nan::ThrowError("All arguments must be numbers");
+	}
+	unsigned int fromNeuron = info[0]->Uint32Value();
+	unsigned int toNeuron = info[1]->Uint32Value();
+	fann_type weight = v8NumberToFannType(info[2]);
+	fanny->fann->set_weight(fromNeuron, toNeuron, weight);
 }
 
 }

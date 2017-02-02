@@ -45,18 +45,6 @@ v8::Local<v8::Value> fannDataSetToV8Array(fann_type ** data, unsigned int length
 	return scope.Escape(v8Array);
 }
 
-fann_type v8NumberToFannType(v8::Local<v8::Value> number) {
-	fann_type fannNumber = 0;
-	if (number->IsNumber()) {
-		#ifdef FANNY_FIXED
-		fannNumber = number->Uint32Value();
-		#else
-		fannNumber = number->NumberValue();
-		#endif
-	}
-	return fannNumber;
-}
-
 v8::Local<v8::Value> trainingAlgorithmEnumToV8String(FANN::training_algorithm_enum value) {
 	Nan::EscapableHandleScope scope;
 	const char *str = NULL;
@@ -139,16 +127,17 @@ bool v8StringToStopFunctionEnum(v8::Local<v8::Value> value, FANN::stop_function_
 }
 
 v8::Local<v8::Object> connectionToV8Object(FANN::connection connection) {
-	v8::Local<v8::Object> conncetionObject = Nan::New<v8::Object>();
+	Nan::EscapableHandleScope scope;
+	v8::Local<v8::Object> connectionObject = Nan::New<v8::Object>();
 	v8::Local<v8::Value> fromNeuron = Nan::New<v8::Number>(connection.from_neuron);
 	v8::Local<v8::Value> toNeuron = Nan::New<v8::Number>(connection.to_neuron);
 	v8::Local<v8::Value> weight = Nan::New<v8::Number>(connection.weight);
 
-	Nan::Set(conncetionObject, Nan::New<v8::String>("from_neuron").ToLocalChecked(), fromNeuron);
-	Nan::Set(conncetionObject, Nan::New<v8::String>("to_neuron").ToLocalChecked(), toNeuron);
-	Nan::Set(conncetionObject, Nan::New<v8::String>("weight").ToLocalChecked(), weight);
+	Nan::Set(connectionObject, Nan::New<v8::String>("fromNeuron").ToLocalChecked(), fromNeuron);
+	Nan::Set(connectionObject, Nan::New<v8::String>("toNeuron").ToLocalChecked(), toNeuron);
+	Nan::Set(connectionObject, Nan::New<v8::String>("weight").ToLocalChecked(), weight);
 
-	return conncetionObject;
+	return scope.Escape(connectionObject);
 }
 
 v8::Local<v8::Value> connectionArrayToToV8Array(std::vector<FANN::connection> connectionArray, unsigned int size) {
@@ -159,6 +148,46 @@ v8::Local<v8::Value> connectionArrayToToV8Array(std::vector<FANN::connection> co
 		Nan::Set(v8Array, idx, value);
 	}
 	return scope.Escape(v8Array);
+}
+
+std::vector<FANN::connection> v8ArrayToConnection(v8::Local<v8::Value> v8Array) {
+	std::vector<FANN::connection> result;
+	if (v8Array->IsArray()) {
+		v8::Local<v8::Array> localArray = v8Array.As<v8::Array>();
+		uint32_t length = localArray->Length();
+		result.reserve(length);
+		for (uint32_t idx = 0; idx < length; ++idx) {
+			Nan::MaybeLocal<v8::Value> maybeIdxValue = Nan::Get(localArray, idx);
+			if (!maybeIdxValue.IsEmpty()) {
+				v8::Local<v8::Value> value = maybeIdxValue.ToLocalChecked();
+				if (value->IsObject()) {
+					v8::Local<v8::Object> obj = value.As<v8::Object>();
+					// from_neuron, to_neuron, weight
+					FANN::connection connection;
+					unsigned int count = 0;
+					Nan::MaybeLocal<v8::Value> maybeToNeuron = Nan::Get(obj, Nan::New("toNeuron").ToLocalChecked());
+					if (!maybeToNeuron.IsEmpty()) {
+						++count;
+						connection.to_neuron = maybeToNeuron.ToLocalChecked()->Uint32Value();
+					}
+					Nan::MaybeLocal<v8::Value> maybeFromNeuron = Nan::Get(obj, Nan::New("fromNeuron").ToLocalChecked());
+					if (!maybeFromNeuron.IsEmpty()) {
+						++count;
+						connection.from_neuron = maybeFromNeuron.ToLocalChecked()->Uint32Value();
+					}
+					Nan::MaybeLocal<v8::Value> maybeWeight = Nan::Get(obj, Nan::New("weight").ToLocalChecked());
+					if (!maybeWeight.IsEmpty()) {
+						++count;
+						connection.weight = v8NumberToFannType(maybeWeight.ToLocalChecked());
+					}
+					if (count == 3) {
+						result.push_back(connection);
+					}
+				}
+			}
+		}
+	}
+	return result;
 }
 
 v8::Local<v8::Value> activationFunctionEnumToV8String(FANN::activation_function_enum value) {
