@@ -125,7 +125,7 @@ describe('Tests', function() {
 		}
 	});
 
-	describe('Randomize Weights', function() {
+	describe('Weights', function() {
 		it('Can call randomizeWeights', function() {
 			var ann = createANN({ layers: [ 2, 1, 2 ] });
 			var initalConnections = ann.getConnectionArray();
@@ -140,9 +140,6 @@ describe('Tests', function() {
 				expect(updatedConnections[i]).to.have.property('weight').that.is.not.equal(initalConnections[i].weight);
 			}
 		});
-	});
-
-	describe('init Weights', function() {
 		it('Can call initWeights', function() {
 			var ann = createANN({ layers: [ 2, 1, 5 ] });
 			var initalConnections = ann.getConnectionArray();
@@ -159,6 +156,35 @@ describe('Tests', function() {
 				expect(updatedConnections[i]).to.have.property('weight').that.is.not.equal(initalConnections[i].weight);
 			}
 		});
+		it('can set a single weight', function() {
+			var data = createTrainingData(booleanTrainingData);
+			var ann = createANN({ layers: [ 2, 1, 5 ] });
+			ann.initWeights(data);
+			var fromNeuron = 0;
+			var toNeuron = 3;
+			var newWeight = 0.22;
+			ann.setWeight(fromNeuron, toNeuron, newWeight);
+			var array = ann.getConnectionArray();
+			for (var connection of array) {
+				if (connection.fromNeuron === fromNeuron && connection.toNeuron === toNeuron) {
+					expect(connection.weight).to.be.at.most(newWeight);
+					break;
+				}
+			}
+		});
+		it('can set weights by array', function() {
+			var newWeight = 0.22;
+			var data = createTrainingData(booleanTrainingData);
+			var ann = createANN({ layers: [ 2, 1, 5 ] });
+			ann.initWeights(data);
+			var connections = ann.getConnectionArray();
+			for (var connect of connections) {
+				connect.weight = newWeight;
+			}
+			ann.setWeightArray(connections, connections.length);
+			var updatedConnections = ann.getConnectionArray();
+			expect(updatedConnections).to.deep.equal(updatedConnections);
+		});
 	});
 
 	describe('Print Commands', function() {
@@ -167,7 +193,7 @@ describe('Tests', function() {
 			var testFunc = function() { ann.printConnections(); }
 			expect(testFunc).to.not.throw();
 		});
-		it.skip('Can call printParameters', function() {
+		it('Can call printParameters', function() {
 			var ann = createANN({ layers: [ 2, 2, 2 ] });
 			var testFunc = function() { ann.printParameters(); }
 			expect(testFunc).to.not.throw();
@@ -489,37 +515,6 @@ describe('Tests', function() {
 			expect(ann.getActivationSteepness(2,1))
 				.to.be.a('number')
 				.to.not.equal(-1);
-		});
-	});
-	describe('Setting Weights', function() {
-		it('can set a single weight', function() {
-			var data = createTrainingData(booleanTrainingData);
-			var ann = createANN({ layers: [ 2, 1, 5 ] });
-			ann.initWeights(data);
-			var fromNeuron = 0;
-			var toNeuron = 3;
-			var newWeight = 0.22;
-			ann.setWeight(fromNeuron, toNeuron, newWeight);
-			var array = ann.getConnectionArray();
-			for (var connection of array) {
-				if (connection.fromNeuron === fromNeuron && connection.toNeuron === toNeuron) {
-					expect(connection.weight).to.be.at.most(newWeight);
-					break;
-				}
-			}
-		});
-		it('can set weights by array', function() {
-			var newWeight = 0.22;
-			var data = createTrainingData(booleanTrainingData);
-			var ann = createANN({ layers: [ 2, 1, 5 ] });
-			ann.initWeights(data);
-			var connections = ann.getConnectionArray();
-			for (var connect of connections) {
-				connect.weight = newWeight;
-			}
-			ann.setWeightArray(connections, connections.length);
-			var updatedConnections = ann.getConnectionArray();
-			expect(updatedConnections).to.deep.equal(updatedConnections);
 		});
 	});
 
