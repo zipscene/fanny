@@ -140,7 +140,7 @@ v8::Local<v8::Object> connectionToV8Object(FANN::connection connection) {
 	return scope.Escape(connectionObject);
 }
 
-v8::Local<v8::Value> connectionArrayToToV8Array(std::vector<FANN::connection> connectionArray, unsigned int size) {
+v8::Local<v8::Value> connectionArrayToV8Array(std::vector<FANN::connection> connectionArray, unsigned int size) {
 	Nan::EscapableHandleScope scope;
 	v8::Local<v8::Array> v8Array = Nan::New<v8::Array>(size);
 	for (uint32_t idx = 0; idx < size; ++idx) {

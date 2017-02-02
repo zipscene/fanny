@@ -729,7 +729,7 @@ NAN_METHOD(FANNY::getConnectionArray) {
 	std::vector<FANN::connection> connections(size);
 	fanny->fann->get_connection_array(&connections[0]);
 
-	info.GetReturnValue().Set(connectionArrayToToV8Array(connections, size));
+	info.GetReturnValue().Set(connectionArrayToV8Array(connections, size));
 }
 
 NAN_METHOD(FANNY::getNumLayers) {
