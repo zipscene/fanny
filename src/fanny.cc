@@ -729,7 +729,7 @@ NAN_METHOD(FANNY::getConnectionArray) {
 	std::vector<FANN::connection> connections(size);
 	fanny->fann->get_connection_array(&connections[0]);
 
-	info.GetReturnValue().Set(connectionArrayToV8Array(connections, size));
+	info.GetReturnValue().Set(connectionArrayToV8Array(connections));
 }
 
 NAN_METHOD(FANNY::getNumLayers) {
@@ -1322,6 +1322,8 @@ NAN_METHOD(FANNY::getCascadeActivationFunctions) {
 	for (uint32_t idx = 0; idx < size; ++idx) {
 		const char *str = NULL;
 		FANN::activation_function_enum value = activationFunctions[idx];
+		// fann did not include all versions of activation functions in the c++ enum
+		// they are all in the c version so we have to cast
 		fann_activationfunc_enum cValue = *(reinterpret_cast<fann_activationfunc_enum *>(&value));
 		switch(cValue) {
 			case FANN_LINEAR: str = "FANN_LINEAR"; break;

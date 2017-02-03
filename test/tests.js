@@ -30,7 +30,7 @@ describe('Tests', function() {
 			.then(() => {
 				var connections = ann.getConnectionArray();
 				for (var connect of connections) {
-					connect.weight = 1;
+					connect.weight = 0.02;
 				}
 				ann.setWeightArray(connections, connections.length);
 				expect(booleanThreshold(ann.run([ 1, 1 ]))).to.deep.equal([ 1, 1, 1, 1, 1 ]);
@@ -247,7 +247,7 @@ describe('Tests', function() {
 				'LINEAR', 'THRESHOLD', 'THRESHOLD_SYMMETRIC', 'SIGMOID', 'SIGMOID_STEPWISE',
 				'SIGMOID_SYMMETRIC', 'SIGMOID_SYMMETRIC_STEPWISE', 'GAUSSIAN', 'GAUSSIAN_SYMMETRIC',
 				'ELLIOT', 'ELLIOT_SYMMETRIC', 'LINEAR_PIECE', 'LINEAR_PIECE_SYMMETRIC', 'SIN_SYMMETRIC',
-				'COS_SYMMETRIC'
+				'COS_SYMMETRIC', 'SIN', 'COS'
 			];
 
 			var ann = createANN({ layers: [ 2, 2, 2 ] });
@@ -507,7 +507,7 @@ describe('Tests', function() {
 				.to.not.equal(-1);
 		});
 		it('can set activation steepness on hidden layers', function() {
-			var ann = createANN({ layers: [ 2, 1, 5 ] });
+			var ann = createANN({ layers: [ 2, 8, 5 ] });
 			ann.setActivationSteepnessHidden(0.2);
 			expect(ann.getActivationSteepness(1,1))
 				.to.be.a('number')

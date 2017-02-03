@@ -40,7 +40,7 @@ bool v8StringToStopFunctionEnum(v8::Local<v8::Value> value, FANN::stop_function_
 
 v8::Local<v8::Object> connectionToV8Object(FANN::connection connection);
 
-v8::Local<v8::Value> connectionArrayToV8Array(std::vector<FANN::connection> connectionArray, unsigned int size);
+v8::Local<v8::Value> connectionArrayToV8Array(std::vector<FANN::connection> connectionArray);
 
 std::vector<FANN::connection> v8ArrayToConnection(v8::Local<v8::Value> v8Array);
 

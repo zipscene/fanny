@@ -140,8 +140,9 @@ v8::Local<v8::Object> connectionToV8Object(FANN::connection connection) {
 	return scope.Escape(connectionObject);
 }
 
-v8::Local<v8::Value> connectionArrayToV8Array(std::vector<FANN::connection> connectionArray, unsigned int size) {
+v8::Local<v8::Value> connectionArrayToV8Array(std::vector<FANN::connection> connectionArray) {
 	Nan::EscapableHandleScope scope;
+	unsigned int size = connectionArray.size();
 	v8::Local<v8::Array> v8Array = Nan::New<v8::Array>(size);
 	for (uint32_t idx = 0; idx < size; ++idx) {
 		v8::Local<v8::Object> value = connectionToV8Object(connectionArray[idx]);
@@ -162,7 +163,6 @@ std::vector<FANN::connection> v8ArrayToConnection(v8::Local<v8::Value> v8Array) 
 				v8::Local<v8::Value> value = maybeIdxValue.ToLocalChecked();
 				if (value->IsObject()) {
 					v8::Local<v8::Object> obj = value.As<v8::Object>();
-					// from_neuron, to_neuron, weight
 					FANN::connection connection;
 					unsigned int count = 0;
 					Nan::MaybeLocal<v8::Value> maybeToNeuron = Nan::Get(obj, Nan::New("toNeuron").ToLocalChecked());
