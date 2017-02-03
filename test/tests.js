@@ -28,8 +28,13 @@ describe('Tests', function() {
 		var ann = createANN({ layers: [ 2, 20, 5 ] });
 		return ann.train(booleanTrainingData, { desiredError: 0.01 })
 			.then(() => {
-				expect(booleanThreshold(ann.run([ 1, 1 ]))).to.be.an.instanceof(Array).to.have.lengthOf(5);
-				expect(booleanThreshold(ann.run([ 1, 0 ]))).to.be.an.instanceof(Array).to.have.lengthOf(5);
+				var connections = ann.getConnectionArray();
+				for (var connect of connections) {
+					connect.weight = 1;
+				}
+				ann.setWeightArray(connections, connections.length);
+				expect(booleanThreshold(ann.run([ 1, 1 ]))).to.deep.equal([ 1, 1, 1, 1, 1 ]);
+				expect(booleanThreshold(ann.run([ 1, 0 ]))).to.deep.equal([ 1, 1, 1, 1, 1 ]);
 			});
 	});
 
@@ -143,7 +148,6 @@ describe('Tests', function() {
 		it('Can call initWeights', function() {
 			var ann = createANN({ layers: [ 2, 1, 5 ] });
 			var initalConnections = ann.getConnectionArray();
-			console.log(initalConnections);
 			var td = createTrainingData(booleanTrainingData);
 			ann.initWeights(td);
 			var updatedConnections = ann.getConnectionArray();
