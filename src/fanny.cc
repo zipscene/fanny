@@ -1324,8 +1324,8 @@ NAN_METHOD(FANNY::getCascadeActivationFunctions) {
 		FANN::activation_function_enum value = activationFunctions[idx];
 		// fann did not include all versions of activation functions in the c++ enum
 		// they are all in the c version so we have to cast
-		fann_activationfunc_enum cValue = *(reinterpret_cast<fann_activationfunc_enum *>(&value));
-		switch(cValue) {
+		// fann_activationfunc_enum cValue = *(reinterpret_cast<fann_activationfunc_enum *>(&value));
+		switch(value) {
 			case FANN_LINEAR: str = "FANN_LINEAR"; break;
 			case FANN_THRESHOLD: str = "FANN_THRESHOLD"; break;
 			case FANN_THRESHOLD_SYMMETRIC: str = "FANN_THRESHOLD_SYMMETRIC"; break;
@@ -1371,29 +1371,28 @@ NAN_METHOD(FANNY::setCascadeActivationFunctions) {
 		if (!maybeIdxValue.IsEmpty()) {
 			v8::Local<v8::Value> value = maybeIdxValue.ToLocalChecked();
 			if (value->IsString()) {
-				fann_activationfunc_enum ret;
+				FANN::activation_function_enum ret;
 				std::string str = std::string(*(v8::String::Utf8Value(value)));
-				if (str.compare("FANN_LINEAR") == 0) ret = FANN_LINEAR;
-				else if (str.compare("FANN_THRESHOLD") == 0) ret = FANN_THRESHOLD;
-				else if (str.compare("FANN_THRESHOLD_SYMMETRIC") == 0) ret = FANN_THRESHOLD_SYMMETRIC;
-				else if (str.compare("FANN_SIGMOID") == 0) ret = FANN_SIGMOID;
-				else if (str.compare("FANN_SIGMOID_STEPWISE") == 0) ret = FANN_SIGMOID_STEPWISE;
-				else if (str.compare("FANN_SIGMOID_SYMMETRIC") == 0) ret = FANN_SIGMOID_SYMMETRIC;
-				else if (str.compare("FANN_SIGMOID_SYMMETRIC_STEPWISE") == 0) ret = FANN_SIGMOID_SYMMETRIC_STEPWISE;
-				else if (str.compare("FANN_GAUSSIAN") == 0) ret = FANN_GAUSSIAN;
-				else if (str.compare("FANN_GAUSSIAN_SYMMETRIC") == 0) ret = FANN_GAUSSIAN_SYMMETRIC;
-				else if (str.compare("FANN_GAUSSIAN_STEPWISE") == 0) ret = FANN_GAUSSIAN_STEPWISE;
-				else if (str.compare("FANN_ELLIOT") == 0) ret = FANN_ELLIOT;
-				else if (str.compare("FANN_ELLIOT_SYMMETRIC") == 0) ret = FANN_ELLIOT_SYMMETRIC;
-				else if (str.compare("FANN_LINEAR_PIECE") == 0) ret = FANN_LINEAR_PIECE;
-				else if (str.compare("FANN_LINEAR_PIECE_SYMMETRIC") == 0) ret = FANN_LINEAR_PIECE_SYMMETRIC;
-				else if (str.compare("FANN_SIN_SYMMETRIC") == 0) ret = FANN_SIN_SYMMETRIC;
-				else if (str.compare("FANN_COS_SYMMETRIC") == 0) ret = FANN_COS_SYMMETRIC;
-				else if (str.compare("FANN_COS") == 0) ret = FANN_COS;
-				else if (str.compare("FANN_SIN") == 0) ret = FANN_SIN;
+				if (str.compare("FANN_LINEAR") == 0) ret = FANN::LINEAR;
+				else if (str.compare("FANN_THRESHOLD") == 0) ret = FANN::THRESHOLD;
+				else if (str.compare("FANN_THRESHOLD_SYMMETRIC") == 0) ret = FANN::THRESHOLD_SYMMETRIC;
+				else if (str.compare("FANN_SIGMOID") == 0) ret = FANN::SIGMOID;
+				else if (str.compare("FANN_SIGMOID_STEPWISE") == 0) ret = FANN::SIGMOID_STEPWISE;
+				else if (str.compare("FANN_SIGMOID_SYMMETRIC") == 0) ret = FANN::SIGMOID_SYMMETRIC;
+				else if (str.compare("FANN_SIGMOID_SYMMETRIC_STEPWISE") == 0) ret = FANN::SIGMOID_SYMMETRIC_STEPWISE;
+				else if (str.compare("FANN_GAUSSIAN") == 0) ret = FANN::GAUSSIAN;
+				else if (str.compare("FANN_GAUSSIAN_SYMMETRIC") == 0) ret = FANN::GAUSSIAN_SYMMETRIC;
+				else if (str.compare("FANN_GAUSSIAN_STEPWISE") == 0) ret = FANN::GAUSSIAN_STEPWISE;
+				else if (str.compare("FANN_ELLIOT") == 0) ret = FANN::ELLIOT;
+				else if (str.compare("FANN_ELLIOT_SYMMETRIC") == 0) ret = FANN::ELLIOT_SYMMETRIC;
+				else if (str.compare("FANN_LINEAR_PIECE") == 0) ret = FANN::LINEAR_PIECE;
+				else if (str.compare("FANN_LINEAR_PIECE_SYMMETRIC") == 0) ret = FANN::LINEAR_PIECE_SYMMETRIC;
+				else if (str.compare("FANN_SIN_SYMMETRIC") == 0) ret = FANN::SIN_SYMMETRIC;
+				else if (str.compare("FANN_COS_SYMMETRIC") == 0) ret = FANN::COS_SYMMETRIC;
+				else if (str.compare("FANN_COS") == 0) ret = FANN::COS;
+				else if (str.compare("FANN_SIN") == 0) ret = FANN::SIN;
 				else continue;
-				FANN::activation_function_enum value = *(reinterpret_cast<FANN::activation_function_enum *>(&ret));
-				activationFunctions.push_back(value);
+				activationFunctions.push_back(ret);
 			}
 		}
 	}
