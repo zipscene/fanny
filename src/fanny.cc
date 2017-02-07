@@ -1322,28 +1322,25 @@ NAN_METHOD(FANNY::getCascadeActivationFunctions) {
 	for (uint32_t idx = 0; idx < size; ++idx) {
 		const char *str = NULL;
 		FANN::activation_function_enum value = activationFunctions[idx];
-		// fann did not include all versions of activation functions in the c++ enum
-		// they are all in the c version so we have to cast
-		// fann_activationfunc_enum cValue = *(reinterpret_cast<fann_activationfunc_enum *>(&value));
 		switch(value) {
-			case FANN_LINEAR: str = "FANN_LINEAR"; break;
-			case FANN_THRESHOLD: str = "FANN_THRESHOLD"; break;
-			case FANN_THRESHOLD_SYMMETRIC: str = "FANN_THRESHOLD_SYMMETRIC"; break;
-			case FANN_SIGMOID: str = "FANN_SIGMOID"; break;
-			case FANN_SIGMOID_STEPWISE: str = "FANN_SIGMOID_STEPWISE"; break;
-			case FANN_SIGMOID_SYMMETRIC: str = "FANN_SIGMOID_SYMMETRIC"; break;
-			case FANN_SIGMOID_SYMMETRIC_STEPWISE: str = "FANN_SIGMOID_SYMMETRIC_STEPWISE"; break;
-			case FANN_GAUSSIAN: str = "FANN_GAUSSIAN"; break;
-			case FANN_GAUSSIAN_SYMMETRIC: str = "FANN_GAUSSIAN_SYMMETRIC"; break;
-			case FANN_GAUSSIAN_STEPWISE: str = "FANN_GAUSSIAN_STEPWISE"; break;
-			case FANN_ELLIOT: str = "FANN_ELLIOT"; break;
-			case FANN_ELLIOT_SYMMETRIC: str = "FANN_ELLIOT_SYMMETRIC"; break;
-			case FANN_LINEAR_PIECE: str = "FANN_LINEAR_PIECE"; break;
-			case FANN_LINEAR_PIECE_SYMMETRIC: str = "FANN_LINEAR_PIECE_SYMMETRIC"; break;
-			case FANN_SIN_SYMMETRIC: str = "FANN_SIN_SYMMETRIC"; break;
-			case FANN_COS_SYMMETRIC: str = "FANN_COS_SYMMETRIC"; break;
-			case FANN_COS: str = "FANN_COS"; break;
-			case FANN_SIN: str = "FANN_SIN"; break;
+			case FANN::LINEAR: str = "LINEAR"; break;
+			case FANN::THRESHOLD: str = "THRESHOLD"; break;
+			case FANN::THRESHOLD_SYMMETRIC: str = "THRESHOLD_SYMMETRIC"; break;
+			case FANN::SIGMOID: str = "SIGMOID"; break;
+			case FANN::SIGMOID_STEPWISE: str = "SIGMOID_STEPWISE"; break;
+			case FANN::SIGMOID_SYMMETRIC: str = "SIGMOID_SYMMETRIC"; break;
+			case FANN::SIGMOID_SYMMETRIC_STEPWISE: str = "SIGMOID_SYMMETRIC_STEPWISE"; break;
+			case FANN::GAUSSIAN: str = "GAUSSIAN"; break;
+			case FANN::GAUSSIAN_SYMMETRIC: str = "GAUSSIAN_SYMMETRIC"; break;
+			case FANN::GAUSSIAN_STEPWISE: str = "GAUSSIAN_STEPWISE"; break;
+			case FANN::ELLIOT: str = "ELLIOT"; break;
+			case FANN::ELLIOT_SYMMETRIC: str = "ELLIOT_SYMMETRIC"; break;
+			case FANN::LINEAR_PIECE: str = "LINEAR_PIECE"; break;
+			case FANN::LINEAR_PIECE_SYMMETRIC: str = "LINEAR_PIECE_SYMMETRIC"; break;
+			case FANN::SIN_SYMMETRIC: str = "SIN_SYMMETRIC"; break;
+			case FANN::COS_SYMMETRIC: str = "COS_SYMMETRIC"; break;
+			case FANN::COS: str = "COS"; break;
+			case FANN::SIN: str = "SIN"; break;
 		}
 		v8::Local<v8::Value> ret;
 		if (str) {
@@ -1373,24 +1370,24 @@ NAN_METHOD(FANNY::setCascadeActivationFunctions) {
 			if (value->IsString()) {
 				FANN::activation_function_enum ret;
 				std::string str = std::string(*(v8::String::Utf8Value(value)));
-				if (str.compare("FANN_LINEAR") == 0) ret = FANN::LINEAR;
-				else if (str.compare("FANN_THRESHOLD") == 0) ret = FANN::THRESHOLD;
-				else if (str.compare("FANN_THRESHOLD_SYMMETRIC") == 0) ret = FANN::THRESHOLD_SYMMETRIC;
-				else if (str.compare("FANN_SIGMOID") == 0) ret = FANN::SIGMOID;
-				else if (str.compare("FANN_SIGMOID_STEPWISE") == 0) ret = FANN::SIGMOID_STEPWISE;
-				else if (str.compare("FANN_SIGMOID_SYMMETRIC") == 0) ret = FANN::SIGMOID_SYMMETRIC;
-				else if (str.compare("FANN_SIGMOID_SYMMETRIC_STEPWISE") == 0) ret = FANN::SIGMOID_SYMMETRIC_STEPWISE;
-				else if (str.compare("FANN_GAUSSIAN") == 0) ret = FANN::GAUSSIAN;
-				else if (str.compare("FANN_GAUSSIAN_SYMMETRIC") == 0) ret = FANN::GAUSSIAN_SYMMETRIC;
-				else if (str.compare("FANN_GAUSSIAN_STEPWISE") == 0) ret = FANN::GAUSSIAN_STEPWISE;
-				else if (str.compare("FANN_ELLIOT") == 0) ret = FANN::ELLIOT;
-				else if (str.compare("FANN_ELLIOT_SYMMETRIC") == 0) ret = FANN::ELLIOT_SYMMETRIC;
-				else if (str.compare("FANN_LINEAR_PIECE") == 0) ret = FANN::LINEAR_PIECE;
-				else if (str.compare("FANN_LINEAR_PIECE_SYMMETRIC") == 0) ret = FANN::LINEAR_PIECE_SYMMETRIC;
-				else if (str.compare("FANN_SIN_SYMMETRIC") == 0) ret = FANN::SIN_SYMMETRIC;
-				else if (str.compare("FANN_COS_SYMMETRIC") == 0) ret = FANN::COS_SYMMETRIC;
-				else if (str.compare("FANN_COS") == 0) ret = FANN::COS;
-				else if (str.compare("FANN_SIN") == 0) ret = FANN::SIN;
+				if (str.compare("LINEAR") == 0) ret = FANN::LINEAR;
+				else if (str.compare("THRESHOLD") == 0) ret = FANN::THRESHOLD;
+				else if (str.compare("THRESHOLD_SYMMETRIC") == 0) ret = FANN::THRESHOLD_SYMMETRIC;
+				else if (str.compare("SIGMOID") == 0) ret = FANN::SIGMOID;
+				else if (str.compare("SIGMOID_STEPWISE") == 0) ret = FANN::SIGMOID_STEPWISE;
+				else if (str.compare("SIGMOID_SYMMETRIC") == 0) ret = FANN::SIGMOID_SYMMETRIC;
+				else if (str.compare("SIGMOID_SYMMETRIC_STEPWISE") == 0) ret = FANN::SIGMOID_SYMMETRIC_STEPWISE;
+				else if (str.compare("GAUSSIAN") == 0) ret = FANN::GAUSSIAN;
+				else if (str.compare("GAUSSIAN_SYMMETRIC") == 0) ret = FANN::GAUSSIAN_SYMMETRIC;
+				else if (str.compare("GAUSSIAN_STEPWISE") == 0) ret = FANN::GAUSSIAN_STEPWISE;
+				else if (str.compare("ELLIOT") == 0) ret = FANN::ELLIOT;
+				else if (str.compare("ELLIOT_SYMMETRIC") == 0) ret = FANN::ELLIOT_SYMMETRIC;
+				else if (str.compare("LINEAR_PIECE") == 0) ret = FANN::LINEAR_PIECE;
+				else if (str.compare("LINEAR_PIECE_SYMMETRIC") == 0) ret = FANN::LINEAR_PIECE_SYMMETRIC;
+				else if (str.compare("SIN_SYMMETRIC") == 0) ret = FANN::SIN_SYMMETRIC;
+				else if (str.compare("COS_SYMMETRIC") == 0) ret = FANN::COS_SYMMETRIC;
+				else if (str.compare("COS") == 0) ret = FANN::COS;
+				else if (str.compare("SIN") == 0) ret = FANN::SIN;
 				else continue;
 				activationFunctions.push_back(ret);
 			}
