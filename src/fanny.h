@@ -146,6 +146,9 @@ private:
 	static NAN_METHOD(setSarpropTemperature);
 	static NAN_METHOD(setLearningMomentum);
 
+	static NAN_METHOD(getUserDataString);
+	static NAN_METHOD(setUserDataString);
+
 	static void _doTrainOrTest(const Nan::FunctionCallbackInfo<v8::Value> &info, bool fromFile, bool isCascade, bool singleEpoch, bool isTest);
 
 	static NAN_METHOD(setCallback);

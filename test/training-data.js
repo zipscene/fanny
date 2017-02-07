@@ -29,7 +29,7 @@ var booleanOutputData = [
 	[ 1, 1, 0, 0, 0 ]
 ];
 
-describe.only('Training Data', function() {
+describe('Training Data', function() {
 	it('#createTrainingData', function() {
 		var td = createTrainingData(booleanTrainingData, 'float');
 		var td2 = createTrainingData(booleanInputData, booleanOutputData, 'float');
