@@ -532,8 +532,6 @@ describe('Tests', function() {
 			return ann.testData(data)
 				.then(function(res) {
 					expect(res).to.be.a('number');
-				}, function(err) {
-					expect(err).to.not.exist;
 				});
 		});
 		it('can test one input for output error', function() {
