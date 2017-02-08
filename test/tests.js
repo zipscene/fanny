@@ -502,21 +502,24 @@ describe('Tests', function() {
 		it('can set activation steepness on layers', function() {
 			var ann = createANN({ layers: [ 2, 3, 5 ] });
 			ann.setActivationSteepnessLayer(0.2, 1);
-			expect(ann.getActivationSteepness(1,1))
+			expect(ann.getActivationSteepness(1,3))
+				.to.equal(ann.getActivationSteepness(1, 4))
 				.to.be.a('number')
 				.to.not.equal(-1);
 		});
 		it('can set activation steepness on hidden layers', function() {
-			var ann = createANN({ layers: [ 2, 8, 5 ] });
+			var ann = createANN({ layers: [ 2, 2, 5 ] });
 			ann.setActivationSteepnessHidden(0.2);
 			expect(ann.getActivationSteepness(1,1))
+				.to.equal(ann.getActivationSteepness(1,2))
 				.to.be.a('number')
 				.to.not.equal(-1);
 		});
 		it('can set activation steepness on output', function() {
 			var ann = createANN({ layers: [ 2, 3, 5 ] });
 			ann.setActivationSteepnessOutput(0.3);
-			expect(ann.getActivationSteepness(2,1))
+			expect(ann.getActivationSteepness(2,10))
+				.to.equal(ann.getActivationSteepness(2,11))
 				.to.be.a('number')
 				.to.not.equal(-1);
 		});
