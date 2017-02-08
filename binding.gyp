@@ -9,12 +9,13 @@
 				"src/training-data.cc"
 			],
 			"libraries": [
-				"-lfloatfann"
+				"../fann/lib/libfloatfann.a"
 			],
-			"include_dirs": [ "<!(node -e \"require('nan')\")" ],
+			"include_dirs": [ "<!(node -e \"require('nan')\")", "fann/include" ],
 			"defines": [
 				"FANNY_FLOAT"
-			]
+			],
+			"cflags_cc": [ "-fPIC" ]
 		},
 		{
 			"target_name": "addon-doublefann",
@@ -25,12 +26,13 @@
 				"src/training-data.cc"
 			],
 			"libraries": [
-				"-ldoublefann"
+				"../fann/lib/libdoublefann.a"
 			],
-			"include_dirs": [ "<!(node -e \"require('nan')\")" ],
+			"include_dirs": [ "<!(node -e \"require('nan')\")", "fann/include" ],
 			"defines": [
 				"FANNY_DOUBLE"
-			]
+			],
+			"cflags_cc": [ "-fPIC" ]
 		},
 		{
 			"target_name": "addon-fixedfann",
@@ -41,12 +43,13 @@
 				"src/training-data.cc"
 			],
 			"libraries": [
-				"-lfixedfann"
+				"../fann/lib/libfixedfann.a"
 			],
-			"include_dirs": [ "<!(node -e \"require('nan')\")" ],
+			"include_dirs": [ "<!(node -e \"require('nan')\")", "fann/include" ],
 			"defines": [
 				"FANNY_FIXED"
-			]
+			],
+			"cflags_cc": [ "-fPIC" ]
 		}
 
 	]

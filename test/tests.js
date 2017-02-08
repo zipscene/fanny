@@ -45,7 +45,7 @@ describe('Tests', function() {
 			var ann = createANN({ layers: [ 2, 20, 5 ] });
 
 			var initalValue = ann.getOption(optionToTest);
-			expect(initalValue).to.be.a('string');
+			if (initalValue) expect(initalValue).to.be.a('string');
 
 			// Test all valid values
 			for (var testValue of validValues) {
@@ -110,7 +110,7 @@ describe('Tests', function() {
 				var testType = testSettings.type;
 				switch (testType) {
 					case 'string':
-						stringTest(optionToTest, testSettings.enum);
+						stringTest(optionToTest, testSettings.enum || [ 'test' ]);
 						break;
 					case 'number':
 						numberTest(optionToTest, testSettings.min, testSettings.max);
