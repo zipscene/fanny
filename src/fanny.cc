@@ -341,6 +341,9 @@ void FANNY::Init(v8::Local<v8::Object> target) {
 	Nan::SetPrototypeMethod(tpl, "setWeightArray", setWeightArray);
 	Nan::SetPrototypeMethod(tpl, "setWeight", setWeight);
 
+	Nan::SetPrototypeMethod(tpl, "getUserDataString", getUserDataString);
+	Nan::SetPrototypeMethod(tpl, "setUserDataString", setUserDataString);
+
 	// Create the loadFile function
 	v8::Local<v8::FunctionTemplate> loadFileTpl = Nan::New<v8::FunctionTemplate>(loadFile);
 	v8::Local<v8::Function> loadFileFunction = Nan::GetFunction(loadFileTpl).ToLocalChecked();
@@ -379,7 +382,7 @@ NAN_METHOD(FANNY::randomizeWeights) {
 	if (info.Length() != 2) return Nan::ThrowError("Must have 2 arguments: min_weight and max_weight");
 
 	if (!info[0]->IsNumber() || !info[1]->IsNumber()) {
-		return Nan::ThrowError(" min_weight and max_weight must be numbers");
+		return Nan::ThrowError("min_weight and max_weight must be numbers");
 	}
 	fann_type min_weight = v8NumberToFannType(info[0]);
 	fann_type max_weight = v8NumberToFannType(info[1]);
@@ -1686,7 +1689,7 @@ NAN_METHOD(FANNY::getActivationSteepness) {
 	if (info.Length() != 2) return Nan::ThrowError("Must have an arguments: layer and neuron");
 	if (!info[0]->IsNumber() || !info[1]->IsNumber()) return Nan::ThrowError("layer and neuron should be numbers");
 	unsigned int layer = info[0]->Uint32Value();
-	unsigned int neuron = info[0]->Uint32Value();
+	unsigned int neuron = info[1]->Uint32Value();
 	fann_type activationSteepness = fanny->fann->get_activation_steepness(layer, neuron);
 	info.GetReturnValue().Set(activationSteepness);
 }
@@ -1759,4 +1762,22 @@ NAN_METHOD(FANNY::setWeight) {
 	fanny->fann->set_weight(fromNeuron, toNeuron, weight);
 }
 
+NAN_METHOD(FANNY::getUserDataString) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	char *str = fanny->fann->get_user_data_string();
+	if (str) {
+		info.GetReturnValue().Set(Nan::New(str).ToLocalChecked());
+	} else {
+		info.GetReturnValue().Set(Nan::Null());
+	}
 }
+
+NAN_METHOD(FANNY::setUserDataString) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 1 || !info[0]->IsString()) return Nan::ThrowError("Argument must be string");
+	v8::String::Utf8Value utf8String(info[0]);
+	fanny->fann->set_user_data_string(*utf8String);
+}
+
+}
+

@@ -41,7 +41,9 @@ This can be accessed by including the native addon itself: `require('fanny').get
 
 ## Getting FANN
 
-This module is currently built on the latest version of FANN, available from their git repository.
+This module is currently built on FANN 1.0.0.  However, the original author no longer seems to be
+maintaining the library, and several bugs in the current official version break some features of
+FANNy.  A maintained version with the appropriate bugfixes is available [here](https://github.com/crispy1989/fann).
 
 ```
 $ git clone https://github.com/libfann/fann.git
@@ -256,6 +258,12 @@ The `ANN` object has a property called `info` containing current information abo
 - `numLayers`
 
 Each of these corresponds to a FANN getter.
+
+## User Data
+
+The `ANN` object has a property called `userData` which is initialized to an empty object.  You can store
+any data you need to in there, and it will be saved and loaded with the neural network.  The data is
+stored as a JSON object in the FANN `user_data_string` field.
 
 ## Other ANN Functions
 
