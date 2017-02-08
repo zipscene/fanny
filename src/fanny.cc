@@ -348,9 +348,16 @@ void FANNY::Init(v8::Local<v8::Object> target) {
 	v8::Local<v8::FunctionTemplate> loadFileTpl = Nan::New<v8::FunctionTemplate>(loadFile);
 	v8::Local<v8::Function> loadFileFunction = Nan::GetFunction(loadFileTpl).ToLocalChecked();
 
+	v8::Local<v8::FunctionTemplate> disableSeedRandTpl = Nan::New<v8::FunctionTemplate>(disableSeedRand);
+	v8::Local<v8::Function> disableSeedRandFunction = Nan::GetFunction(disableSeedRandTpl).ToLocalChecked();
+	v8::Local<v8::FunctionTemplate> enableSeedRandTpl = Nan::New<v8::FunctionTemplate>(enableSeedRand);
+	v8::Local<v8::Function> enableSeedRandFunction = Nan::GetFunction(enableSeedRandTpl).ToLocalChecked();
+
 	// Assign a property called 'FANNY' to module.exports, pointing to our constructor
 	v8::Local<v8::Function> ctorFunction = Nan::GetFunction(tpl).ToLocalChecked();
 	Nan::Set(ctorFunction, Nan::New("loadFile").ToLocalChecked(), loadFileFunction);
+	Nan::Set(ctorFunction, Nan::New("disableSeedRand").ToLocalChecked(), disableSeedRandFunction);
+	Nan::Set(ctorFunction, Nan::New("enableSeedRand").ToLocalChecked(), enableSeedRandFunction);
 	FANNY::constructorFunction.Reset(ctorFunction);
 	Nan::Set(target, Nan::New("FANNY").ToLocalChecked(), ctorFunction);
 }
@@ -1777,6 +1784,14 @@ NAN_METHOD(FANNY::setUserDataString) {
 	if (info.Length() != 1 || !info[0]->IsString()) return Nan::ThrowError("Argument must be string");
 	v8::String::Utf8Value utf8String(info[0]);
 	fanny->fann->set_user_data_string(*utf8String);
+}
+
+NAN_METHOD(FANNY::disableSeedRand) {
+	fann_disable_seed_rand();
+}
+
+NAN_METHOD(FANNY::enableSeedRand) {
+	fann_enable_seed_rand();
 }
 
 }
