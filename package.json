@@ -12,7 +12,8 @@
   },
   "scripts": {
     "test": "./node_modules/.bin/mocha",
-    "build": "node-gyp build"
+    "build": "node-gyp build",
+	"preinstall": "./build_fann.sh"
   },
   "generatorInfo": {
     "name": "generator-zs-lib",
