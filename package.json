@@ -1,20 +1,24 @@
 {
-  "name": "zs-fanny",
+  "name": "fanny",
   "version": "0.0.1",
   "description": "FANN Fast Artificial Neural Network Node.JS Bindings",
   "main": "./dist/lib/index.js",
-  "keywords": [ "fann", "ann", "neural", "network", "ai", "neural network" ],
+  "keywords": [
+    "fann",
+    "ann",
+    "neural",
+    "network",
+    "ai",
+    "neural network"
+  ],
   "repository": {
     "type": "git",
-    "url": "git@git.zipscene.com:zsapilibs/zs-fanny.git"
-  },
-  "publishConfig": {
-    "registry": "https://npm.zipscene.com/"
+    "url": "https://github.com/zipscene/fanny.git"
   },
   "scripts": {
     "test": "./node_modules/.bin/mocha",
     "build": "node-gyp build",
-	"preinstall": "./build_fann.sh"
+    "preinstall": "./build_fann.sh"
   },
   "generatorInfo": {
     "name": "generator-zs-lib",
@@ -31,5 +35,6 @@
     "es6-promise": "^4.0.5",
     "mocha": "^3.2.0",
     "zstreams": "^3.2.2"
-  }
+  },
+  "license": "Apache-2.0"
 }
