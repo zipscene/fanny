@@ -92,6 +92,9 @@ private:
 	static NAN_METHOD(printParameters);
 
 	static NAN_METHOD(randomizeWeights);
+	static NAN_METHOD(disableSeedRand);
+	static NAN_METHOD(enableSeedRand);
+
 
 	// TODO
 	/*
