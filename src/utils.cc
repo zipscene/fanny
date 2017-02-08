@@ -45,18 +45,6 @@ v8::Local<v8::Value> fannDataSetToV8Array(fann_type ** data, unsigned int length
 	return scope.Escape(v8Array);
 }
 
-fann_type v8NumberToFannType(v8::Local<v8::Value> number) {
-	fann_type fannNumber = 0;
-	if (number->IsNumber()) {
-		#ifdef FANNY_FIXED
-		fannNumber = number->Uint32Value();
-		#else
-		fannNumber = number->NumberValue();
-		#endif
-	}
-	return fannNumber;
-}
-
 v8::Local<v8::Value> trainingAlgorithmEnumToV8String(FANN::training_algorithm_enum value) {
 	Nan::EscapableHandleScope scope;
 	const char *str = NULL;
@@ -137,5 +125,131 @@ bool v8StringToStopFunctionEnum(v8::Local<v8::Value> value, FANN::stop_function_
 	else return false;
 	return true;
 }
+
+v8::Local<v8::Object> connectionToV8Object(FANN::connection connection) {
+	Nan::EscapableHandleScope scope;
+	v8::Local<v8::Object> connectionObject = Nan::New<v8::Object>();
+	v8::Local<v8::Value> fromNeuron = Nan::New<v8::Number>(connection.from_neuron);
+	v8::Local<v8::Value> toNeuron = Nan::New<v8::Number>(connection.to_neuron);
+	v8::Local<v8::Value> weight = Nan::New<v8::Number>(connection.weight);
+
+	Nan::Set(connectionObject, Nan::New<v8::String>("fromNeuron").ToLocalChecked(), fromNeuron);
+	Nan::Set(connectionObject, Nan::New<v8::String>("toNeuron").ToLocalChecked(), toNeuron);
+	Nan::Set(connectionObject, Nan::New<v8::String>("weight").ToLocalChecked(), weight);
+
+	return scope.Escape(connectionObject);
+}
+
+v8::Local<v8::Value> connectionArrayToV8Array(std::vector<FANN::connection> connectionArray) {
+	Nan::EscapableHandleScope scope;
+	unsigned int size = connectionArray.size();
+	v8::Local<v8::Array> v8Array = Nan::New<v8::Array>(size);
+	for (uint32_t idx = 0; idx < size; ++idx) {
+		v8::Local<v8::Object> value = connectionToV8Object(connectionArray[idx]);
+		Nan::Set(v8Array, idx, value);
+	}
+	return scope.Escape(v8Array);
+}
+
+std::vector<FANN::connection> v8ArrayToConnection(v8::Local<v8::Value> v8Array) {
+	std::vector<FANN::connection> result;
+	if (v8Array->IsArray()) {
+		v8::Local<v8::Array> localArray = v8Array.As<v8::Array>();
+		uint32_t length = localArray->Length();
+		result.reserve(length);
+		for (uint32_t idx = 0; idx < length; ++idx) {
+			Nan::MaybeLocal<v8::Value> maybeIdxValue = Nan::Get(localArray, idx);
+			if (!maybeIdxValue.IsEmpty()) {
+				v8::Local<v8::Value> value = maybeIdxValue.ToLocalChecked();
+				if (value->IsObject()) {
+					v8::Local<v8::Object> obj = value.As<v8::Object>();
+					FANN::connection connection;
+					unsigned int count = 0;
+					Nan::MaybeLocal<v8::Value> maybeToNeuron = Nan::Get(obj, Nan::New("toNeuron").ToLocalChecked());
+					if (!maybeToNeuron.IsEmpty()) {
+						++count;
+						connection.to_neuron = maybeToNeuron.ToLocalChecked()->Uint32Value();
+					}
+					Nan::MaybeLocal<v8::Value> maybeFromNeuron = Nan::Get(obj, Nan::New("fromNeuron").ToLocalChecked());
+					if (!maybeFromNeuron.IsEmpty()) {
+						++count;
+						connection.from_neuron = maybeFromNeuron.ToLocalChecked()->Uint32Value();
+					}
+					Nan::MaybeLocal<v8::Value> maybeWeight = Nan::Get(obj, Nan::New("weight").ToLocalChecked());
+					if (!maybeWeight.IsEmpty()) {
+						++count;
+						connection.weight = v8NumberToFannType(maybeWeight.ToLocalChecked());
+					}
+					if (count == 3) {
+						result.push_back(connection);
+					}
+				}
+			}
+		}
+	}
+	return result;
+}
+
+v8::Local<v8::Value> activationFunctionEnumToV8String(FANN::activation_function_enum value) {
+	Nan::EscapableHandleScope scope;
+	const char *str = NULL;
+	fann_activationfunc_enum cValue = *(reinterpret_cast<fann_activationfunc_enum *>(&value));
+	switch(cValue) {
+		case FANN_LINEAR: str = "FANN_LINEAR"; break;
+		case FANN_THRESHOLD: str = "FANN_THRESHOLD"; break;
+		case FANN_THRESHOLD_SYMMETRIC: str = "FANN_THRESHOLD_SYMMETRIC"; break;
+		case FANN_SIGMOID: str = "FANN_SIGMOID"; break;
+		case FANN_SIGMOID_STEPWISE: str = "FANN_SIGMOID_STEPWISE"; break;
+		case FANN_SIGMOID_SYMMETRIC: str = "FANN_SIGMOID_SYMMETRIC"; break;
+		case FANN_SIGMOID_SYMMETRIC_STEPWISE: str = "FANN_SIGMOID_SYMMETRIC_STEPWISE"; break;
+		case FANN_GAUSSIAN: str = "FANN_GAUSSIAN"; break;
+		case FANN_GAUSSIAN_SYMMETRIC: str = "FANN_GAUSSIAN_SYMMETRIC"; break;
+		case FANN_GAUSSIAN_STEPWISE: str = "FANN_GAUSSIAN_STEPWISE"; break;
+		case FANN_ELLIOT: str = "FANN_ELLIOT"; break;
+		case FANN_ELLIOT_SYMMETRIC: str = "FANN_ELLIOT_SYMMETRIC"; break;
+		case FANN_LINEAR_PIECE: str = "FANN_LINEAR_PIECE"; break;
+		case FANN_LINEAR_PIECE_SYMMETRIC: str = "FANN_LINEAR_PIECE_SYMMETRIC"; break;
+		case FANN_SIN_SYMMETRIC: str = "FANN_SIN_SYMMETRIC"; break;
+		case FANN_COS_SYMMETRIC: str = "FANN_COS_SYMMETRIC"; break;
+		case FANN_COS: str = "FANN_COS"; break;
+		case FANN_SIN: str = "FANN_SIN"; break;
+	}
+	v8::Local<v8::Value> ret;
+	if (str) {
+		ret = Nan::New<v8::String>(str).ToLocalChecked();
+	} else {
+		ret = Nan::Null();
+	}
+	return scope.Escape(ret);
+}
+
+bool v8StringToActivationFunctionEnum(v8::Local<v8::Value> value, FANN::activation_function_enum &activation_function) {
+	if (!value->IsString()) return false;
+	std::string str(*v8::String::Utf8Value(value));
+	fann_activationfunc_enum ret;
+	if (str.compare("FANN_LINEAR") == 0) ret = FANN_LINEAR;
+	else if (str.compare("FANN_THRESHOLD") == 0) ret = FANN_THRESHOLD;
+	else if (str.compare("FANN_THRESHOLD_SYMMETRIC") == 0) ret = FANN_THRESHOLD_SYMMETRIC;
+	else if (str.compare("FANN_SIGMOID") == 0) ret = FANN_SIGMOID;
+	else if (str.compare("FANN_SIGMOID_STEPWISE") == 0) ret = FANN_SIGMOID_STEPWISE;
+	else if (str.compare("FANN_SIGMOID_SYMMETRIC") == 0) ret = FANN_SIGMOID_SYMMETRIC;
+	else if (str.compare("FANN_SIGMOID_SYMMETRIC_STEPWISE") == 0) ret = FANN_SIGMOID_SYMMETRIC_STEPWISE;
+	else if (str.compare("FANN_GAUSSIAN") == 0) ret = FANN_GAUSSIAN;
+	else if (str.compare("FANN_GAUSSIAN_SYMMETRIC") == 0) ret = FANN_GAUSSIAN_SYMMETRIC;
+	else if (str.compare("FANN_GAUSSIAN_STEPWISE") == 0) ret = FANN_GAUSSIAN_STEPWISE;
+	else if (str.compare("FANN_ELLIOT") == 0) ret = FANN_ELLIOT;
+	else if (str.compare("FANN_ELLIOT_SYMMETRIC") == 0) ret = FANN_ELLIOT_SYMMETRIC;
+	else if (str.compare("FANN_LINEAR_PIECE") == 0) ret = FANN_LINEAR_PIECE;
+	else if (str.compare("FANN_LINEAR_PIECE_SYMMETRIC") == 0) ret = FANN_LINEAR_PIECE_SYMMETRIC;
+	else if (str.compare("FANN_SIN_SYMMETRIC") == 0) ret = FANN_SIN_SYMMETRIC;
+	else if (str.compare("FANN_COS_SYMMETRIC") == 0) ret = FANN_COS_SYMMETRIC;
+	else if (str.compare("FANN_COS") == 0) ret = FANN_COS;
+	else if (str.compare("FANN_SIN") == 0) ret = FANN_SIN;
+	else return false;
+
+	activation_function = *(reinterpret_cast<FANN::activation_function_enum *>(&ret));
+	return true;
+}
+
 
 }

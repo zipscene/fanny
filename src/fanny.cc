@@ -225,6 +225,11 @@ void FANNY::Init(v8::Local<v8::Object> target) {
 	FANNY::constructorFunctionTpl.Reset(tpl);
 
 	// Add prototype methods
+
+	Nan::SetPrototypeMethod(tpl, "printConnections", printConnections);
+	Nan::SetPrototypeMethod(tpl, "printParameters", printParameters);
+	Nan::SetPrototypeMethod(tpl, "randomizeWeights", randomizeWeights);
+
 	Nan::SetPrototypeMethod(tpl, "save", save);
 	Nan::SetPrototypeMethod(tpl, "saveToFixed", saveToFixed);
 	Nan::SetPrototypeMethod(tpl, "setCallback", setCallback);
@@ -242,15 +247,22 @@ void FANNY::Init(v8::Local<v8::Object> target) {
 	Nan::SetPrototypeMethod(tpl, "setTrainStopFunction", setTrainStopFunction);
 	Nan::SetPrototypeMethod(tpl, "getLearningRate", getLearningRate);
 	Nan::SetPrototypeMethod(tpl, "setLearningRate", setLearningRate);
+	Nan::SetPrototypeMethod(tpl, "getActivationFunction", getActivationFunction);
+	Nan::SetPrototypeMethod(tpl, "setActivationFunction", setActivationFunction);
+	Nan::SetPrototypeMethod(tpl, "setActivationFunctionLayer", setActivationFunctionLayer);
+	Nan::SetPrototypeMethod(tpl, "setActivationFunctionHidden", setActivationFunctionHidden);
+	Nan::SetPrototypeMethod(tpl, "setActivationFunctionOutput", setActivationFunctionOutput);
 	Nan::SetPrototypeMethod(tpl, "getNumInput", getNumInput);
 	Nan::SetPrototypeMethod(tpl, "getNumOutput", getNumOutput);
 	Nan::SetPrototypeMethod(tpl, "getTotalNeurons", getTotalNeurons);
 	Nan::SetPrototypeMethod(tpl, "getTotalConnections", getTotalConnections);
+	Nan::SetPrototypeMethod(tpl, "getConnectionArray", getConnectionArray);
 	Nan::SetPrototypeMethod(tpl, "getNumLayers", getNumLayers);
 	Nan::SetPrototypeMethod(tpl, "getBitFail", getBitFail);
 	Nan::SetPrototypeMethod(tpl, "getBitFailLimit", getBitFailLimit);
 	Nan::SetPrototypeMethod(tpl, "setBitFailLimit", setBitFailLimit);
 	Nan::SetPrototypeMethod(tpl, "getMSE", getMSE);
+	Nan::SetPrototypeMethod(tpl, "resetMSE", resetMSE);
 	Nan::SetPrototypeMethod(tpl, "getQuickpropDecay", getQuickpropDecay);
 	Nan::SetPrototypeMethod(tpl, "getQuickpropMu", getQuickpropMu);
 	Nan::SetPrototypeMethod(tpl, "getRpropIncreaseFactor", getRpropIncreaseFactor);
@@ -301,7 +313,6 @@ void FANNY::Init(v8::Local<v8::Object> target) {
 	Nan::SetPrototypeMethod(tpl, "setCascadeMaxCandEpochs", setCascadeMaxCandEpochs);
 	Nan::SetPrototypeMethod(tpl, "setCascadeNumCandidateGroups", setCascadeNumCandidateGroups);
 
-	Nan::SetPrototypeMethod(tpl, "setLearningRate", setLearningRate);
 	Nan::SetPrototypeMethod(tpl, "setQuickpropDecay", setQuickpropDecay);
 	Nan::SetPrototypeMethod(tpl, "setQuickpropMu", setQuickpropMu);
 	Nan::SetPrototypeMethod(tpl, "setRpropIncreaseFactor", setRpropIncreaseFactor);
@@ -320,6 +331,15 @@ void FANNY::Init(v8::Local<v8::Object> target) {
 	Nan::SetPrototypeMethod(tpl, "setSarpropStepErrorShift", setSarpropStepErrorShift);
 	Nan::SetPrototypeMethod(tpl, "setSarpropTemperature", setSarpropTemperature);
 	Nan::SetPrototypeMethod(tpl, "setLearningMomentum", setLearningMomentum);
+
+	Nan::SetPrototypeMethod(tpl, "getActivationSteepness", getActivationSteepness);
+	Nan::SetPrototypeMethod(tpl, "setActivationSteepness", setActivationSteepness);
+	Nan::SetPrototypeMethod(tpl, "setActivationSteepnessLayer", setActivationSteepnessLayer);
+	Nan::SetPrototypeMethod(tpl, "setActivationSteepnessHidden", setActivationSteepnessHidden);
+	Nan::SetPrototypeMethod(tpl, "setActivationSteepnessOutput", setActivationSteepnessOutput);
+
+	Nan::SetPrototypeMethod(tpl, "setWeightArray", setWeightArray);
+	Nan::SetPrototypeMethod(tpl, "setWeight", setWeight);
 
 	Nan::SetPrototypeMethod(tpl, "getUserDataString", getUserDataString);
 	Nan::SetPrototypeMethod(tpl, "setUserDataString", setUserDataString);
@@ -345,6 +365,29 @@ FANNY::~FANNY() {
 	delete fann;
 	constructorFunctionTpl.Empty();
 	constructorFunction.Empty();
+}
+
+NAN_METHOD(FANNY::printConnections) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	fanny->fann->print_connections();
+}
+
+NAN_METHOD(FANNY::printParameters) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	fanny->fann->print_parameters();
+}
+
+NAN_METHOD(FANNY::randomizeWeights) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 2) return Nan::ThrowError("Must have 2 arguments: min_weight and max_weight");
+
+	if (!info[0]->IsNumber() || !info[1]->IsNumber()) {
+		return Nan::ThrowError("min_weight and max_weight must be numbers");
+	}
+	fann_type min_weight = v8NumberToFannType(info[0]);
+	fann_type max_weight = v8NumberToFannType(info[1]);
+
+	fanny->fann->randomize_weights(min_weight, max_weight);
 }
 
 NAN_METHOD(FANNY::loadFile) {
@@ -683,6 +726,15 @@ NAN_METHOD(FANNY::getTotalConnections) {
 	info.GetReturnValue().Set(num);
 }
 
+NAN_METHOD(FANNY::getConnectionArray) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	unsigned int size = fanny->fann->get_total_connections();
+	std::vector<FANN::connection> connections(size);
+	fanny->fann->get_connection_array(&connections[0]);
+
+	info.GetReturnValue().Set(connectionArrayToV8Array(connections));
+}
+
 NAN_METHOD(FANNY::getNumLayers) {
 	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
 	unsigned int num = fanny->fann->get_num_layers();
@@ -717,6 +769,11 @@ NAN_METHOD(FANNY::getMSE) {
 	info.GetReturnValue().Set(num);
 }
 
+NAN_METHOD(FANNY::resetMSE) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	fanny->fann->reset_MSE();
+}
+
 // by default 0.7
 NAN_METHOD(FANNY::getLearningRate) {
 	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
@@ -733,6 +790,62 @@ NAN_METHOD(FANNY::setLearningRate) {
 	float value = info[0]->NumberValue();
 
 	fanny->fann->set_learning_rate(value);
+}
+
+NAN_METHOD(FANNY::getActivationFunction) {
+	if (info.Length() != 2) return Nan::ThrowError("Must have 2 arguments: layer and neuron");
+	if (!info[0]->IsNumber()) return Nan::ThrowError("layer must be a number");
+	if (!info[1]->IsNumber()) return Nan::ThrowError("neuron must be a number");
+
+	unsigned int layer = info[0]->Uint32Value();
+	unsigned int neuron = info[1]->Uint32Value();
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	FANN::activation_function_enum activationFunction = fanny->fann->get_activation_function(layer, neuron);
+	info.GetReturnValue().Set(activationFunctionEnumToV8String(activationFunction));
+}
+
+NAN_METHOD(FANNY::setActivationFunction) {
+	if (info.Length() != 3) return Nan::ThrowError("Must have 3 arguments: activation_function, layer, and neuron");
+	if (!info[0]->IsString()) return Nan::ThrowError("activation_function must be a string");
+	if (!info[1]->IsNumber()) return Nan::ThrowError("layer must be a number");
+	if (!info[2]->IsNumber()) return Nan::ThrowError("neuron must be a number");
+
+	unsigned int layer = info[1]->Uint32Value();
+	unsigned int neuron = info[2]->Uint32Value();
+
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	FANN::activation_function_enum activationFunction;
+	if(v8StringToActivationFunctionEnum(info[0], activationFunction)) fanny->fann->set_activation_function(activationFunction, layer, neuron);
+}
+
+NAN_METHOD(FANNY::setActivationFunctionLayer) {
+	if (info.Length() != 2) return Nan::ThrowError("Must have 2 arguments: activation_function, layer");
+	if (!info[0]->IsString()) return Nan::ThrowError("activation_function must be a string");
+	if (!info[1]->IsNumber()) return Nan::ThrowError("layer must be a number");
+
+	unsigned int layer = info[1]->Uint32Value();
+
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	FANN::activation_function_enum activationFunction;
+	if(v8StringToActivationFunctionEnum(info[0], activationFunction)) fanny->fann->set_activation_function_layer(activationFunction, layer);
+}
+
+NAN_METHOD(FANNY::setActivationFunctionHidden) {
+	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: activation_function,");
+	if (!info[0]->IsString()) return Nan::ThrowError("activation_function must be a string");
+
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	FANN::activation_function_enum activationFunction;
+	if(v8StringToActivationFunctionEnum(info[0], activationFunction)) fanny->fann->set_activation_function_hidden(activationFunction);
+}
+
+NAN_METHOD(FANNY::setActivationFunctionOutput) {
+	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: activation_function,");
+	if (!info[0]->IsString()) return Nan::ThrowError("activation_function must be a string");
+
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	FANN::activation_function_enum activationFunction;
+	if(v8StringToActivationFunctionEnum(info[0], activationFunction)) fanny->fann->set_activation_function_output(activationFunction);
 }
 
 // by default -0.0001
@@ -1056,13 +1169,13 @@ NAN_METHOD(FANNY::clearScalingParams) {
 NAN_METHOD(FANNY::setInputScalingParams) {
 	#ifndef FANNY_FIXED
 	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
-	if (info.Length() != 3) return Nan::ThrowError("Must have 5 arguments: tainingData, new_input_min, and new_input_max");
+	if (info.Length() != 3) return Nan::ThrowError("Must have 3 arguments: tainingData, new_input_min, and new_input_max");
 	if (!Nan::New(TrainingData::constructorFunctionTpl)->HasInstance(info[0])) {
 		return Nan::ThrowError("Argument must be an instance of TrainingData");
 	}
 
 	if (!info[1]->IsNumber() || !info[2]->IsNumber()) {
-		return Nan::ThrowError("new_input_min and new_input_max must be of numbers");
+		return Nan::ThrowError("new_input_min and new_input_max must be numbers");
 	}
 
 	TrainingData *fannyTrainingData = Nan::ObjectWrap::Unwrap<TrainingData>(info[0].As<v8::Object>());
@@ -1081,13 +1194,13 @@ NAN_METHOD(FANNY::setInputScalingParams) {
 NAN_METHOD(FANNY::setOutputScalingParams) {
 	#ifndef FANNY_FIXED
 	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
-	if (info.Length() != 3) return Nan::ThrowError("Must have 5 arguments: tainingData new_output_min, and new_output_max");
+	if (info.Length() != 3) return Nan::ThrowError("Must have 3 arguments: tainingData new_output_min, and new_output_max");
 	if (!Nan::New(TrainingData::constructorFunctionTpl)->HasInstance(info[0])) {
 		return Nan::ThrowError("Argument must be an instance of TrainingData");
 	}
 
 	if (!info[1]->IsNumber() || !info[2]->IsNumber()) {
-		return Nan::ThrowError("new_output_min and new_output_max must be of numbers");
+		return Nan::ThrowError("new_output_min and new_output_max must be numbers");
 	}
 
 	TrainingData *fannyTrainingData = Nan::ObjectWrap::Unwrap<TrainingData>(info[0].As<v8::Object>());
@@ -1111,7 +1224,7 @@ NAN_METHOD(FANNY::setScalingParams) {
 	}
 
 	if (!info[1]->IsNumber() || !info[2]->IsNumber() || !info[3]->IsNumber() || !info[4]->IsNumber()) {
-		return Nan::ThrowError("new_input_min, new_input_max, new_output_min, and new_output_max must be of numbers");
+		return Nan::ThrowError("new_input_min, new_input_max, new_output_min, and new_output_max must be numbers");
 	}
 
 	TrainingData *fannyTrainingData = Nan::ObjectWrap::Unwrap<TrainingData>(info[0].As<v8::Object>());
@@ -1212,6 +1325,8 @@ NAN_METHOD(FANNY::getCascadeActivationFunctions) {
 	for (uint32_t idx = 0; idx < size; ++idx) {
 		const char *str = NULL;
 		FANN::activation_function_enum value = activationFunctions[idx];
+		// fann did not include all versions of activation functions in the c++ enum
+		// they are all in the c version so we have to cast
 		fann_activationfunc_enum cValue = *(reinterpret_cast<fann_activationfunc_enum *>(&value));
 		switch(cValue) {
 			case FANN_LINEAR: str = "FANN_LINEAR"; break;
@@ -1573,6 +1688,84 @@ NAN_METHOD(FANNY::setCascadeNumCandidateGroups) {
 	#endif
 }
 
+NAN_METHOD(FANNY::getActivationSteepness) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 2) return Nan::ThrowError("Must have an arguments: layer and neuron");
+	if (!info[0]->IsNumber() || !info[1]->IsNumber()) return Nan::ThrowError("layer and neuron should be numbers");
+	unsigned int layer = info[0]->Uint32Value();
+	unsigned int neuron = info[1]->Uint32Value();
+	fann_type activationSteepness = fanny->fann->get_activation_steepness(layer, neuron);
+	info.GetReturnValue().Set(activationSteepness);
+}
+
+NAN_METHOD(FANNY::setActivationSteepness) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 3) return Nan::ThrowError("Must have 3 arguments");
+	if (!info[0]->IsNumber() || !info[1]->IsNumber() || !info[2]->IsNumber()) {
+		return Nan::ThrowError("All arguments must be numbers");
+	}
+
+	fann_type steepness = v8NumberToFannType(info[0]);
+	unsigned int layer = info[1]->Uint32Value();
+	unsigned int neuron = info[2]->Uint32Value();
+	fanny->fann->set_activation_steepness(steepness, layer, neuron);
+}
+
+NAN_METHOD(FANNY::setActivationSteepnessLayer) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 2) return Nan::ThrowError("Must have 2 arguments");
+	if (!info[0]->IsNumber() || !info[1]->IsNumber()) {
+		return Nan::ThrowError("All arguments must be numbers");
+	}
+
+	fann_type steepness = v8NumberToFannType(info[0]);
+	unsigned int layer = info[1]->Uint32Value();
+	fanny->fann->set_activation_steepness_layer(steepness, layer);
+}
+
+NAN_METHOD(FANNY::setActivationSteepnessHidden) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 1) return Nan::ThrowError("Must have 1 arguments");
+	if (!info[0]->IsNumber()) {
+		return Nan::ThrowError("steepness must be numbers");
+	}
+	fann_type steepness = v8NumberToFannType(info[0]);
+	fanny->fann->set_activation_steepness_hidden(steepness);
+}
+
+NAN_METHOD(FANNY::setActivationSteepnessOutput) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 1) return Nan::ThrowError("Must have 1 arguments");
+	if (!info[0]->IsNumber()) {
+		return Nan::ThrowError("steepness must be numbers");
+	}
+	fann_type steepness = v8NumberToFannType(info[0]);
+	fanny->fann->set_activation_steepness_output(steepness);
+}
+
+NAN_METHOD(FANNY::setWeightArray) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 2) return Nan::ThrowError("Must have two arguments");
+	if (!info[0]->IsArray()) return Nan::ThrowError("Connections must be an array");
+	if (!info[1]->IsNumber()) return Nan::ThrowError("size must be a number");
+
+	std::vector<FANN::connection> connections = v8ArrayToConnection(info[0]);
+	unsigned int num = info[1]->Uint32Value();
+	fanny->fann->set_weight_array(&connections[0], num);
+}
+
+NAN_METHOD(FANNY::setWeight) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 3) return Nan::ThrowError("Must have 3 arguments");
+	if (!info[0]->IsNumber() || !info[1]->IsNumber() || !info[2]->IsNumber()) {
+		return Nan::ThrowError("All arguments must be numbers");
+	}
+	unsigned int fromNeuron = info[0]->Uint32Value();
+	unsigned int toNeuron = info[1]->Uint32Value();
+	fann_type weight = v8NumberToFannType(info[2]);
+	fanny->fann->set_weight(fromNeuron, toNeuron, weight);
+}
+
 NAN_METHOD(FANNY::getUserDataString) {
 	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
 	char *str = fanny->fann->get_user_data_string();
@@ -1591,3 +1784,4 @@ NAN_METHOD(FANNY::setUserDataString) {
 }
 
 }
+
