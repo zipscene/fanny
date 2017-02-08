@@ -339,7 +339,7 @@ describe('Tests', function() {
 		it('can call scale train data', function() {
 			expect(function() {
 				var data = createTrainingData(booleanTrainingData);
-				var ann = createANN({ layers: [ 2, 1, 5 ] });
+				var ann = createANN({ layers: [ 2, 2, 5 ] });
 				ann.setScalingParams(data, 0, 1, 0, 1);
 				return ann.scaleTrainingData(data);
 			}).to.not.throw();
@@ -356,7 +356,7 @@ describe('Tests', function() {
 		it('can call descale train data', function() {
 			expect(function() {
 				var data = createTrainingData(booleanTrainingData);
-				var ann = createANN({ layers: [ 2, 1, 5 ] });
+				var ann = createANN({ layers: [ 2, 3, 5 ] });
 				ann.setScalingParams(data, 0, 1, 0, 1);
 				return ann.descaleTrainingData(data);
 			}).to.not.throw();
@@ -389,7 +389,7 @@ describe('Tests', function() {
 		it('can call setInputScalingParams', function() {
 			expect(function() {
 				var data = createTrainingData(booleanTrainingData);
-				var ann = createANN({ layers: [ 2, 1, 5 ] });
+				var ann = createANN({ layers: [ 2, 3, 5 ] });
 				return ann.setInputScalingParams(data, 0, 1);
 			}).to.not.throw();
 		});
@@ -397,7 +397,7 @@ describe('Tests', function() {
 	describe('#setOutputScalingParams', function() {
 		it('can throw an error if data is not trainingData', function() {
 			var func = function() {
-				var ann = createANN({ layers: [ 2, 2, 2 ] });
+				var ann = createANN({ layers: [ 2, 3, 2 ] });
 				return ann.setOutputScalingParams([], 0, 1);
 			};
 			expect(func).to.throw(XError.INVALID_ARGUMENT);
@@ -405,7 +405,7 @@ describe('Tests', function() {
 		it('can throw an error if min is not a number', function() {
 			var func = function() {
 				var data = createTrainingData(booleanTrainingData);
-				var ann = createANN({ layers: [ 2, 2, 2 ] });
+				var ann = createANN({ layers: [ 2, 3, 2 ] });
 				return ann.setOutputScalingParams(data, 'blah', 1);
 			};
 			expect(func).to.throw(XError.INVALID_ARGUMENT);
@@ -413,7 +413,7 @@ describe('Tests', function() {
 		it('can throw an error if max is not a number', function() {
 			var func = function() {
 				var data = createTrainingData(booleanTrainingData);
-				var ann = createANN({ layers: [ 2, 2, 2 ] });
+				var ann = createANN({ layers: [ 2, 3, 2 ] });
 				return ann.setOutputScalingParams(data, 0, 'blah');
 			};
 			expect(func).to.throw(XError.INVALID_ARGUMENT);
@@ -421,7 +421,7 @@ describe('Tests', function() {
 		it('can call setOutputScalingParams', function() {
 			expect(function() {
 				var data = createTrainingData(booleanTrainingData);
-				var ann = createANN({ layers: [ 2, 1, 5 ] });
+				var ann = createANN({ layers: [ 2, 3, 5 ] });
 				return ann.setOutputScalingParams(data, 0, 1);
 			}).to.not.throw();
 		});
@@ -430,7 +430,7 @@ describe('Tests', function() {
 		it('can call setScalingParams', function() {
 			expect(function() {
 				var data = createTrainingData(booleanTrainingData);
-				var ann = createANN({ layers: [ 2, 1, 5 ] });
+				var ann = createANN({ layers: [ 2, 3, 5 ] });
 				return ann.setScalingParams(data, 0, 1, 0, 1);
 			}).to.not.throw();
 		});
@@ -449,7 +449,7 @@ describe('Tests', function() {
 		it('can scale input', function() {
 			expect(function() {
 				var data = createTrainingData(booleanTrainingData);
-				var ann = createANN({ layers: [ 2, 1, 5 ] });
+				var ann = createANN({ layers: [ 2, 3, 5 ] });
 				ann.setScalingParams(data, 0, 1, 0, 1);
 				return ann.scaleInput([ 0, 1 ]);
 			}).to.not.throw();
@@ -459,7 +459,7 @@ describe('Tests', function() {
 		it('can scale output', function() {
 			expect(function() {
 				var data = createTrainingData(booleanTrainingData);
-				var ann = createANN({ layers: [ 2, 1, 5 ] });
+				var ann = createANN({ layers: [ 2, 3, 5 ] });
 				ann.setScalingParams(data, 0, 1, 0, 1);
 				return ann.scaleOutput([ 0, 1, 1, 1, 0 ]);
 			}).to.not.throw();
@@ -469,7 +469,7 @@ describe('Tests', function() {
 		it('can descale input', function() {
 			expect(function() {
 				var data = createTrainingData(booleanTrainingData);
-				var ann = createANN({ layers: [ 2, 1, 5 ] });
+				var ann = createANN({ layers: [ 2, 3, 5 ] });
 				ann.setScalingParams(data, 0, 1, 0, 1);
 				return ann.descaleInput([ 0, 1 ]);
 			}).to.not.throw();
@@ -487,20 +487,20 @@ describe('Tests', function() {
 	});
 	describe('Activation Steepness', function() {
 		it('can get activation steepness', function() {
-			var ann = createANN({ layers: [ 2, 1, 5 ] });
+			var ann = createANN({ layers: [ 2, 3, 5 ] });
 			expect(ann.getActivationSteepness(1, 1))
 				.to.be.a('number')
 				.to.not.equal(-1);
 		});
 		it('can set activation steepness', function() {
-			var ann = createANN({ layers: [ 2, 1, 5 ] });
+			var ann = createANN({ layers: [ 2, 3, 5 ] });
 			ann.setActivationSteepness(0.2, 1, 1);
 			expect(ann.getActivationSteepness(1, 1))
 				.to.be.a('number')
 				.to.not.equal(-1);
 		});
 		it('can set activation steepness on layers', function() {
-			var ann = createANN({ layers: [ 2, 1, 5 ] });
+			var ann = createANN({ layers: [ 2, 3, 5 ] });
 			ann.setActivationSteepnessLayer(0.2, 1);
 			expect(ann.getActivationSteepness(1,1))
 				.to.be.a('number')
@@ -514,7 +514,7 @@ describe('Tests', function() {
 				.to.not.equal(-1);
 		});
 		it('can set activation steepness on output', function() {
-			var ann = createANN({ layers: [ 2, 1, 5 ] });
+			var ann = createANN({ layers: [ 2, 3, 5 ] });
 			ann.setActivationSteepnessOutput(0.3);
 			expect(ann.getActivationSteepness(2,1))
 				.to.be.a('number')
@@ -525,7 +525,7 @@ describe('Tests', function() {
 	describe('Testing Data', function() {
 		it('can test set of data', function() {
 			var data = createTrainingData(booleanTrainingData);
-			var ann = createANN({ layers: [ 2, 1, 5 ] });
+			var ann = createANN({ layers: [ 2, 3, 5 ] });
 			return ann.testData(data)
 				.then(function(res) {
 					expect(res).to.be.a('number');
@@ -534,7 +534,7 @@ describe('Tests', function() {
 				});
 		});
 		it('can test one input for output error', function() {
-			var ann = createANN({ layers: [ 2, 1, 5 ] });
+			var ann = createANN({ layers: [ 2, 3, 5 ] });
 			var result = ann.testOne([ 1, 0 ], [ 1, 1, 1, 1, 1 ]);
 			expect(result).to.be.an.instanceof(Array).to.have.a.lengthOf(5);
 		});
