@@ -26,15 +26,10 @@ describe('Tests', function() {
 
 	it('basic test', function() {
 		var ann = createANN({ layers: [ 2, 20, 5 ] });
-		return ann.train(booleanTrainingData, { desiredError: 0.01 })
+		return ann.train(booleanTrainingData, { desiredError: 0.0, stopFunction: 'BIT' })
 			.then(() => {
-				var connections = ann.getConnectionArray();
-				for (var connect of connections) {
-					connect.weight = 0.02;
-				}
-				ann.setWeightArray(connections, connections.length);
-				expect(booleanThreshold(ann.run([ 1, 1 ]))).to.deep.equal([ 1, 1, 1, 1, 1 ]);
-				expect(booleanThreshold(ann.run([ 1, 0 ]))).to.deep.equal([ 1, 1, 1, 1, 1 ]);
+				expect(booleanThreshold(ann.run([ 1, 1 ]))).to.deep.equal([ 1, 1, 0, 0, 0 ]);
+				expect(booleanThreshold(ann.run([ 1, 0 ]))).to.deep.equal([ 0, 1, 1, 0, 1 ]);
 			});
 	});
 
