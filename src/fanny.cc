@@ -1783,22 +1783,5 @@ NAN_METHOD(FANNY::setUserDataString) {
 	fanny->fann->set_user_data_string(*utf8String);
 }
 
-NAN_METHOD(FANNY::getUserDataString) {
-	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
-	char *str = fanny->fann->get_user_data_string();
-	if (str) {
-		info.GetReturnValue().Set(Nan::New(str).ToLocalChecked());
-	} else {
-		info.GetReturnValue().Set(Nan::Null());
-	}
-}
-
-NAN_METHOD(FANNY::setUserDataString) {
-	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
-	if (info.Length() != 1 || !info[0]->IsString()) return Nan::ThrowError("Argument must be string");
-	v8::String::Utf8Value utf8String(info[0]);
-	fanny->fann->set_user_data_string(*utf8String);
-}
-
 }
 

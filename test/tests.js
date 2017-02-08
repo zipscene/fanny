@@ -26,7 +26,7 @@ describe('Tests', function() {
 
 	it('basic test', function() {
 		var ann = createANN({ layers: [ 2, 20, 5 ] });
-		return ann.train(booleanTrainingData, { desiredError: 0.0, stopFunction: 'BIT' })
+		return ann.train(booleanTrainingData, { desiredError: 0, stopFunction: 'BIT' })
 			.then(() => {
 				expect(booleanThreshold(ann.run([ 1, 1 ]))).to.deep.equal([ 1, 1, 0, 0, 0 ]);
 				expect(booleanThreshold(ann.run([ 1, 0 ]))).to.deep.equal([ 0, 1, 1, 0, 1 ]);
@@ -497,8 +497,8 @@ describe('Tests', function() {
 		it('can set activation steepness on layers', function() {
 			var ann = createANN({ layers: [ 2, 3, 5 ] });
 			ann.setActivationSteepnessLayer(0.2, 1);
-			expect(ann.getActivationSteepness(1,3))
-				.to.equal(ann.getActivationSteepness(1, 4))
+			expect(ann.getActivationSteepness(1, 2))
+				.to.equal(ann.getActivationSteepness(1, 3))
 				.to.be.a('number')
 				.to.not.equal(-1);
 		});
@@ -513,8 +513,8 @@ describe('Tests', function() {
 		it('can set activation steepness on output', function() {
 			var ann = createANN({ layers: [ 2, 3, 5 ] });
 			ann.setActivationSteepnessOutput(0.3);
-			expect(ann.getActivationSteepness(2,10))
-				.to.equal(ann.getActivationSteepness(2,11))
+			expect(ann.getActivationSteepness(2,4))
+				.to.equal(ann.getActivationSteepness(2,5))
 				.to.be.a('number')
 				.to.not.equal(-1);
 		});
