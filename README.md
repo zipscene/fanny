@@ -70,7 +70,7 @@ var config = {
 		// Possible values: 'LINEAR', 'THRESHOLD', 'THRESHOLD_SYMMETRIC', 'SIGMOID', 'SIGMOID_STEPWISE',
 		// 'SIGMOID_SYMMETRIC', 'SIGMOID_SYMMETRIC_STEPWISE', 'GAUSSIAN', 'GAUSSIAN_SYMMETRIC',
 		// 'ELLIOT', 'ELLIOT_SYMMETRIC', 'LINEAR_PIECE', 'LINEAR_PIECE_SYMMETRIC', 'SIN_SYMMETRIC',
-		// 'COS_SYMMETRIC'
+		// 'COS_SYMMETRIC', 'SIN', 'COS'
 		hidden: 'LINEAR', // all hidden nodes
 		output: 'THRESHOLD', // all output nodes
 		'2': 'LINEAR', // nodes on layer 2 (indexed from 0)

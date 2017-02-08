@@ -59,12 +59,20 @@ private:
 	static NAN_METHOD(getNumOutput);
 	static NAN_METHOD(getTotalNeurons);
 	static NAN_METHOD(getTotalConnections);
+	static NAN_METHOD(getConnectionArray);
 	static NAN_METHOD(getNumLayers);
 	static NAN_METHOD(getBitFail);
 	static NAN_METHOD(getBitFailLimit);
 	static NAN_METHOD(setBitFailLimit);
 	static NAN_METHOD(getMSE);
+	static NAN_METHOD(resetMSE);
 	static NAN_METHOD(getLearningRate);
+	static NAN_METHOD(setLearningRate);
+	static NAN_METHOD(getActivationFunction);
+	static NAN_METHOD(setActivationFunction);
+	static NAN_METHOD(setActivationFunctionLayer);
+	static NAN_METHOD(setActivationFunctionHidden);
+	static NAN_METHOD(setActivationFunctionOutput);
 	static NAN_METHOD(getQuickpropDecay);
 	static NAN_METHOD(getQuickpropMu);
 	static NAN_METHOD(getRpropIncreaseFactor);
@@ -79,6 +87,16 @@ private:
 	static NAN_METHOD(setCascadeActivationFunctions);
 	static NAN_METHOD(getCascadeActivationSteepnesses);
 	static NAN_METHOD(setCascadeActivationSteepnesses);
+
+	static NAN_METHOD(printConnections);
+	static NAN_METHOD(printParameters);
+
+	static NAN_METHOD(randomizeWeights);
+
+	// TODO
+	/*
+	- train (rename to trainOne)
+	*/
 
 	static NAN_METHOD(getCascadeOutputChangeFraction);
 	static NAN_METHOD(getCascadeOutputStagnationEpochs);
@@ -100,7 +118,6 @@ private:
 	static NAN_METHOD(setCascadeMaxCandEpochs);
 	static NAN_METHOD(setCascadeNumCandidateGroups);
 
-	static NAN_METHOD(setLearningRate);
 	static NAN_METHOD(setQuickpropDecay);
 	static NAN_METHOD(setQuickpropMu);
 	static NAN_METHOD(setRpropIncreaseFactor);
@@ -108,6 +125,7 @@ private:
 	static NAN_METHOD(setRpropDeltaZero);
 	static NAN_METHOD(setRpropDeltaMin);
 	static NAN_METHOD(setRpropDeltaMax);
+
 	static NAN_METHOD(train);
 	static NAN_METHOD(test);
 	static NAN_METHOD(scaleTrain);
@@ -145,6 +163,14 @@ private:
 	static NAN_METHOD(setSarpropStepErrorShift);
 	static NAN_METHOD(setSarpropTemperature);
 	static NAN_METHOD(setLearningMomentum);
+
+	static NAN_METHOD(getActivationSteepness);
+	static NAN_METHOD(setActivationSteepness);
+	static NAN_METHOD(setActivationSteepnessLayer);
+	static NAN_METHOD(setActivationSteepnessHidden);
+	static NAN_METHOD(setActivationSteepnessOutput);
+	static NAN_METHOD(setWeightArray);
+	static NAN_METHOD(setWeight);
 
 	static NAN_METHOD(getUserDataString);
 	static NAN_METHOD(setUserDataString);
