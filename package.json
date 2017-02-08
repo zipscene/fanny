@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "FANN Fast Artificial Neural Network Node.JS Bindings",
   "main": "./dist/lib/index.js",
+  "keywords": [ "fann", "ann", "neural", "network", "ai", "neural network" ],
   "repository": {
     "type": "git",
     "url": "git@git.zipscene.com:zsapilibs/zs-fanny.git"
