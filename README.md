@@ -259,6 +259,12 @@ The `ANN` object has a property called `info` containing current information abo
 
 Each of these corresponds to a FANN getter.
 
+## User Data
+
+The `ANN` object has a property called `userData` which is initialized to an empty object.  You can store
+any data you need to in there, and it will be saved and loaded with the neural network.  The data is
+stored as a JSON object in the FANN `user_data_string` field.
+
 ## Other ANN Functions
 
 These functions correspond directly (insofar as translation to Javascript allows) to functions

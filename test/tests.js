@@ -33,6 +33,16 @@ describe('Tests', function() {
 			});
 	});
 
+	it('user data', function() {
+		var ann = createANN({ layers: [ 2, 5, 2 ] });
+		ann.userData.foo = 'bar';
+		return ann.save('/tmp/fanny_test_save')
+			.then(() => fanny.loadANN('/tmp/fanny_test_save'))
+			.then((ann) => {
+				expect(ann.userData).to.deep.equal({ foo: 'bar' });
+			});
+	});
+
 	describe('Options Tests', function() {
 		var optionsToTest = annOptionsSchema.getData().properties;
 
