@@ -41,7 +41,7 @@ This can be accessed by including the native addon itself: `require('fanny').get
 
 ## Getting FANN
 
-This module is currently built on FANN 1.0.0.  However, the original author no longer seems to be
+This module is currently built on FANN git as of Jan. 2017.  However, the original author no longer seems to be
 maintaining the library, and several bugs in the current official version break some features of
 FANNy.  A maintained version with the appropriate bugfixes is available [here](https://github.com/crispy1989/fann).
 
