@@ -532,12 +532,16 @@ describe('Tests', function() {
 			return ann.testData(data)
 				.then(function(res) {
 					expect(res).to.be.a('number');
+					expect(ann.getMSE()).to.be.below(0.5);
+					expect(ann.getOption('bitFailLimit')).to.be.below(0.5);
 				});
 		});
 		it('can test one input for output error', function() {
 			var ann = createANN({ layers: [ 2, 3, 5 ] });
 			var result = ann.testOne([ 1, 0 ], [ 1, 1, 1, 1, 1 ]);
 			expect(result).to.be.an.instanceof(Array).to.have.a.lengthOf(5);
+			expect(ann.getMSE()).to.be.below(0.5);
+			expect(ann.getOption('bitFailLimit')).to.be.below(0.5);
 		});
 	});
 
