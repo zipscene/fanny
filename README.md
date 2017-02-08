@@ -45,13 +45,8 @@ This module is currently built on FANN 1.0.0.  However, the original author no l
 maintaining the library, and several bugs in the current official version break some features of
 FANNy.  A maintained version with the appropriate bugfixes is available [here](https://github.com/crispy1989/fann).
 
-```
-$ git clone https://github.com/libfann/fann.git
-$ cd fann
-$ cmake .
-$ make
-$ sudo make install
-```
+When you npm install fanny, it should automatically fetch and compile this version of FANN
+in a sandbox.  You will need standard build tools along with `cmake` installed.
 
 ## Creating a Neural Network
 
