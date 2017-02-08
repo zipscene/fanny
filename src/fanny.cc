@@ -344,7 +344,6 @@ void FANNY::Init(v8::Local<v8::Object> target) {
 	Nan::SetPrototypeMethod(tpl, "getUserDataString", getUserDataString);
 	Nan::SetPrototypeMethod(tpl, "setUserDataString", setUserDataString);
 
-
 	// Create the loadFile function
 	v8::Local<v8::FunctionTemplate> loadFileTpl = Nan::New<v8::FunctionTemplate>(loadFile);
 	v8::Local<v8::Function> loadFileFunction = Nan::GetFunction(loadFileTpl).ToLocalChecked();
@@ -1689,7 +1688,6 @@ NAN_METHOD(FANNY::setCascadeNumCandidateGroups) {
 	#endif
 }
 
-
 NAN_METHOD(FANNY::getActivationSteepness) {
 	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
 	if (info.Length() != 2) return Nan::ThrowError("Must have an arguments: layer and neuron");
@@ -1785,4 +1783,22 @@ NAN_METHOD(FANNY::setUserDataString) {
 	fanny->fann->set_user_data_string(*utf8String);
 }
 
+NAN_METHOD(FANNY::getUserDataString) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	char *str = fanny->fann->get_user_data_string();
+	if (str) {
+		info.GetReturnValue().Set(Nan::New(str).ToLocalChecked());
+	} else {
+		info.GetReturnValue().Set(Nan::Null());
+	}
 }
+
+NAN_METHOD(FANNY::setUserDataString) {
+	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
+	if (info.Length() != 1 || !info[0]->IsString()) return Nan::ThrowError("Argument must be string");
+	v8::String::Utf8Value utf8String(info[0]);
+	fanny->fann->set_user_data_string(*utf8String);
+}
+
+}
+
