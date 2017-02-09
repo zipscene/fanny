@@ -28,9 +28,9 @@ function booleanThreshold(array) {
 
 describe('Tests', function() {
 
-	it('basic test', function() {
-		var ann = createANN({ layers: [ 2, 20, 5 ] });
-		return ann.train(booleanTrainingData, { desiredError: 0, stopFunction: 'BIT' })
+	it.only('basic test', function() {
+		var ann = createANN({ layers: [ 2, 5 ], type: 'shortcut' });
+		return ann.train(booleanTrainingData, { desiredError: 0, stopFunction: 'BIT', cascade: true }, 'default')
 			.then(() => {
 				expect(booleanThreshold(ann.run([ 1, 1 ]))).to.deep.equal([ 1, 1, 0, 0, 0 ]);
 				expect(booleanThreshold(ann.run([ 1, 0 ]))).to.deep.equal([ 0, 1, 1, 0, 1 ]);
