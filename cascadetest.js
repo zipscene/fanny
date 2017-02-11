@@ -20,10 +20,15 @@ function booleanThreshold(array) {
 }
 
 
-var ann = createANN({ layers: [ 2, 5 ], type: 'shortcut' });
+var ann = createANN({ layers: [ 2, 5 ], type: 'shortcut' }, { bitFailLimit: 0.2, learningRate: 0.01, trainingAlgorithm: 'QUICKPROP' });
 ann.train(booleanTrainingData, { desiredError: 0, stopFunction: 'BIT', cascade: true }, 'default')
 	.then(() => {
+		console.log('Training done');
 		expect(booleanThreshold(ann.run([ 1, 1 ]))).to.deep.equal([ 1, 1, 0, 0, 0 ]);
 		expect(booleanThreshold(ann.run([ 1, 0 ]))).to.deep.equal([ 0, 1, 1, 0, 1 ]);
+		console.log('Complete');
+	})
+	.catch((err) => {
+		console.log('Error', err);
 	});
 
