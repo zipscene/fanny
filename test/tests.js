@@ -37,6 +37,30 @@ describe('Tests', function() {
 			});
 	});
 
+	it('cascade test', function() {
+		var ann = createANN({
+			layers: [ 2, 5 ],
+			type: 'shortcut'
+		}, {
+			cascadeWeightMultiplier: 0.2,
+			trainingAlgorithm: 'QUICKPROP',
+			learningRate: 1,
+			bitFailLimit: 0.05
+		});
+		var trainOptions = {
+			desiredError: 0,
+			stopFunction: 'BIT',
+			cascade: true,
+			maxNeurons: 50
+		};
+		return ann.train(booleanTrainingData, trainOptions)
+			.then(() => {
+				expect(booleanThreshold(ann.run([ 1, 1 ]))).to.deep.equal([ 1, 1, 0, 0, 0 ]);
+				expect(booleanThreshold(ann.run([ 1, 0 ]))).to.deep.equal([ 0, 1, 1, 0, 1 ]);
+			});
+	});
+
+
 	it('user data', function() {
 		var ann = createANN({ layers: [ 2, 5, 2 ] });
 		ann.userData.foo = 'bar';
