@@ -37,15 +37,12 @@ describe('Tests', function() {
 			});
 	});
 
-	it('cascade test', function() {
+	it.only('cascade test', function() {
 		var ann = createANN({
 			layers: [ 2, 5 ],
 			type: 'shortcut'
 		}, {
-			cascadeWeightMultiplier: 0.2,
-			trainingAlgorithm: 'QUICKPROP',
-			learningRate: 1,
-			bitFailLimit: 0.05
+			bitFailLimit: 0.01
 		});
 		var trainOptions = {
 			desiredError: 0,
@@ -53,8 +50,10 @@ describe('Tests', function() {
 			cascade: true,
 			maxNeurons: 50
 		};
-		return ann.train(booleanTrainingData, trainOptions)
+		return ann.train(booleanTrainingData, trainOptions, 'default')
+			.then(() => ann.testData(createTrainingData(booleanTrainingData)))
 			.then(() => {
+				console.log(ann.getMSE());
 				expect(booleanThreshold(ann.run([ 1, 1 ]))).to.deep.equal([ 1, 1, 0, 0, 0 ]);
 				expect(booleanThreshold(ann.run([ 1, 0 ]))).to.deep.equal([ 0, 1, 1, 0, 1 ]);
 			});
