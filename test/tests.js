@@ -29,7 +29,7 @@ function booleanThreshold(array) {
 describe('Tests', function() {
 
 	it('basic test', function() {
-		var ann = createANN({ layers: [ 2, 20, 5 ] });
+		var ann = createANN({ layers: [ 2, 20, 20, 5 ] });
 		return ann.train(booleanTrainingData, { desiredError: 0, stopFunction: 'BIT' })
 			.then(() => {
 				expect(booleanThreshold(ann.run([ 1, 1 ]))).to.deep.equal([ 1, 1, 0, 0, 0 ]);
@@ -42,10 +42,7 @@ describe('Tests', function() {
 			layers: [ 2, 5 ],
 			type: 'shortcut'
 		}, {
-			cascadeWeightMultiplier: 0.2,
-			trainingAlgorithm: 'QUICKPROP',
-			learningRate: 1,
-			bitFailLimit: 0.05
+			bitFailLimit: 0.1
 		});
 		var trainOptions = {
 			desiredError: 0,
