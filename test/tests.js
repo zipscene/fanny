@@ -29,7 +29,7 @@ function booleanThreshold(array) {
 describe('Tests', function() {
 
 	it('basic test', function() {
-		var ann = createANN({ layers: [ 2, 20, 5 ] });
+		var ann = createANN({ layers: [ 2, 20, 20, 5 ] });
 		return ann.train(booleanTrainingData, { desiredError: 0, stopFunction: 'BIT' })
 			.then(() => {
 				expect(booleanThreshold(ann.run([ 1, 1 ]))).to.deep.equal([ 1, 1, 0, 0, 0 ]);
@@ -37,12 +37,12 @@ describe('Tests', function() {
 			});
 	});
 
-	it.only('cascade test', function() {
+	it('cascade test', function() {
 		var ann = createANN({
 			layers: [ 2, 5 ],
 			type: 'shortcut'
 		}, {
-			bitFailLimit: 0.01
+			bitFailLimit: 0.1
 		});
 		var trainOptions = {
 			desiredError: 0,
@@ -50,10 +50,8 @@ describe('Tests', function() {
 			cascade: true,
 			maxNeurons: 50
 		};
-		return ann.train(booleanTrainingData, trainOptions, 'default')
-			.then(() => ann.testData(createTrainingData(booleanTrainingData)))
+		return ann.train(booleanTrainingData, trainOptions)
 			.then(() => {
-				console.log(ann.getMSE());
 				expect(booleanThreshold(ann.run([ 1, 1 ]))).to.deep.equal([ 1, 1, 0, 0, 0 ]);
 				expect(booleanThreshold(ann.run([ 1, 0 ]))).to.deep.equal([ 0, 1, 1, 0, 1 ]);
 			});
