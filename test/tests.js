@@ -31,7 +31,7 @@ describe('Tests', function() {
 	it('basic test', function() {
 		var ann = createANN({ layers: [ 2, 20, 20, 5 ] });
 		return ann.train(booleanTrainingData, { desiredError: 0, stopFunction: 'BIT' })
-			.then(() => {
+			.then(function() {
 				expect(booleanThreshold(ann.run([ 1, 1 ]))).to.deep.equal([ 1, 1, 0, 0, 0 ]);
 				expect(booleanThreshold(ann.run([ 1, 0 ]))).to.deep.equal([ 0, 1, 1, 0, 1 ]);
 			});
@@ -51,7 +51,7 @@ describe('Tests', function() {
 			maxNeurons: 50
 		};
 		return ann.train(booleanTrainingData, trainOptions)
-			.then(() => {
+			.then(function() {
 				expect(booleanThreshold(ann.run([ 1, 1 ]))).to.deep.equal([ 1, 1, 0, 0, 0 ]);
 				expect(booleanThreshold(ann.run([ 1, 0 ]))).to.deep.equal([ 0, 1, 1, 0, 1 ]);
 			});
@@ -62,8 +62,8 @@ describe('Tests', function() {
 		var ann = createANN({ layers: [ 2, 5, 2 ] });
 		ann.userData.foo = 'bar';
 		return ann.save('/tmp/fanny_test_save')
-			.then(() => fanny.loadANN('/tmp/fanny_test_save'))
-			.then((ann) => {
+			.then(function() { return fanny.loadANN('/tmp/fanny_test_save'); })
+			.then(function(ann) {
 				expect(ann.userData).to.deep.equal({ foo: 'bar' });
 			});
 	});
@@ -231,6 +231,14 @@ describe('Tests', function() {
 			var ann = createANN({ layers: [ 2, 2, 2 ] });
 			var testFunc = function() { ann.printParameters(); }
 			expect(testFunc).to.not.throw();
+		});
+	});
+
+	describe('Get Bit Fail', function() {
+		it('Can call getBitFail', function() {
+			var ann = createANN({ layers: [ 2, 2, 2 ] });
+			var bit = ann.getBitFail();
+			expect(bit).to.be.a('number');
 		});
 	});
 
