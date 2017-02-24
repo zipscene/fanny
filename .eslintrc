@@ -1,3 +1,5 @@
 {
-	"extends": "zipscene/environments/node"
+	"env": {
+		"node": true
+	}
 }
