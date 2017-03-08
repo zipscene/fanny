@@ -1,6 +1,6 @@
 {
   "name": "fanny",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "FANN Fast Artificial Neural Network Node.JS Bindings",
   "main": "./lib/index.js",
   "keywords": [
