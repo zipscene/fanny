@@ -1,6 +1,6 @@
 {
   "name": "fanny",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "FANN Fast Artificial Neural Network Node.JS Bindings",
   "main": "./lib/index.js",
   "keywords": [
@@ -20,6 +20,7 @@
     "build": "node-gyp build",
     "preinstall": "./build_fann.sh"
   },
+  "gypfile": true,
   "generatorInfo": {
     "name": "generator-zs-lib",
     "version": "0.9.7"
