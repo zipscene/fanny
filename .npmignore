@@ -1,12 +1,10 @@
 # general
 bower_components
+dist
+docs
 node_modules
 tmp
-
-# config
-.babelrc
-.editorconfig
-.eslintrc
+build
 
 # environment
 .configurez.*
@@ -22,3 +20,8 @@ npm-debug.log
 *.sublime-workspace
 *.swp
 .DS_Store
+
+# fann
+/fann
+build
+
