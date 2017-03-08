@@ -1,6 +1,6 @@
 {
   "name": "fanny",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "FANN Fast Artificial Neural Network Node.JS Bindings",
   "main": "./lib/index.js",
   "keywords": [
@@ -17,7 +17,8 @@
   },
   "scripts": {
     "test": "./node_modules/.bin/mocha",
-    "build": "node-gyp build",
+    "build": "node-gyp configure && node-gyp build",
+	"postinstall": "node-gyp configure && node-gyp build",
     "preinstall": "./build_fann.sh"
   },
   "gypfile": true,
