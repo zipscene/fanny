@@ -2,7 +2,8 @@
 
 # This script builds and installs FANN in the node module directory
 
-FANN_GIT_REPO="git@github.com:crispy1989/fann.git"
+# FANN_GIT_REPO="git@github.com:crispy1989/fann.git"
+FANN_GIT_REPO="https://github.com/crispy1989/fann.git"
 
 REALPATH="`realpath "$0"`"
 ROOT="`dirname "$REALPATH"`"
