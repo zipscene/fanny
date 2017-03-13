@@ -370,8 +370,6 @@ FANNY::FANNY(FANN::neural_net *_fann) : fann(_fann), currentTrainWorker(NULL) {}
 
 FANNY::~FANNY() {
 	delete fann;
-	constructorFunctionTpl.Empty();
-	constructorFunction.Empty();
 }
 
 NAN_METHOD(FANNY::printConnections) {
@@ -1795,4 +1793,3 @@ NAN_METHOD(FANNY::enableSeedRand) {
 }
 
 }
-

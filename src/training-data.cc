@@ -93,7 +93,6 @@ TrainingData::TrainingData(FANN::training_data *_training_data) : trainingData(_
 
 TrainingData::~TrainingData() {
 	delete trainingData;
-	constructorFunctionTpl.Empty();
 }
 
 NAN_METHOD(TrainingData::New) {
