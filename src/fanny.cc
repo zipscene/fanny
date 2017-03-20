@@ -202,9 +202,10 @@ public:
 		if (!fanny->trainingCallbackFn.IsEmpty() && !fanny->cancelTrainingFlag) {
 			v8::Local<v8::Function> trainingCallbackFn = Nan::New(fanny->trainingCallbackFn);
 			v8::Local<v8::Object> obj = Nan::New<v8::Object>();
-			Nan::Set(obj, Nan::New("iteration").ToLocalChecked(), Nan::New(fanny->currentTrainingProgress.iteration));
+			Nan::Set(obj, Nan::New("epochs").ToLocalChecked(), Nan::New(fanny->currentTrainingProgress.epochs));
 			Nan::Set(obj, Nan::New("mse").ToLocalChecked(), Nan::New(fanny->currentTrainingProgress.mse));
 			Nan::Set(obj, Nan::New("bitfail").ToLocalChecked(), Nan::New(fanny->currentTrainingProgress.bitFail));
+			Nan::Set(obj, Nan::New("neurons").ToLocalChecked(), Nan::New(fanny->currentTrainingProgress.neurons));
 			v8::Local<v8::Value> args[] = { obj };
 			Nan::MaybeLocal<v8::Value> ret = Nan::Call(trainingCallbackFn, GetFromPersistent("fannyHolder").As<v8::Object>(), 1, args);
 			if (!ret.IsEmpty() && ret.ToLocalChecked()->IsNumber() && ret.ToLocalChecked()->Int32Value() < 0) {
@@ -531,9 +532,10 @@ int FANNY::fannInternalCallback(
 	void *user_data
 ) {
 	FANNY *fanny = (FANNY *)user_data;
-	fanny->currentTrainingProgress.iteration = epochs;
+	fanny->currentTrainingProgress.epochs = epochs;
 	fanny->currentTrainingProgress.mse = fanny->fann->get_MSE();
 	fanny->currentTrainingProgress.bitFail = fanny->fann->get_bit_fail();
+	fanny->currentTrainingProgress.neurons = fanny->fann->get_total_neurons();
 	if (fanny->currentTrainWorker && fanny->currentTrainWorker->executionProgress) {
 		fanny->currentTrainWorker->executionProgress->Signal();
 	}
