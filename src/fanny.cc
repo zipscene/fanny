@@ -189,8 +189,8 @@ public:
 	void HandleOKCallback() {
 		Nan::HandleScope scope;
 		if (fanny->cancelTrainingFlag) {
-			v8::Local<v8::Value> errorArgs[] = { Nan::Error("canceled") };
-			callback->Call(1, errorArgs);
+			v8::Local<v8::Value> args[] = { Nan::Error("canceled"), Nan::New(retVal) };
+			callback->Call(2, args);
 			return;
 		}
 		v8::Local<v8::Value> args[] = { Nan::Null(), Nan::New(retVal) };
