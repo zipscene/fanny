@@ -28,9 +28,10 @@ public:
 	// Current training iteration data
 	class TrainingProgress {
 	public:
-		unsigned int iteration;
+		unsigned int epochs;
 		float mse;
 		unsigned int bitFail;
+		unsigned int neurons;
 	};
 	TrainingProgress currentTrainingProgress;
 	TrainWorker *currentTrainWorker;
