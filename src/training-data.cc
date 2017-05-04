@@ -5,6 +5,8 @@
 #include "utils.h"
 #include "training-data.h"
 
+int tdCnt = 0;
+
 namespace fanny {
 
 class TDIOWorker : public Nan::AsyncWorker {
@@ -92,10 +94,14 @@ void TrainingData::Init(v8::Local<v8::Object> target) {
 TrainingData::TrainingData(FANN::training_data *_training_data) : trainingData(_training_data) {}
 
 TrainingData::~TrainingData() {
+	tdCnt--;
+	std::cout << "Delete TD: " << tdCnt << "\n";
 	delete trainingData;
 }
 
 NAN_METHOD(TrainingData::New) {
+	tdCnt++;
+	std::cout << "Create TD: " << tdCnt << "\n";
 	FANN::training_data *trainingData;
 	if (info.Length() == 1 && Nan::New(TrainingData::constructorFunctionTpl)->HasInstance(info[0])) {
 		TrainingData *other = Nan::ObjectWrap::Unwrap<TrainingData>(info[0].As<v8::Object>());
@@ -127,7 +133,23 @@ NAN_METHOD(TrainingData::merge) {
 	}
 	TrainingData *other = Nan::ObjectWrap::Unwrap<TrainingData>(info[0].As<v8::Object>());
 	TrainingData *self = Nan::ObjectWrap::Unwrap<TrainingData>(info.Holder());
+	unsigned int sizeOfTrainDataEntry = self->trainingData->num_input_train_data() + self->trainingData->num_output_train_data();
+	unsigned int bytesPerTrainingEntry = sizeOfTrainDataEntry * sizeof (fann_type);
+	unsigned int lengthOfPreTrainData = self->trainingData->length_train_data();
+	unsigned int lengthOfNewTrainData = other->trainingData->length_train_data();
+
+	unsigned int sizeOfTDPreMerge = lengthOfPreTrainData * bytesPerTrainingEntry;
+	unsigned int sizeOfTDNew = lengthOfNewTrainData * bytesPerTrainingEntry;
+
 	self->trainingData->merge_train_data(*other->trainingData);
+
+	unsigned int lengthOfPostTrainData = self->trainingData->length_train_data();
+	unsigned int sizeOfTDPostMerge = lengthOfPostTrainData * bytesPerTrainingEntry;
+	std::cout << "pre: " << sizeOfTDPreMerge << "\n"
+						<< "new: " << sizeOfTDNew << "\n"
+						<< "post: " << sizeOfTDPostMerge << "\n"
+						<< "change: " << sizeOfTDPostMerge - sizeOfTDPreMerge << "\n";
+		Nan::AdjustExternalMemory(sizeOfTDPostMerge - sizeOfTDPreMerge);
 }
 
 NAN_METHOD(TrainingData::length) {
