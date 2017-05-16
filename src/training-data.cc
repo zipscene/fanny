@@ -5,8 +5,6 @@
 #include "utils.h"
 #include "training-data.h"
 
-int tdCnt = 0;
-
 namespace fanny {
 
 class TDIOWorker : public Nan::AsyncWorker {
@@ -94,14 +92,17 @@ void TrainingData::Init(v8::Local<v8::Object> target) {
 TrainingData::TrainingData(FANN::training_data *_training_data) : trainingData(_training_data) {}
 
 TrainingData::~TrainingData() {
-	tdCnt--;
-	std::cout << "Delete TD: " << tdCnt << "\n";
 	delete trainingData;
 }
 
+static int getTrainingDataByteCount(TrainingData *td) {
+	int sizeOfTrainDataEntry = td->trainingData->num_input_train_data() + td->trainingData->num_output_train_data();
+	int bytesPerTrainingEntry = sizeOfTrainDataEntry * sizeof (fann_type);
+	int lengthOfTrainData = td->trainingData->length_train_data();
+	return lengthOfTrainData * bytesPerTrainingEntry;
+}
+
 NAN_METHOD(TrainingData::New) {
-	tdCnt++;
-	std::cout << "Create TD: " << tdCnt << "\n";
 	FANN::training_data *trainingData;
 	if (info.Length() == 1 && Nan::New(TrainingData::constructorFunctionTpl)->HasInstance(info[0])) {
 		TrainingData *other = Nan::ObjectWrap::Unwrap<TrainingData>(info[0].As<v8::Object>());
@@ -116,6 +117,7 @@ NAN_METHOD(TrainingData::New) {
 	}
 	TrainingData *obj = new TrainingData(trainingData);
 	obj->Wrap(info.This());
+	Nan::AdjustExternalMemory(fanny::getTrainingDataByteCount(obj));
 	info.GetReturnValue().Set(info.This());
 }
 
@@ -133,23 +135,13 @@ NAN_METHOD(TrainingData::merge) {
 	}
 	TrainingData *other = Nan::ObjectWrap::Unwrap<TrainingData>(info[0].As<v8::Object>());
 	TrainingData *self = Nan::ObjectWrap::Unwrap<TrainingData>(info.Holder());
-	unsigned int sizeOfTrainDataEntry = self->trainingData->num_input_train_data() + self->trainingData->num_output_train_data();
-	unsigned int bytesPerTrainingEntry = sizeOfTrainDataEntry * sizeof (fann_type);
-	unsigned int lengthOfPreTrainData = self->trainingData->length_train_data();
-	unsigned int lengthOfNewTrainData = other->trainingData->length_train_data();
 
-	unsigned int sizeOfTDPreMerge = lengthOfPreTrainData * bytesPerTrainingEntry;
-	unsigned int sizeOfTDNew = lengthOfNewTrainData * bytesPerTrainingEntry;
+	int sizeOfTDPreMerge = fanny::getTrainingDataByteCount(self);
 
 	self->trainingData->merge_train_data(*other->trainingData);
 
-	unsigned int lengthOfPostTrainData = self->trainingData->length_train_data();
-	unsigned int sizeOfTDPostMerge = lengthOfPostTrainData * bytesPerTrainingEntry;
-	std::cout << "pre: " << sizeOfTDPreMerge << "\n"
-						<< "new: " << sizeOfTDNew << "\n"
-						<< "post: " << sizeOfTDPostMerge << "\n"
-						<< "change: " << sizeOfTDPostMerge - sizeOfTDPreMerge << "\n";
-		Nan::AdjustExternalMemory(sizeOfTDPostMerge - sizeOfTDPreMerge);
+	int sizeOfTDPostMerge = fanny::getTrainingDataByteCount(self);
+	Nan::AdjustExternalMemory(sizeOfTDPostMerge - sizeOfTDPreMerge);
 }
 
 NAN_METHOD(TrainingData::length) {
@@ -233,6 +225,7 @@ NAN_METHOD(TrainingData::setTrainData) {
 	}
 	TrainingData *self = Nan::ObjectWrap::Unwrap<TrainingData>(info.Holder());
 	self->trainingData->set_train_data(dataSetLength, numInputNodes, &inputVector[0], numOutputNodes, &outputVector[0]);
+	Nan::AdjustExternalMemory(fanny::getTrainingDataByteCount(self));
 }
 
 NAN_METHOD(TrainingData::getMinInput) {
@@ -334,7 +327,12 @@ NAN_METHOD(TrainingData::subsetTrainData) {
 	unsigned int length = info[1]->Uint32Value();
 
 	TrainingData *self = Nan::ObjectWrap::Unwrap<TrainingData>(info.Holder());
+	int sizeOfTDPre = fanny::getTrainingDataByteCount(self);
+
 	self->trainingData->subset_train_data(pos, length);
+
+	int sizeOfTDPost = fanny::getTrainingDataByteCount(self);
+	Nan::AdjustExternalMemory(sizeOfTDPost - sizeOfTDPre);
 }
 
 }
