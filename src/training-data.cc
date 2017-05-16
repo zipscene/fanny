@@ -95,6 +95,13 @@ TrainingData::~TrainingData() {
 	delete trainingData;
 }
 
+static int getTrainingDataByteCount(TrainingData *td) {
+	int sizeOfTrainDataEntry = td->trainingData->num_input_train_data() + td->trainingData->num_output_train_data();
+	int bytesPerTrainingEntry = sizeOfTrainDataEntry * sizeof (fann_type);
+	int lengthOfTrainData = td->trainingData->length_train_data();
+	return lengthOfTrainData * bytesPerTrainingEntry;
+}
+
 NAN_METHOD(TrainingData::New) {
 	FANN::training_data *trainingData;
 	if (info.Length() == 1 && Nan::New(TrainingData::constructorFunctionTpl)->HasInstance(info[0])) {
@@ -110,6 +117,7 @@ NAN_METHOD(TrainingData::New) {
 	}
 	TrainingData *obj = new TrainingData(trainingData);
 	obj->Wrap(info.This());
+	Nan::AdjustExternalMemory(fanny::getTrainingDataByteCount(obj));
 	info.GetReturnValue().Set(info.This());
 }
 
@@ -127,7 +135,13 @@ NAN_METHOD(TrainingData::merge) {
 	}
 	TrainingData *other = Nan::ObjectWrap::Unwrap<TrainingData>(info[0].As<v8::Object>());
 	TrainingData *self = Nan::ObjectWrap::Unwrap<TrainingData>(info.Holder());
+
+	int sizeOfTDPreMerge = fanny::getTrainingDataByteCount(self);
+
 	self->trainingData->merge_train_data(*other->trainingData);
+
+	int sizeOfTDPostMerge = fanny::getTrainingDataByteCount(self);
+	Nan::AdjustExternalMemory(sizeOfTDPostMerge - sizeOfTDPreMerge);
 }
 
 NAN_METHOD(TrainingData::length) {
@@ -211,6 +225,7 @@ NAN_METHOD(TrainingData::setTrainData) {
 	}
 	TrainingData *self = Nan::ObjectWrap::Unwrap<TrainingData>(info.Holder());
 	self->trainingData->set_train_data(dataSetLength, numInputNodes, &inputVector[0], numOutputNodes, &outputVector[0]);
+	Nan::AdjustExternalMemory(fanny::getTrainingDataByteCount(self));
 }
 
 NAN_METHOD(TrainingData::getMinInput) {
@@ -312,7 +327,12 @@ NAN_METHOD(TrainingData::subsetTrainData) {
 	unsigned int length = info[1]->Uint32Value();
 
 	TrainingData *self = Nan::ObjectWrap::Unwrap<TrainingData>(info.Holder());
+	int sizeOfTDPre = fanny::getTrainingDataByteCount(self);
+
 	self->trainingData->subset_train_data(pos, length);
+
+	int sizeOfTDPost = fanny::getTrainingDataByteCount(self);
+	Nan::AdjustExternalMemory(sizeOfTDPost - sizeOfTDPre);
 }
 
 }

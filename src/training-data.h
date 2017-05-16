@@ -28,6 +28,9 @@ private:
 	explicit TrainingData(FANN::training_data *training_data);
 	~TrainingData();
 
+	// Training Data size helper
+	static int getTrainingDataByteCount(TrainingData *td);
+
 	// Methods
 	static NAN_METHOD(shuffle);
 	static NAN_METHOD(merge);
