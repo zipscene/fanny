@@ -2,25 +2,28 @@
 #include <nan.h>
 #include <vector>
 
-namespace fanny {
+namespace fanny
+{
 
 std::vector<fann_type> v8ArrayToFannData(v8::Local<v8::Value> v8Array);
 
-v8::Local<v8::Value> fannDataToV8Array(fann_type * data, unsigned int size);
+v8::Local<v8::Value> fannDataToV8Array(fann_type *data, unsigned int size);
 
-v8::Local<v8::Value> fannDataSetToV8Array(fann_type ** data, unsigned int length, unsigned int size);
+v8::Local<v8::Value> fannDataSetToV8Array(fann_type **data, unsigned int length, unsigned int size);
 
 // Number converter
-inline fann_type v8NumberToFannType(v8::Local<v8::Value> number) {
-	fann_type fannNumber = 0;
-	if (number->IsNumber()) {
-		#ifdef FANNY_FIXED
-		fannNumber = number->Uint32Value();
-		#else
-		fannNumber = number->NumberValue();
-		#endif
-	}
-	return fannNumber;
+inline fann_type v8NumberToFannType(v8::Local<v8::Value> number)
+{
+    fann_type fannNumber = 0;
+    if (number->IsNumber())
+    {
+#ifdef FANNY_FIXED
+        fannNumber = number->Uint32Value(Nan::GetCurrentContext()).FromJust();
+#else
+        fannNumber = number->NumberValue(Nan::GetCurrentContext()).FromJust();
+#endif
+    }
+    return fannNumber;
 }
 
 // training_algorithm_enum converters
@@ -48,4 +51,4 @@ std::vector<FANN::connection> v8ArrayToConnection(v8::Local<v8::Value> v8Array);
 v8::Local<v8::Value> activationFunctionEnumToV8String(FANN::activation_function_enum value);
 
 bool v8StringToActivationFunctionEnum(v8::Local<v8::Value> value, FANN::activation_function_enum &ret);
-}
+} // namespace fanny
