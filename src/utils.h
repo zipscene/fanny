@@ -15,9 +15,9 @@ inline fann_type v8NumberToFannType(v8::Local<v8::Value> number) {
 	fann_type fannNumber = 0;
 	if (number->IsNumber()) {
 		#ifdef FANNY_FIXED
-		fannNumber = number->Uint32Value();
+		fannNumber = number->Uint32Value(Nan::GetCurrentContext()).FromJust();
 		#else
-		fannNumber = number->NumberValue();
+		fannNumber = number->NumberValue(Nan::GetCurrentContext()).FromJust();
 		#endif
 	}
 	return fannNumber;

@@ -13,9 +13,9 @@ std::vector<fann_type> v8ArrayToFannData(v8::Local<v8::Value> v8Array) {
 				v8::Local<v8::Value> value = maybeIdxValue.ToLocalChecked();
 				if (value->IsNumber()) {
 					#ifdef FANNY_FIXED
-					result.push_back(value->Int32Value());
+					result.push_back(value->Int32Value(Nan::GetCurrentContext()).FromJust());
 					#else
-					result.push_back(value->NumberValue());
+					result.push_back(value->NumberValue(Nan::GetCurrentContext()).FromJust());
 					#endif
 				}
 			}
@@ -66,7 +66,7 @@ v8::Local<v8::Value> trainingAlgorithmEnumToV8String(FANN::training_algorithm_en
 
 bool v8StringToTrainingAlgorithmEnum(v8::Local<v8::Value> value, FANN::training_algorithm_enum &ret) {
 	if (!value->IsString()) return false;
-	std::string str(*v8::String::Utf8Value(value));
+	std::string str(*Nan::Utf8String(value));
 	if (str.compare("TRAIN_INCREMENTAL") == 0) ret = FANN::TRAIN_INCREMENTAL;
 	else if (str.compare("TRAIN_BATCH") == 0) ret = FANN::TRAIN_BATCH;
 	else if (str.compare("TRAIN_RPROP") == 0) ret = FANN::TRAIN_RPROP;
@@ -94,7 +94,7 @@ v8::Local<v8::Value> errorFunctionEnumToV8String(FANN::error_function_enum value
 
 bool v8StringToErrorFunctionEnum(v8::Local<v8::Value> value, FANN::error_function_enum &ret) {
 	if (!value->IsString()) return false;
-	std::string str(*v8::String::Utf8Value(value));
+	std::string str(*Nan::Utf8String(value));
 	if (str.compare("ERRORFUNC_LINEAR") == 0) ret = FANN::ERRORFUNC_LINEAR;
 	else if (str.compare("ERRORFUNC_TANH") == 0) ret = FANN::ERRORFUNC_TANH;
 	else return false;
@@ -119,7 +119,7 @@ v8::Local<v8::Value> stopFunctionEnumToV8String(FANN::stop_function_enum value) 
 
 bool v8StringToStopFunctionEnum(v8::Local<v8::Value> value, FANN::stop_function_enum &ret) {
 	if (!value->IsString()) return false;
-	std::string str(*v8::String::Utf8Value(value));
+	std::string str(*Nan::Utf8String(value));
 	if (str.compare("STOPFUNC_MSE") == 0) ret = FANN::STOPFUNC_MSE;
 	else if (str.compare("STOPFUNC_BIT") == 0) ret = FANN::STOPFUNC_BIT;
 	else return false;
@@ -168,12 +168,12 @@ std::vector<FANN::connection> v8ArrayToConnection(v8::Local<v8::Value> v8Array) 
 					Nan::MaybeLocal<v8::Value> maybeToNeuron = Nan::Get(obj, Nan::New("toNeuron").ToLocalChecked());
 					if (!maybeToNeuron.IsEmpty()) {
 						++count;
-						connection.to_neuron = maybeToNeuron.ToLocalChecked()->Uint32Value();
+						connection.to_neuron = maybeToNeuron.ToLocalChecked()->Uint32Value(Nan::GetCurrentContext()).FromJust();
 					}
 					Nan::MaybeLocal<v8::Value> maybeFromNeuron = Nan::Get(obj, Nan::New("fromNeuron").ToLocalChecked());
 					if (!maybeFromNeuron.IsEmpty()) {
 						++count;
-						connection.from_neuron = maybeFromNeuron.ToLocalChecked()->Uint32Value();
+						connection.from_neuron = maybeFromNeuron.ToLocalChecked()->Uint32Value(Nan::GetCurrentContext()).FromJust();
 					}
 					Nan::MaybeLocal<v8::Value> maybeWeight = Nan::Get(obj, Nan::New("weight").ToLocalChecked());
 					if (!maybeWeight.IsEmpty()) {
@@ -224,7 +224,7 @@ v8::Local<v8::Value> activationFunctionEnumToV8String(FANN::activation_function_
 
 bool v8StringToActivationFunctionEnum(v8::Local<v8::Value> value, FANN::activation_function_enum &activation_function) {
 	if (!value->IsString()) return false;
-	std::string str(*v8::String::Utf8Value(value));
+	std::string str(*Nan::Utf8String(value));
 	FANN::activation_function_enum ret;
 	if (str.compare("LINEAR") == 0) ret = FANN::LINEAR;
 	else if (str.compare("THRESHOLD") == 0) ret = FANN::THRESHOLD;
