@@ -162,7 +162,7 @@ NAN_METHOD(TrainingData::getTrainInput) {
 		return Nan::ThrowError("Argument must be a number");
 	}
 	TrainingData *self = Nan::ObjectWrap::Unwrap<TrainingData>(info.Holder());
-	unsigned int pos = info[0]->Uint32Value();
+	unsigned int pos = info[0]->Uint32Value(Nan::GetCurrentContext()).FromJust();
 	fann_type *data = self->trainingData->get_train_input(pos);
 	info.GetReturnValue().Set(fannDataToV8Array(data, self->trainingData->num_input_train_data()));
 }
@@ -172,7 +172,7 @@ NAN_METHOD(TrainingData::getTrainOutput) {
 		return Nan::ThrowError("Argument must be a number");
 	}
 	TrainingData *self = Nan::ObjectWrap::Unwrap<TrainingData>(info.Holder());
-	unsigned int pos = info[0]->Uint32Value();
+	unsigned int pos = info[0]->Uint32Value(Nan::GetCurrentContext()).FromJust();
 	fann_type *data = self->trainingData->get_train_output(pos);
 	info.GetReturnValue().Set(fannDataToV8Array(data, self->trainingData->num_output_train_data()));
 }
@@ -251,22 +251,22 @@ NAN_METHOD(TrainingData::getMaxOutput) {
 
 NAN_METHOD(TrainingData::readTrainFromFile) {
 	if (info.Length() < 2 || !info[0]->IsString()) return Nan::ThrowError("Filename required");
-	std::string filename = std::string(*v8::String::Utf8Value(info[0]));
+	std::string filename = std::string(*Nan::Utf8String(info[0]));
 	Nan::Callback *callback = new Nan::Callback(info[1].As<v8::Function>());
 	AsyncQueueWorker(new TDIOWorker(callback, info.Holder(), filename, false, false, 0));
 }
 
 NAN_METHOD(TrainingData::saveTrain) {
 	if (info.Length() < 2 || !info[0]->IsString()) return Nan::ThrowError("Filename required");
-	std::string filename = std::string(*v8::String::Utf8Value(info[0]));
+	std::string filename = std::string(*Nan::Utf8String(info[0]));
 	Nan::Callback *callback = new Nan::Callback(info[1].As<v8::Function>());
 	AsyncQueueWorker(new TDIOWorker(callback, info.Holder(), filename, true, false, 0));
 }
 
 NAN_METHOD(TrainingData::saveTrainToFixed) {
 	if (info.Length() < 3 || !info[0]->IsString() || !info[1]->IsNumber()) return Nan::ThrowError("Filename and decimalPoint required");
-	std::string filename = std::string(*v8::String::Utf8Value(info[0]));
-	unsigned int decimalPoint = info[1]->Uint32Value();
+	std::string filename = std::string(*Nan::Utf8String(info[0]));
+	unsigned int decimalPoint = info[1]->Uint32Value(Nan::GetCurrentContext()).FromJust();
 	Nan::Callback *callback = new Nan::Callback(info[1].As<v8::Function>());
 	AsyncQueueWorker(new TDIOWorker(callback, info.Holder(), filename, true, true, decimalPoint));
 }
@@ -308,8 +308,8 @@ NAN_METHOD(TrainingData::subsetTrainData) {
 	if (info.Length() != 2) return Nan::ThrowError("Must have 2 arguments: pos, legth");
 	if (!info[0]->IsNumber() || !info[1]->IsNumber()) return Nan::ThrowError("Arguments must be numbers");
 
-	unsigned int pos = info[0]->Uint32Value();
-	unsigned int length = info[1]->Uint32Value();
+	unsigned int pos = info[0]->Uint32Value(Nan::GetCurrentContext()).FromJust();
+	unsigned int length = info[1]->Uint32Value(Nan::GetCurrentContext()).FromJust();
 
 	TrainingData *self = Nan::ObjectWrap::Unwrap<TrainingData>(info.Holder());
 	self->trainingData->subset_train_data(pos, length);

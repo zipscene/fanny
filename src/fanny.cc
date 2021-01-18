@@ -36,7 +36,7 @@ public:
 			Nan::Null(),
 			fannDataToV8Array(&outputs[0], outputs.size())
 		};
-		callback->Call(2, args);
+		callback->Call(2, args, async_resource);
 	}
 
 	std::vector<fann_type> inputs;
@@ -61,7 +61,7 @@ public:
 		if (fann->get_errno()) {
 			v8::Local<v8::Value> args[] = { Nan::Error(std::string(fann->get_errstr()).c_str()) };
 			delete fann;
-			callback->Call(1, args);
+			callback->Call(1, args, async_resource);
 		} else {
 			v8::Local<v8::Value> externFann = Nan::New<v8::External>(fann);
 			v8::Local<v8::Function> ctor = Nan::New(FANNY::constructorFunction);
@@ -70,7 +70,7 @@ public:
 				Nan::Null(),
 				Nan::NewInstance(ctor, 1, ctorArgs).ToLocalChecked()
 			};
-			callback->Call(2, cbargs);
+			callback->Call(2, cbargs, async_resource);
 		}
 	}
 
@@ -108,7 +108,7 @@ public:
 	void HandleOKCallback() {
 		Nan::HandleScope scope;
 		v8::Local<v8::Value> args[] = { Nan::Null(), Nan::New(decimalPoint) };
-		callback->Call(2, args);
+		callback->Call(2, args, async_resource);
 	}
 
 	FANNY *fanny;
@@ -190,11 +190,11 @@ public:
 		Nan::HandleScope scope;
 		if (fanny->cancelTrainingFlag) {
 			v8::Local<v8::Value> args[] = { Nan::Error("canceled"), Nan::New(retVal) };
-			callback->Call(2, args);
+			callback->Call(2, args, async_resource);
 			return;
 		}
 		v8::Local<v8::Value> args[] = { Nan::Null(), Nan::New(retVal) };
-		callback->Call(2, args);
+		callback->Call(2, args, async_resource);
 	}
 
 	void HandleProgressCallback(const char *_discard1, size_t _discard2) {
@@ -208,7 +208,7 @@ public:
 			Nan::Set(obj, Nan::New("neurons").ToLocalChecked(), Nan::New(fanny->currentTrainingProgress.neurons));
 			v8::Local<v8::Value> args[] = { obj };
 			Nan::MaybeLocal<v8::Value> ret = Nan::Call(trainingCallbackFn, GetFromPersistent("fannyHolder").As<v8::Object>(), 1, args);
-			if (!ret.IsEmpty() && ret.ToLocalChecked()->IsNumber() && ret.ToLocalChecked()->Int32Value() < 0) {
+			if (!ret.IsEmpty() && ret.ToLocalChecked()->IsNumber() && ret.ToLocalChecked()->Int32Value(Nan::GetCurrentContext()).FromJust() < 0) {
 				fanny->cancelTrainingFlag = true;
 			}
 		}
@@ -398,7 +398,7 @@ NAN_METHOD(FANNY::randomizeWeights) {
 
 NAN_METHOD(FANNY::loadFile) {
 	if (info.Length() != 2) return Nan::ThrowError("Requires filename and callback");
-	std::string filename = *v8::String::Utf8Value(info[0]);
+	std::string filename = *Nan::Utf8String(info[0]->ToString(Nan::GetCurrentContext()).FromMaybe(v8::Local<v8::String>()));
 	Nan::Callback * callback = new Nan::Callback(info[1].As<v8::Function>());
 	Nan::AsyncQueueWorker(new LoadFileWorker(callback, filename));
 }
@@ -417,7 +417,7 @@ NAN_METHOD(FANNY::New) {
 		fann = new FANN::neural_net(*other->fann);
 	} else if (info[0]->IsString()) {
 		// Load-from-file constructor
-		fann = new FANN::neural_net(std::string(*v8::String::Utf8Value(info[0])));
+		fann = new FANN::neural_net(std::string(*Nan::Utf8String(info[0]->ToString(Nan::GetCurrentContext()).FromMaybe(v8::Local<v8::String>()))));
 	} else if (info[0]->IsExternal()) {
 		// Internal from-instance constructor
 		fann = (FANN::neural_net *)info[0].As<v8::External>()->Value();
@@ -437,7 +437,7 @@ NAN_METHOD(FANNY::New) {
 		if (!maybeType.IsEmpty()) {
 			v8::Local<v8::Value> localType = maybeType.ToLocalChecked();
 			if (localType->IsString()) {
-				optType = std::string(*(v8::String::Utf8Value(localType)));
+				optType = std::string(*(Nan::Utf8String(localType->ToString(Nan::GetCurrentContext()).FromMaybe(v8::Local<v8::String>()))));
 			}
 		}
 
@@ -453,7 +453,7 @@ NAN_METHOD(FANNY::New) {
 					if (!maybeIdxValue.IsEmpty()) {
 						v8::Local<v8::Value> localIdxValue = maybeIdxValue.ToLocalChecked();
 						if (localIdxValue->IsNumber()) {
-							unsigned int idxValue = localIdxValue->Uint32Value();
+							unsigned int idxValue = localIdxValue->Uint32Value(Nan::GetCurrentContext()).FromJust();
 							optLayers.push_back(idxValue);
 						}
 					}
@@ -469,7 +469,7 @@ NAN_METHOD(FANNY::New) {
 		if (!maybeConnectionRate.IsEmpty()) {
 			v8::Local<v8::Value> localConnectionRate = maybeConnectionRate.ToLocalChecked();
 			if (localConnectionRate->IsNumber()) {
-				optConnectionRate = localConnectionRate->NumberValue();
+				optConnectionRate = localConnectionRate->NumberValue(Nan::GetCurrentContext()).FromJust();
 			}
 		}
 
@@ -509,7 +509,7 @@ bool FANNY::checkError() {
 NAN_METHOD(FANNY::save) {
 	if (info.Length() != 2) return Nan::ThrowError("Takes a filename and a callback");
 	if (!info[0]->IsString() || !info[1]->IsFunction()) return Nan::ThrowTypeError("Wrong argument type");
-	std::string filename(*v8::String::Utf8Value(info[0]));
+	std::string filename(*Nan::Utf8String(info[0]->ToString(Nan::GetCurrentContext()).FromMaybe(v8::Local<v8::String>())));
 	Nan::Callback *callback = new Nan::Callback(info[1].As<v8::Function>());
 	Nan::AsyncQueueWorker(new SaveFileWorker(callback, info.Holder(), filename, false));
 }
@@ -517,7 +517,7 @@ NAN_METHOD(FANNY::save) {
 NAN_METHOD(FANNY::saveToFixed) {
 	if (info.Length() != 2) return Nan::ThrowError("Takes a filename and a callback");
 	if (!info[0]->IsString() || !info[1]->IsFunction()) return Nan::ThrowTypeError("Wrong argument type");
-	std::string filename(*v8::String::Utf8Value(info[0]));
+	std::string filename(*Nan::Utf8String(info[0]->ToString(Nan::GetCurrentContext()).FromMaybe(v8::Local<v8::String>())));
 	Nan::Callback *callback = new Nan::Callback(info[1].As<v8::Function>());
 	Nan::AsyncQueueWorker(new SaveFileWorker(callback, info.Holder(), filename, true));
 }
@@ -576,7 +576,7 @@ void FANNY::_doTrainOrTest(
 	Nan::MaybeLocal<v8::Object> maybeTrainingData;
 	if (fromFile) {
 		if (!info[0]->IsString()) return Nan::ThrowTypeError("First argument must be a string");
-		filename = std::string(*v8::String::Utf8Value(info[0]));
+		filename = std::string(*Nan::Utf8String(info[0]->ToString(Nan::GetCurrentContext()).FromMaybe(v8::Local<v8::String>())));
 	} else {
 		if (!info[0]->IsObject()) return Nan::ThrowTypeError("First argument must be TrainingData");
 		if (!Nan::New(TrainingData::constructorFunctionTpl)->HasInstance(info[0])) return Nan::ThrowTypeError("First argument must be TrainingData");
@@ -590,9 +590,9 @@ void FANNY::_doTrainOrTest(
 		if (!info[1]->IsNumber() || !info[2]->IsNumber() || !info[3]->IsNumber()) {
 			return Nan::ThrowTypeError("Arguments must be numbers");
 		}
-		maxIterations = info[1]->Uint32Value();
-		iterationsBetweenReports = info[2]->Uint32Value();
-		desiredError = (float)info[3]->NumberValue();
+		maxIterations = info[1]->Uint32Value(Nan::GetCurrentContext()).FromJust();
+		iterationsBetweenReports = info[2]->Uint32Value(Nan::GetCurrentContext()).FromJust();
+		desiredError = (float)info[3]->NumberValue(Nan::GetCurrentContext()).FromJust();
 	}
 	if (!info[numArgs - 1]->IsFunction()) return Nan::ThrowTypeError("Last argument must be callback");
 	Nan::Callback *callback = new Nan::Callback(info[numArgs - 1].As<v8::Function>());
@@ -794,7 +794,7 @@ NAN_METHOD(FANNY::setLearningRate) {
 	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: learning_rate");
 	if (!info[0]->IsNumber()) return Nan::ThrowError("learning_rate not a number");
 
-	float value = info[0]->NumberValue();
+	float value = info[0]->NumberValue(Nan::GetCurrentContext()).FromJust();
 
 	fanny->fann->set_learning_rate(value);
 }
@@ -804,8 +804,8 @@ NAN_METHOD(FANNY::getActivationFunction) {
 	if (!info[0]->IsNumber()) return Nan::ThrowError("layer must be a number");
 	if (!info[1]->IsNumber()) return Nan::ThrowError("neuron must be a number");
 
-	unsigned int layer = info[0]->Uint32Value();
-	unsigned int neuron = info[1]->Uint32Value();
+	unsigned int layer = info[0]->Uint32Value(Nan::GetCurrentContext()).FromJust();
+	unsigned int neuron = info[1]->Uint32Value(Nan::GetCurrentContext()).FromJust();
 	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
 	FANN::activation_function_enum activationFunction = fanny->fann->get_activation_function(layer, neuron);
 	info.GetReturnValue().Set(activationFunctionEnumToV8String(activationFunction));
@@ -817,8 +817,8 @@ NAN_METHOD(FANNY::setActivationFunction) {
 	if (!info[1]->IsNumber()) return Nan::ThrowError("layer must be a number");
 	if (!info[2]->IsNumber()) return Nan::ThrowError("neuron must be a number");
 
-	unsigned int layer = info[1]->Uint32Value();
-	unsigned int neuron = info[2]->Uint32Value();
+	unsigned int layer = info[1]->Uint32Value(Nan::GetCurrentContext()).FromJust();
+	unsigned int neuron = info[2]->Uint32Value(Nan::GetCurrentContext()).FromJust();
 
 	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
 	FANN::activation_function_enum activationFunction;
@@ -830,7 +830,7 @@ NAN_METHOD(FANNY::setActivationFunctionLayer) {
 	if (!info[0]->IsString()) return Nan::ThrowError("activation_function must be a string");
 	if (!info[1]->IsNumber()) return Nan::ThrowError("layer must be a number");
 
-	unsigned int layer = info[1]->Uint32Value();
+	unsigned int layer = info[1]->Uint32Value(Nan::GetCurrentContext()).FromJust();
 
 	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
 	FANN::activation_function_enum activationFunction;
@@ -867,7 +867,7 @@ NAN_METHOD(FANNY::setQuickpropDecay) {
 	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: quickprop_decay");
 	if (!info[0]->IsNumber()) return Nan::ThrowError("quickprop_decay not a number");
 
-	float value = info[0]->NumberValue();
+	float value = info[0]->NumberValue(Nan::GetCurrentContext()).FromJust();
 
 	fanny->fann->set_quickprop_decay(value);
 }
@@ -884,7 +884,7 @@ NAN_METHOD(FANNY::setQuickpropMu) {
 	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: quickprop_mu");
 	if (!info[0]->IsNumber()) return Nan::ThrowError("quickprop_mu not a number");
 
-	float value = info[0]->NumberValue();
+	float value = info[0]->NumberValue(Nan::GetCurrentContext()).FromJust();
 
 	fanny->fann->set_quickprop_mu(value);
 }
@@ -901,7 +901,7 @@ NAN_METHOD(FANNY::setRpropIncreaseFactor) {
 	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: rprop_increase_factor");
 	if (!info[0]->IsNumber()) return Nan::ThrowError("rprop_increase_factor not a number");
 
-	float value = info[0]->NumberValue();
+	float value = info[0]->NumberValue(Nan::GetCurrentContext()).FromJust();
 
 	fanny->fann->set_rprop_increase_factor(value);
 }
@@ -918,7 +918,7 @@ NAN_METHOD(FANNY::setRpropDecreaseFactor) {
 	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: rprop_decrease_factor");
 	if (!info[0]->IsNumber()) return Nan::ThrowError("rprop_decrease_factor not a number");
 
-	float value = info[0]->NumberValue();
+	float value = info[0]->NumberValue(Nan::GetCurrentContext()).FromJust();
 
 	fanny->fann->set_rprop_decrease_factor(value);
 }
@@ -935,7 +935,7 @@ NAN_METHOD(FANNY::setRpropDeltaZero) {
 	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: rprop_delta_zero");
 	if (!info[0]->IsNumber()) return Nan::ThrowError("rprop_delta_zero not a number");
 
-	float value = info[0]->NumberValue();
+	float value = info[0]->NumberValue(Nan::GetCurrentContext()).FromJust();
 
 	fanny->fann->set_rprop_delta_zero(value);
 }
@@ -952,7 +952,7 @@ NAN_METHOD(FANNY::setRpropDeltaMin) {
 	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: rprop_delta_min");
 	if (!info[0]->IsNumber()) return Nan::ThrowError("rprop_delta_min not a number");
 
-	float value = info[0]->NumberValue();
+	float value = info[0]->NumberValue(Nan::GetCurrentContext()).FromJust();
 
 	fanny->fann->set_rprop_delta_min(value);
 }
@@ -969,7 +969,7 @@ NAN_METHOD(FANNY::setRpropDeltaMax) {
 	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: rprop_delta_max");
 	if (!info[0]->IsNumber()) return Nan::ThrowError("rprop_delta_max not a number");
 
-	float value = info[0]->NumberValue();
+	float value = info[0]->NumberValue(Nan::GetCurrentContext()).FromJust();
 
 	fanny->fann->set_rprop_delta_max(value);
 }
@@ -986,7 +986,7 @@ NAN_METHOD(FANNY::setSarpropWeightDecayShift) {
 	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: sarprop_weight_decay_shift");
 	if (!info[0]->IsNumber()) return Nan::ThrowError("sarprop_weight_decay_shift not a number");
 
-	float value = info[0]->NumberValue();
+	float value = info[0]->NumberValue(Nan::GetCurrentContext()).FromJust();
 
 	fanny->fann->set_sarprop_weight_decay_shift(value);
 }
@@ -1003,7 +1003,7 @@ NAN_METHOD(FANNY::setSarpropStepErrorThresholdFactor) {
 	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: sarprop_step_error_threshold_factor");
 	if (!info[0]->IsNumber()) return Nan::ThrowError("sarprop_step_error_threshold_factor not a number");
 
-	float value = info[0]->NumberValue();
+	float value = info[0]->NumberValue(Nan::GetCurrentContext()).FromJust();
 
 	fanny->fann->set_sarprop_step_error_threshold_factor(value);
 }
@@ -1020,7 +1020,7 @@ NAN_METHOD(FANNY::setSarpropStepErrorShift) {
 	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: sarprop_step_error_shift");
 	if (!info[0]->IsNumber()) return Nan::ThrowError("sarprop_step_error_shift not a number");
 
-	float value = info[0]->NumberValue();
+	float value = info[0]->NumberValue(Nan::GetCurrentContext()).FromJust();
 
 	fanny->fann->set_sarprop_step_error_shift(value);
 }
@@ -1037,7 +1037,7 @@ NAN_METHOD(FANNY::setSarpropTemperature) {
 	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: sarprop_temperature");
 	if (!info[0]->IsNumber()) return Nan::ThrowError("sarprop_temperature not a number");
 
-	float value = info[0]->NumberValue();
+	float value = info[0]->NumberValue(Nan::GetCurrentContext()).FromJust();
 
 	fanny->fann->set_sarprop_temperature(value);
 }
@@ -1054,7 +1054,7 @@ NAN_METHOD(FANNY::setLearningMomentum) {
 	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: learning_momentum");
 	if (!info[0]->IsNumber()) return Nan::ThrowError("learning_momentum not a number");
 
-	float value = info[0]->NumberValue();
+	float value = info[0]->NumberValue(Nan::GetCurrentContext()).FromJust();
 
 	fanny->fann->set_learning_momentum(value);
 }
@@ -1187,8 +1187,8 @@ NAN_METHOD(FANNY::setInputScalingParams) {
 
 	TrainingData *fannyTrainingData = Nan::ObjectWrap::Unwrap<TrainingData>(info[0].As<v8::Object>());
 
-	float new_input_min = info[1]->NumberValue();
-	float new_input_max = info[2]->NumberValue();
+	float new_input_min = info[1]->NumberValue(Nan::GetCurrentContext()).FromJust();
+	float new_input_max = info[2]->NumberValue(Nan::GetCurrentContext()).FromJust();
 
 
 	fanny->fann->set_input_scaling_params(*fannyTrainingData->trainingData, new_input_min, new_input_max);
@@ -1212,8 +1212,8 @@ NAN_METHOD(FANNY::setOutputScalingParams) {
 
 	TrainingData *fannyTrainingData = Nan::ObjectWrap::Unwrap<TrainingData>(info[0].As<v8::Object>());
 
-	float new_output_min = info[1]->NumberValue();
-	float new_output_max = info[2]->NumberValue();
+	float new_output_min = info[1]->NumberValue(Nan::GetCurrentContext()).FromJust();
+	float new_output_max = info[2]->NumberValue(Nan::GetCurrentContext()).FromJust();
 
 	fanny->fann->set_output_scaling_params(*fannyTrainingData->trainingData, new_output_min, new_output_max);
 
@@ -1236,10 +1236,10 @@ NAN_METHOD(FANNY::setScalingParams) {
 
 	TrainingData *fannyTrainingData = Nan::ObjectWrap::Unwrap<TrainingData>(info[0].As<v8::Object>());
 
-	float new_input_min = info[1]->NumberValue();
-	float new_input_max = info[2]->NumberValue();
-	float new_output_min = info[3]->NumberValue();
-	float new_output_max = info[4]->NumberValue();
+	float new_input_min = info[1]->NumberValue(Nan::GetCurrentContext()).FromJust();
+	float new_input_max = info[2]->NumberValue(Nan::GetCurrentContext()).FromJust();
+	float new_output_min = info[3]->NumberValue(Nan::GetCurrentContext()).FromJust();
+	float new_output_max = info[4]->NumberValue(Nan::GetCurrentContext()).FromJust();
 
 	fanny->fann->set_scaling_params(*fannyTrainingData->trainingData, new_input_min, new_input_max, new_output_min, new_output_max);
 	#else
@@ -1369,7 +1369,7 @@ NAN_METHOD(FANNY::setCascadeActivationFunctions) {
 	if (!info[0]->IsArray()) return Nan::ThrowError("1st argument must be an array");
 	if (!info[1]->IsNumber()) return Nan::ThrowError("2nd argument must be a number");
 	v8::Local<v8::Array> inputs = info[0].As<v8::Array>();
-	unsigned int size = info[1]->Uint32Value();
+	unsigned int size = info[1]->Uint32Value(Nan::GetCurrentContext()).FromJust();
 	if (inputs->Length() != size) return Nan::ThrowError("The length of the array must be the second argument");
 	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
 	std::vector<FANN::activation_function_enum> activationFunctions;
@@ -1379,7 +1379,7 @@ NAN_METHOD(FANNY::setCascadeActivationFunctions) {
 			v8::Local<v8::Value> value = maybeIdxValue.ToLocalChecked();
 			if (value->IsString()) {
 				FANN::activation_function_enum ret;
-				std::string str = std::string(*(v8::String::Utf8Value(value)));
+				std::string str = std::string(*(Nan::Utf8String(value->ToString(Nan::GetCurrentContext()).FromMaybe(v8::Local<v8::String>()))));
 				if (str.compare("LINEAR") == 0) ret = FANN::LINEAR;
 				else if (str.compare("THRESHOLD") == 0) ret = FANN::THRESHOLD;
 				else if (str.compare("THRESHOLD_SYMMETRIC") == 0) ret = FANN::THRESHOLD_SYMMETRIC;
@@ -1436,7 +1436,7 @@ NAN_METHOD(FANNY::setCascadeActivationSteepnesses) {
 	if (!info[1]->IsNumber()) return Nan::ThrowError("cascade_activation_steepnesses_count not a number");
 
 	std::vector<fann_type> cascadeActivationSteepnesses = v8ArrayToFannData(info[0]);
-	unsigned int cascadeActivationSteepnessesCount = info[1]->Uint32Value();
+	unsigned int cascadeActivationSteepnessesCount = info[1]->Uint32Value(Nan::GetCurrentContext()).FromJust();
 
 	if (cascadeActivationSteepnesses.size() != cascadeActivationSteepnessesCount) return Nan::ThrowError("Wrong number of steepnesses or count");
 
@@ -1466,7 +1466,7 @@ NAN_METHOD(FANNY::setCascadeOutputChangeFraction) {
 	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: cascade_output_change_fraction");
 	if (!info[0]->IsNumber()) return Nan::ThrowError("cascade_output_change_fraction not a number");
 
-	float value = info[0]->NumberValue();
+	float value = info[0]->NumberValue(Nan::GetCurrentContext()).FromJust();
 
 	fanny->fann->set_cascade_output_change_fraction(value);
 
@@ -1494,7 +1494,7 @@ NAN_METHOD(FANNY::setCascadeOutputStagnationEpochs) {
 	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: cascade_output_stagnation_epochs");
 	if (!info[0]->IsNumber()) return Nan::ThrowError("cascade_output_stagnation_epochs not a number");
 
-	unsigned int value = info[0]->Uint32Value();
+	unsigned int value = info[0]->Uint32Value(Nan::GetCurrentContext()).FromJust();
 
 	fanny->fann->set_cascade_output_stagnation_epochs(value);
 
@@ -1522,7 +1522,7 @@ NAN_METHOD(FANNY::setCascadeCandidateChangeFraction) {
 	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: cascade_candidate_change_fraction");
 	if (!info[0]->IsNumber()) return Nan::ThrowError("cascade_candidate_change_fraction not a number");
 
-	float value = info[0]->NumberValue();
+	float value = info[0]->NumberValue(Nan::GetCurrentContext()).FromJust();
 
 	fanny->fann->set_cascade_candidate_change_fraction(value);
 
@@ -1550,7 +1550,7 @@ NAN_METHOD(FANNY::setCascadeCandidateStagnationEpochs) {
 	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: cascade_candidate_stagnation_epochs");
 	if (!info[0]->IsNumber()) return Nan::ThrowError("cascade_candidate_stagnation_epochs not a number");
 
-	unsigned int value = info[0]->Uint32Value();
+	unsigned int value = info[0]->Uint32Value(Nan::GetCurrentContext()).FromJust();
 
 	fanny->fann->set_cascade_candidate_stagnation_epochs(value);
 
@@ -1626,7 +1626,7 @@ NAN_METHOD(FANNY::setCascadeMaxOutEpochs) {
 	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: cascade_max_out_epochs");
 	if (!info[0]->IsNumber()) return Nan::ThrowError("cascade_max_out_epochs not a number");
 
-	unsigned int value = info[0]->Uint32Value();
+	unsigned int value = info[0]->Uint32Value(Nan::GetCurrentContext()).FromJust();
 
 	fanny->fann->set_cascade_max_out_epochs(value);
 
@@ -1654,7 +1654,7 @@ NAN_METHOD(FANNY::setCascadeMaxCandEpochs) {
 	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: cascade_max_cand_epochs");
 	if (!info[0]->IsNumber()) return Nan::ThrowError("cascade_max_cand_epochs not a number");
 
-	unsigned int value = info[0]->Uint32Value();
+	unsigned int value = info[0]->Uint32Value(Nan::GetCurrentContext()).FromJust();
 
 	fanny->fann->set_cascade_max_cand_epochs(value);
 
@@ -1682,7 +1682,7 @@ NAN_METHOD(FANNY::setCascadeNumCandidateGroups) {
 	if (info.Length() != 1) return Nan::ThrowError("Must have an arguments: cascade_num_candidate_groups");
 	if (!info[0]->IsNumber()) return Nan::ThrowError("cascade_num_candidate_groups not a number");
 
-	float value = info[0]->NumberValue();
+	float value = info[0]->NumberValue(Nan::GetCurrentContext()).FromJust();
 
 	fanny->fann->set_cascade_num_candidate_groups(value);
 
@@ -1695,8 +1695,8 @@ NAN_METHOD(FANNY::getActivationSteepness) {
 	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
 	if (info.Length() != 2) return Nan::ThrowError("Must have an arguments: layer and neuron");
 	if (!info[0]->IsNumber() || !info[1]->IsNumber()) return Nan::ThrowError("layer and neuron should be numbers");
-	unsigned int layer = info[0]->Uint32Value();
-	unsigned int neuron = info[1]->Uint32Value();
+	unsigned int layer = info[0]->Uint32Value(Nan::GetCurrentContext()).FromJust();
+	unsigned int neuron = info[1]->Uint32Value(Nan::GetCurrentContext()).FromJust();
 	fann_type activationSteepness = fanny->fann->get_activation_steepness(layer, neuron);
 	info.GetReturnValue().Set(activationSteepness);
 }
@@ -1709,8 +1709,8 @@ NAN_METHOD(FANNY::setActivationSteepness) {
 	}
 
 	fann_type steepness = v8NumberToFannType(info[0]);
-	unsigned int layer = info[1]->Uint32Value();
-	unsigned int neuron = info[2]->Uint32Value();
+	unsigned int layer = info[1]->Uint32Value(Nan::GetCurrentContext()).FromJust();
+	unsigned int neuron = info[2]->Uint32Value(Nan::GetCurrentContext()).FromJust();
 	fanny->fann->set_activation_steepness(steepness, layer, neuron);
 }
 
@@ -1722,7 +1722,7 @@ NAN_METHOD(FANNY::setActivationSteepnessLayer) {
 	}
 
 	fann_type steepness = v8NumberToFannType(info[0]);
-	unsigned int layer = info[1]->Uint32Value();
+	unsigned int layer = info[1]->Uint32Value(Nan::GetCurrentContext()).FromJust();
 	fanny->fann->set_activation_steepness_layer(steepness, layer);
 }
 
@@ -1753,7 +1753,7 @@ NAN_METHOD(FANNY::setWeightArray) {
 	if (!info[1]->IsNumber()) return Nan::ThrowError("size must be a number");
 
 	std::vector<FANN::connection> connections = v8ArrayToConnection(info[0]);
-	unsigned int num = info[1]->Uint32Value();
+	unsigned int num = info[1]->Uint32Value(Nan::GetCurrentContext()).FromJust();
 	fanny->fann->set_weight_array(&connections[0], num);
 }
 
@@ -1763,8 +1763,8 @@ NAN_METHOD(FANNY::setWeight) {
 	if (!info[0]->IsNumber() || !info[1]->IsNumber() || !info[2]->IsNumber()) {
 		return Nan::ThrowError("All arguments must be numbers");
 	}
-	unsigned int fromNeuron = info[0]->Uint32Value();
-	unsigned int toNeuron = info[1]->Uint32Value();
+	unsigned int fromNeuron = info[0]->Uint32Value(Nan::GetCurrentContext()).FromJust();
+	unsigned int toNeuron = info[1]->Uint32Value(Nan::GetCurrentContext()).FromJust();
 	fann_type weight = v8NumberToFannType(info[2]);
 	fanny->fann->set_weight(fromNeuron, toNeuron, weight);
 }
@@ -1782,7 +1782,7 @@ NAN_METHOD(FANNY::getUserDataString) {
 NAN_METHOD(FANNY::setUserDataString) {
 	FANNY *fanny = Nan::ObjectWrap::Unwrap<FANNY>(info.Holder());
 	if (info.Length() != 1 || !info[0]->IsString()) return Nan::ThrowError("Argument must be string");
-	v8::String::Utf8Value utf8String(info[0]);
+	Nan::Utf8String utf8String(info[0]->ToString(Nan::GetCurrentContext()).FromMaybe(v8::Local<v8::String>()));
 	fanny->fann->set_user_data_string(*utf8String);
 }
 
